@@ -19,7 +19,7 @@ class Car extends Model implements HasMedia
         'mileage',
         'plate_number',
         'description',
-        'inspection_report',
+        'specs',
     ];
 
     public function brand()
@@ -41,7 +41,6 @@ class Car extends Model implements HasMedia
     {
         $this->addMediaCollection('cars')
              ->useDisk('public')
-             ->singleFile(false); // ✅ يسمح بعدة صور
+             ->singleFile(false);
     }
 }
-        

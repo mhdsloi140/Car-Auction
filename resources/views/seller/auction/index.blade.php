@@ -81,7 +81,7 @@
 @section('content')
 <div class="container mt-5">
     <div class="container mt-5">
-        <h3 class="mb-4">إدارة المزادات</h3>
+       
 
         {{--
         <!-- استدعاء الـ Component بالكامل --> --}}

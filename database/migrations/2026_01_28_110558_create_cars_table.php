@@ -31,7 +31,7 @@ return new class extends Migration {
             $table->integer('mileage');
             $table->string('plate_number')->nullable();
             $table->text('description');
-            $table->text('inspection_report');
+            $table->text('specs');
 
             $table->timestamps();
         });

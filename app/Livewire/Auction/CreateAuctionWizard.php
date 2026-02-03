@@ -16,7 +16,7 @@ class CreateAuctionWizard extends Component
     public int $step = 1;
     public bool $showModal = false;
 
-    // Car data
+    // بيانات السيارة
     public ?int $brand_id = null;
     public ?int $model_id = null;
     public ?int $year = null;
@@ -24,23 +24,23 @@ class CreateAuctionWizard extends Component
     public int $mileage = 0;
     public ?string $plate_number = null;
     public string $description = '';
-    public string $inspection_report = '';
-    public array $photos = []; // ✅ مصفوفة
+    public ?string $specs = null;
+    public array $photos = [];
 
-    // Auction data
+    // أسعار المزاد
     public ?float $starting_price = null;
     public ?float $buy_now_price = null;
 
-    // Lists
+    // قوائم الاختيارات
     public $brands = [];
     public $models = [];
-    public $years = [];
+    public array $years = [];
+
+    public string $modelSearch = '';
 
     protected $listeners = [
         'showCreateAuctionWizard' => 'openModal',
     ];
-
-    public string $modelSearch = '';
 
     public function mount()
     {
@@ -48,9 +48,6 @@ class CreateAuctionWizard extends Component
         $this->years = range(now()->year, 1980);
     }
 
-    // =========================
-    // Livewire Hooks
-    // =========================
     public function updatedBrandId($value)
     {
         $this->model_id = null;
@@ -74,9 +71,6 @@ class CreateAuctionWizard extends Component
             ->get();
     }
 
-    // =========================
-    // Modal Controls
-    // =========================
     public function openModal()
     {
         $this->resetExcept(['brands', 'years']);
@@ -91,9 +85,6 @@ class CreateAuctionWizard extends Component
         $this->showModal = false;
     }
 
-    // =========================
-    // Wizard Steps
-    // =========================
     public function nextStep()
     {
         $this->validateStep();
@@ -107,69 +98,70 @@ class CreateAuctionWizard extends Component
 
     protected function validateStep()
     {
+        //   $messages = __('custom_ar.validation');
+         $messages = require resource_path('lang/custom_ar/validation.php');
         if ($this->step === 1) {
             $this->validate([
-                'brand_id' => 'required|exists:brands,id',
-                'model_id' => 'required|exists:car_models,id',
-                'year' => 'required|integer|min:1980|max:' . now()->year,
-                'city' => 'required|string|max:255',
-                'mileage' => 'required|integer|min:0',
+                'brand_id'    => 'required|exists:brands,id',
+                'model_id'    => 'required|exists:car_models,id',
+                'year'        => 'required|integer|between:1980,' . now()->year,
+                'city'        => 'required|string|max:255',
+                'mileage'     => 'required|integer|min:0',
                 'description' => 'required|string|max:2000',
-                'inspection_report' => 'required|string|max:2000',
-            ]);
+                'specs'       => 'required|in:gcc,non_gcc,unknown',
+            ],$messages);
         }
 
         if ($this->step === 2) {
             $this->validate([
                 'plate_number' => 'nullable|string|max:50',
-                'photos.*' => 'image|max:5120', // 5MB لكل صورة
+                'photos.*'     => 'image|max:5120',
             ]);
         }
 
         if ($this->step === 3) {
             $this->validate([
                 'starting_price' => 'required|numeric|min:1',
-                'buy_now_price' => 'nullable|numeric|gt:starting_price',
+                'buy_now_price'  => 'nullable|numeric|gt:starting_price',
             ]);
         }
     }
 
-    // =========================
-    // Save Auction & Car
-    // =========================
     public function save()
     {
         $this->validateStep();
 
         DB::beginTransaction();
+
         try {
+
             $car = Car::create([
-                'brand_id' => $this->brand_id,
-                'model_id' => $this->model_id,
-                'year' => $this->year,
-                'city' => $this->city,
-                'mileage' => $this->mileage,
+                'brand_id'     => $this->brand_id,
+                'model_id'     => $this->model_id,
+                'year'         => $this->year,
+                'city'         => $this->city,
+                'mileage'      => $this->mileage,
                 'plate_number' => $this->plate_number,
-                'description' => $this->description,
-                'inspection_report' => $this->inspection_report,
+                'description'  => $this->description,
+                'specs'        => $this->specs,
             ]);
 
-            // ✅ رفع عدة صور
+
             if ($this->photos) {
                 foreach ($this->photos as $photo) {
-                    $car->addMedia($photo->getRealPath())
+                    $car->addMedia($photo)
                         ->usingFileName($photo->getClientOriginalName())
                         ->toMediaCollection('cars');
                 }
-
-                $this->photos = []; // ✅ إعادة تعيين بعد الحفظ
+                $this->photos = [];
             }
 
+
             $car->auction()->create([
-                'seller_id' => auth()->id(),
+                'seller_id'      => auth()->id(),
                 'starting_price' => $this->starting_price,
-                'buy_now_price' => $this->buy_now_price,
-                'status' => 'pending',
+                'buy_now_price'  => $this->buy_now_price,
+                'status'         => 'pending',
             ]);
 
             DB::commit();
