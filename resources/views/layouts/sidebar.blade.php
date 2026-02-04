@@ -1,19 +1,19 @@
 <!-- Sidebar -->
 <div class="sidebar" dir="rtl" data-background-color="dark">
 
-    <!-- Logo + Toggle -->
+    
   <div class="sidebar-logo">
     <div class="logo-header d-flex justify-content-between align-items-center" data-background-color="dark">
 
-        <!-- أزرار القائمة (RTL) -->
+
         <div class="nav-toggle d-flex align-items-center">
 
-            <!-- زر إغلاق/فتح القائمة -->
+
             <button class="btn btn-toggle toggle-sidebar">
                 <i class="gg-menu-right"></i>
             </button>
 
-            <!-- زر تصغير/تكبير القائمة -->
+
             <button class="btn btn-toggle sidenav-toggler">
                 <i class="gg-menu-left"></i>
             </button>
