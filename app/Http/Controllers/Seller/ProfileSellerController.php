@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
 use Illuminate\Http\Request;
 
-class BrandController extends Controller
+class ProfileSellerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $brands = Brand::with('media')->get();
-        dd($brands);
-        return view('admin.brand.index',compact('brands'));
+        //
     }
 
     /**
@@ -47,10 +44,6 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
-
-        $brands=Brand::find($id);
-        $brands->delete();
-        return redirect()->back()->with('success','تم حذف  العلامة التجارية بنجاح ');
-
+        //
     }
 }

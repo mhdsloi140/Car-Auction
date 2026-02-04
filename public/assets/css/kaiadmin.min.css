@@ -140,3 +140,25 @@ danger-color : #f3545d
     margin-left: 0;
     transition: margin 0.3s ease;
 }
+/* جعل الصفحة بالكامل RTL */
+.page-rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+/* ضبط الفلاتر */
+.page-rtl .form-control,
+.page-rtl .form-select {
+    text-align: right;
+}
+
+/* ضبط الجدول */
+.page-rtl table th,
+.page-rtl table td {
+    text-align: right !important;
+}
+
+/* ضبط زر الإجراءات */
+.page-rtl .btn {
+    float: right;
+}

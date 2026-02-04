@@ -19,7 +19,7 @@ class Brand extends Model implements HasMedia
         $this->addMediaCollection('brands')->singleFile();
     }
 
-       public function carModels()
+       public function models()
     {
         return $this->hasMany(CarModel::class);
     }

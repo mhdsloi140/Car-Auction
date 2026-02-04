@@ -1,4 +1,5 @@
-<div wire:poll.5s>
+<div class="page-rtl">
+<div wire:poll.5s style="padding-top: 20px">
 
 
     @if (session()->has('success'))
@@ -21,7 +22,7 @@
                placeholder="بحث عن مزاد..."
                wire:model.debounce.500ms="search">
 
-        <select class="form-select" wire:model="statusFilter">
+        <select class="form-select" wire:model.lazy="statusFilter">
             <option value="">كل الحالات</option>
             <option value="pending">معلق</option>
             <option value="active">نشط</option>
@@ -114,4 +115,5 @@
         {{ $auctions->links('pagination::bootstrap-5') }}
     </div>
 
+</div>
 </div>

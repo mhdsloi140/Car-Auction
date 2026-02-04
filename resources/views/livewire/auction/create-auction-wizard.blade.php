@@ -1,6 +1,6 @@
 <div style="direction: rtl; text-align: right;" class="p-3">
 
-    {{-- زر فتح المودال --}}
+
     <button class="btn btn-lg btn-success shadow-sm d-flex align-items-center gap-2 px-4 rounded-pill transition-all"
         wire:click="openModal"
         style="font-weight: 600; border: none; background: linear-gradient(45deg, #198754, #20c997);">
@@ -8,7 +8,7 @@
         <span>إضافة سيارة ومزاد جديد</span>
     </button>
 
-    {{-- المودال --}}
+
     @if($showModal)
     <div class="modal fade show d-block p-4" style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);"
         wire:ignore.self>
@@ -16,7 +16,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 1.25rem; overflow: hidden;">
 
-                {{-- HEADER --}}
+               
                 <div class="modal-header border-0 bg-light px-4 py-3">
                     <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
                         <span class="badge bg-primary rounded-pill px-3 py-2">{{ $step }}/3</span>

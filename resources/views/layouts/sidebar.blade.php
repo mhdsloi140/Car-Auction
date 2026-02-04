@@ -1,32 +1,32 @@
 <!-- Sidebar -->
 <div class="sidebar" dir="rtl" data-background-color="dark">
 
-    
-  <div class="sidebar-logo">
-    <div class="logo-header d-flex justify-content-between align-items-center" data-background-color="dark">
+
+    <div class="sidebar-logo">
+        <div class="logo-header d-flex justify-content-between align-items-center" data-background-color="dark">
 
 
-        <div class="nav-toggle d-flex align-items-center">
+            <div class="nav-toggle d-flex align-items-center">
 
 
-            <button class="btn btn-toggle toggle-sidebar">
-                <i class="gg-menu-right"></i>
-            </button>
+                <button class="btn btn-toggle toggle-sidebar">
+                    <i class="gg-menu-right"></i>
+                </button>
 
 
-            <button class="btn btn-toggle sidenav-toggler">
-                <i class="gg-menu-left"></i>
+                <button class="btn btn-toggle sidenav-toggler">
+                    <i class="gg-menu-left"></i>
+                </button>
+
+            </div>
+
+            <!-- زر المزيد -->
+            <button class="topbar-toggler more">
+                <i class="gg-more-vertical-alt"></i>
             </button>
 
         </div>
-
-        <!-- زر المزيد -->
-        <button class="topbar-toggler more">
-            <i class="gg-more-vertical-alt"></i>
-        </button>
-
     </div>
-</div>
 
 
     <!-- Sidebar Content -->
@@ -43,15 +43,7 @@
                     </a>
                 </li>
 
-                <!-- Admin: Brands -->
-                @role('admin')
-                <li class="nav-item {{ request()->is('brand*') ? 'active' : '' }}">
-                    <a href="{{ route('brand.index') }}" class="nav-link d-flex align-items-center">
-                        <i class="fas fa-tags me-2"></i>
-                        <span>العلامات التجارية</span>
-                    </a>
-                </li>
-                @endrole
+            
 
                 <!-- Seller: Auctions -->
                 @role('seller')
@@ -72,6 +64,15 @@
                     </a>
                 </li>
                 @endrole
+                @role('admin')
+                <li class="nav-item {{ request()->is('admin/settings*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.settings.index') }}" class="nav-link d-flex align-items-center">
+                        <i class="fa fa-cog ms-2"></i>
+                        <span>الإعدادات</span>
+                    </a>
+                </li>
+                @endrole
+
 
             </ul>
 

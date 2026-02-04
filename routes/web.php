@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\Admin\AuctionAdminController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\SettingsAdminController;
 use App\Http\Controllers\Seller\AuctionController;
 use App\Http\Controllers\Seller\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -48,7 +49,14 @@ Route::prefix('admin')->group(function () {
         Route::patch('/auctions/{id}/reject', [AuctionadminController::class, 'reject'])
             ->middleware('permission:reject auction')
             ->name('auctions.reject');
-            Route::delete('auction/{id} ',[AuctionAdminController::class,'destroy'])->name('auction.admin.destroy');
+        Route::delete('auction/{id} ', [AuctionAdminController::class, 'destroy'])->name('auction.admin.destroy');
+        Route::get('settings', [SettingsAdminController::class, 'index'])->name('admin.settings.index');
+        Route::get('users', [SettingsAdminController::class, 'users'])->name('admin.users.index');
+        Route::get('brands', [SettingsAdminController::class, 'brands'])->name('admin.brands.index');
+        Route::get('models', [SettingsAdminController::class, 'models'])->name('admin.models.index');
+        Route::get('/settings/general', \App\Livewire\Admin\Settings\GeneralSettings::class)
+            ->name('admin.settings.general');
+
 
     });
 });

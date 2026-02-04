@@ -1,24 +1,24 @@
 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom" dir="rtl">
     <div class="container-fluid">
-
+<ul class="navbar-nav ms-auto align-items-center">
+    <li class="nav-item d-flex align-items-center">
+         <span class="fw-bold" style="font-size: 18px;"> {{ setting('site_name', 'اسم الموقع') }} </span> </li> </ul>
         <ul class="navbar-nav topbar-nav me-md-auto align-items-center">
 
-            {{-- البحث للجوال --}}
-            {{-- <li class="nav-item topbar-icon dropdown d-flex d-lg-none">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
-                    <i class="fa fa-search"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-search animated fadeIn">
-                    <form class="navbar-left navbar-form nav-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="بحث ...">
-                        </div>
-                    </form>
-                </ul>
-            </li> --}}
+            {{-- شعار الموقع --}}
+        <li class="nav-item d-flex align-items-center me-3">
+    @if(setting('site_logo'))
+        <img src="{{ setting('site_logo') }}"
+             alt="Logo"
+             style="height: 40px; width: auto; object-fit: contain;">
+    @endif
+</li>
+
+
+            {{-- اسم الموقع --}}
 
             {{-- المستخدم --}}
-            <li class="nav-item topbar-user dropdown">
+            {{-- <li class="nav-item topbar-user dropdown">
                 <a class="dropdown-toggle profile-pic d-flex align-items-center" data-bs-toggle="dropdown" href="#">
                     <span class="profile-username me-2 text-end">
                         <span class="op-7">مرحباً،</span>
@@ -28,7 +28,6 @@
 
                 <ul class="dropdown-menu dropdown-user animated fadeIn" style="text-align: right;">
                     <div class="dropdown-user-scroll scrollbar-outer">
-
 
                         <li><div class="dropdown-divider"></div></li>
 
@@ -43,7 +42,7 @@
 
                     </div>
                 </ul>
-            </li>
+            </li> --}}
 
         </ul>
 
