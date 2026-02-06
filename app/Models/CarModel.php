@@ -9,8 +9,8 @@ class CarModel extends Model
 {
     use HasFactory;
        protected $fillable = [
-        'brand_id', // الماركة التي ينتمي لها الموديل
-        'name',     // اسم الموديل
+        'brand_id',
+        'name',     
     ];
 
 

@@ -4,13 +4,13 @@
 
     <form wire:submit.prevent="save">
 
-        
+
         <div class="mb-3">
             <label class="form-label">اسم الموقع</label>
             <input type="text" class="form-control" wire:model="site_name">
         </div>
 
-        <
+       
         <div class="mb-3">
             <label class="form-label">الشعار</label>
             <input type="file" class="form-control" wire:model="site_logo">

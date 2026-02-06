@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SettingsAdminController;
 use App\Http\Controllers\Seller\AuctionController;
 use App\Http\Controllers\Seller\AuthController;
+use App\Http\Controllers\Users\AuthUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +22,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
 
 Route::prefix('seller')->group(function () {
     Route::get('/login', [AuthController::class, 'index'])->name('seller.login.form');
@@ -59,4 +61,7 @@ Route::prefix('admin')->group(function () {
 
 
     });
+});
+Route::prefix('users')->group(function(){
+  Route::post('logout',[AuthUserController::class,'logout'])->name('logout');
 });

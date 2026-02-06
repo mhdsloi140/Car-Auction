@@ -38,7 +38,7 @@
         </div>
 
         <!-- إعدادات المزادات -->
-        <div class="col-md-4">
+        {{-- <div class="col-md-4">
             <a href="{{ route('admin.car-settings') }}" class="text-decoration-none">
                 <div class="card shadow-sm p-3 h-100">
                     <div class="d-flex align-items-center">
@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </a>
-        </div>
+        </div> --}}
 
         <!-- إعدادات المستخدمين -->
         <div class="col-md-4">
