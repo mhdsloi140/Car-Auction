@@ -25,7 +25,7 @@ class RejectAuction extends Component
         $this->authorizeAction();
 
         $this->auction->update([
-            'status' => 'rejected',
+            'status' => 'active',
             'start_at' => now(),
             'end_at' => now()->addDay()
         ]);

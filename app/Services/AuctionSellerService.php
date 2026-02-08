@@ -23,4 +23,9 @@ class AuctionSellerService
 
         return $car;
     }
+
+    public function details($id)
+    {
+        return $id;
+    }
 }

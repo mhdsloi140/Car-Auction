@@ -15,7 +15,7 @@ class BrandAndCarModelSeeder extends Seeder
             'Honda' => ['Civic', 'Accord', 'CR-V', 'Pilot', 'Fit', 'HR-V'],
             'BMW' => ['3 Series', '5 Series', '7 Series', 'X3', 'X5', 'i8'],
             'Mercedes' => ['C-Class', 'E-Class', 'S-Class', 'GLA', 'GLE', 'A-Class'],
-            'Ford' => ['Focus', 'Fiesta', 'Mustang', 'Explorer', 'F-150', 'EcoSport'],
+            'Ford' => ['    ', 'Fiesta', 'Mustang', 'Explorer', 'F-150', 'EcoSport'],
             'Audi' => ['A3', 'A4', 'A6', 'Q3', 'Q5', 'Q7'],
             'Nissan' => ['Sentra', 'Altima', 'Maxima', 'X-Trail', 'Qashqai', 'GT-R'],
             'Kia' => ['Rio', 'Cerato', 'Sportage', 'Sorento', 'Picanto', 'K5'],

@@ -4,18 +4,23 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\Auction;
+use App\Models\Car;
 use App\Services\AuctionSellerService;
 use Illuminate\Http\Request;
 
-class AuctionController extends Controller
+class AuctionSellersController extends Controller
 {
-
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function __construct(protected AuctionSellerService $auctionSellerService)
     {
 
-        // $auctions=Auction::where()ions=$this->auctio
-
-
+    }
+    public function index()
+    {
+        $auctions = $this->auctionSellerService->index();
+        return view('seller.auction.index', compact('auctions'));
     }
 
     /**
@@ -29,15 +34,22 @@ class AuctionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
 
-        return view('seller.auction.show',compact('car'));
+        $car = $this->auctionSellerService->show($id);
+
+
+        return view('seller.auction.show', compact('car'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
+public function details($id)
+{
+   $car = Car::findOrFail($id);
+
+    return view('seller.auction.details',compact('car'));
+}
     public function update(Request $request, string $id)
     {
         //

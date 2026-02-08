@@ -18,6 +18,7 @@ class Auction extends Model
         'approved_by',
     ];
 
+
     public function car()
     {
         return $this->belongsTo(Car::class);

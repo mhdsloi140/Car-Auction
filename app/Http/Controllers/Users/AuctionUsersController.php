@@ -1,21 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Seller;
+namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
 use App\Models\Auction;
-use App\Services\AuctionSellerService;
 use Illuminate\Http\Request;
 
-class AuctionController extends Controller
+class AuctionUsersController extends Controller
 {
-
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-
-        // $auctions=Auction::where()ions=$this->auctio
-
-
+        //
     }
 
     /**
@@ -29,11 +27,16 @@ class AuctionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-
-        return view('seller.auction.show',compact('car'));
-    }
+  public function show(string $id)
+{
+    $auction = Auction::with([
+        'car.brand',
+        'car.model',
+        'bids.user',
+    ])->findOrFail($id);
+// dd(    $auction->car->getFirstMediaUrl('cars'));
+    return view('users.auction.show', compact('auction'));
+}
 
     /**
      * Update the specified resource in storage.

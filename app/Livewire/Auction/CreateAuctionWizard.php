@@ -52,10 +52,7 @@ class CreateAuctionWizard extends Component
     {
         $this->model_id = null;
         $this->modelSearch = '';
-
-        $this->models = CarModel::where('brand_id', $value)
-            ->orderBy('name')
-            ->get();
+        $this->models = CarModel::where('brand_id', $value)->orderBy('name')->get();
     }
 
     public function updatedModelSearch()
@@ -64,11 +61,9 @@ class CreateAuctionWizard extends Component
             $this->models = [];
             return;
         }
-
         $this->models = CarModel::where('brand_id', $this->brand_id)
             ->where('name', 'like', '%' . $this->modelSearch . '%')
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name')->get();
     }
 
     public function openModal()
@@ -98,31 +93,31 @@ class CreateAuctionWizard extends Component
 
     protected function validateStep()
     {
-        //   $messages = __('custom_ar.validation');
-         $messages = require resource_path('lang/custom_ar/validation.php');
+        $messages = require resource_path('lang/custom_ar/validation.php');
+
         if ($this->step === 1) {
             $this->validate([
-                'brand_id'    => 'required|exists:brands,id',
-                'model_id'    => 'required|exists:car_models,id',
-                'year'        => 'required|integer|between:1980,' . now()->year,
-                'city'        => 'required|string|max:255',
-                'mileage'     => 'required|integer|min:0',
+                'brand_id' => 'required|exists:brands,id',
+                'model_id' => 'required|exists:car_models,id',
+                'year' => 'required|integer|between:1980,' . now()->year,
+                'city' => 'required|string|max:255',
+                'mileage' => 'required|integer|min:0',
                 'description' => 'required|string|max:2000',
-                'specs'       => 'required|in:gcc,non_gcc,unknown',
-            ],$messages);
+                'specs' => 'required|in:gcc,non_gcc,unknown',
+            ], $messages);
         }
 
         if ($this->step === 2) {
             $this->validate([
+                'photos.*' => 'image|max:5120',
                 'plate_number' => 'nullable|string|max:50',
-                'photos.*'     => 'image|max:5120',
             ]);
         }
 
         if ($this->step === 3) {
             $this->validate([
                 'starting_price' => 'required|numeric|min:1',
-                'buy_now_price'  => 'nullable|numeric|gt:starting_price',
+                'buy_now_price' => 'nullable|numeric|gt:starting_price',
             ]);
         }
     }
@@ -134,20 +129,19 @@ class CreateAuctionWizard extends Component
         DB::beginTransaction();
 
         try {
-
             $car = Car::create([
-                'brand_id'     => $this->brand_id,
-                'model_id'     => $this->model_id,
-                'year'         => $this->year,
-                'city'         => $this->city,
-                'mileage'      => $this->mileage,
+                'brand_id' => $this->brand_id,
+                'model_id' => $this->model_id,
+                'year' => $this->year,
+                'city' => $this->city,
+                'mileage' => $this->mileage,
                 'plate_number' => $this->plate_number,
-                'description'  => $this->description,
-                'specs'        => $this->specs,
+                'description' => $this->description,
+                'specs' => $this->specs,
             ]);
 
-
-            if ($this->photos) {
+            // رفع كل الصور
+            if ($this->photos && count($this->photos) > 0) {
                 foreach ($this->photos as $photo) {
                     $car->addMedia($photo)
                         ->usingFileName($photo->getClientOriginalName())
@@ -156,12 +150,12 @@ class CreateAuctionWizard extends Component
                 $this->photos = [];
             }
 
-
+            // إنشاء المزاد
             $car->auction()->create([
-                'seller_id'      => auth()->id(),
+                'seller_id' => auth()->id(),
                 'starting_price' => $this->starting_price,
-                'buy_now_price'  => $this->buy_now_price,
-                'status'         => 'pending',
+                'buy_now_price' => $this->buy_now_price,
+                'status' => 'pending',
             ]);
 
             DB::commit();

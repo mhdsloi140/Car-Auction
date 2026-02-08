@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         AdminSeeder::class,
         UserSeeder::class,
         SellerSeeder::class,
-          BrandAndCarModelSeeder::class,
+        //   BrandAndCarModelSeeder::class,
 
 
     ]);

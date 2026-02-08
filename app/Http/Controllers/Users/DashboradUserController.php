@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Seller;
+namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
-use App\Models\Auction;
-use App\Services\AuctionSellerService;
 use Illuminate\Http\Request;
 
-class AuctionController extends Controller
+class DashboradUserController extends Controller
 {
-
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-
-        // $auctions=Auction::where()ions=$this->auctio
-
-
+        return view('users.dashboard.index');
     }
 
     /**
@@ -31,8 +28,7 @@ class AuctionController extends Controller
      */
     public function show(string $id)
     {
-
-        return view('seller.auction.show',compact('car'));
+        //
     }
 
     /**

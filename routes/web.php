@@ -5,8 +5,11 @@ use App\Http\Controllers\Admin\AuctionAdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SettingsAdminController;
 use App\Http\Controllers\Seller\AuctionController;
+use App\Http\Controllers\Seller\AuctionSellersController;
 use App\Http\Controllers\Seller\AuthController;
+use App\Http\Controllers\Users\AuctionUsersController;
 use App\Http\Controllers\Users\AuthUserController;
+use App\Http\Controllers\Users\DashboradUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,9 +23,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [DashboradUserController::class, 'index'])->name('home');
 
 
 Route::prefix('seller')->group(function () {
@@ -31,7 +32,9 @@ Route::prefix('seller')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('seller.logout');
     Route::middleware(['auth', 'role:seller'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Seller\DashbordController::class, 'index'])->name('seller.dashboard');
-        Route::resource('auction', AuctionController::class);
+        Route::resource('auction', AuctionSellersController::class);
+        Route::get('details/{id}', [AuctionSellersController::class, 'details'])->name('auction.selles.details');
+        // Route::get('/car/{id}/bids', \App\Livewire\Seller\CarDetails::class)->name('auction.selles.details');
     });
 });
 
@@ -43,7 +46,7 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashbordController::class, 'index'])->name('admin.dashboard');
         Route::resource('brand', BrandController::class);
-        //  Route::resource('admin/auction',[App\Http\Controllers\Admin\AuctionController::class]);
+
         Route::get('/auction', [AuctionAdminController::class, 'index'])->name('admin.auction.index');
         Route::get('/auctions/{auction}', [AuctionAdminController::class, 'show'])
             ->name('auction.admin.show');
@@ -62,6 +65,9 @@ Route::prefix('admin')->group(function () {
 
     });
 });
-Route::prefix('users')->group(function(){
-  Route::post('logout',[AuthUserController::class,'logout'])->name('logout');
+Route::prefix('users')->group(function () {
+    Route::post('logout', [AuthUserController::class, 'logout'])->name('logout');
+    Route::get('/auctions/{id}', [AuctionUsersController::class, 'show'])
+        ->name('auction.users.show');
+
 });
