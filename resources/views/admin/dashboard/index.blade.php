@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 
-<h1>Admin Dashboard</h1>
+@livewire('admin.dashboard.stats')
+@livewire('admin.dashboard.quick-alerts')
 
 @endsection

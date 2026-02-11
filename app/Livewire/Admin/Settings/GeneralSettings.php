@@ -42,7 +42,7 @@ class GeneralSettings extends Component
         setting_save('secondary_color', $this->secondary_color);
 
         session()->flash('success', 'تم حفظ الإعدادات بنجاح');
-          return redirect()->route('admin.settings.index');
+          return redirect()->route('settings.admin.index');
     }
 
 

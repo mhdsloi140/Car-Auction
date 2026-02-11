@@ -1,6 +1,6 @@
 <div style="direction: rtl; text-align: right;" class="p-3">
 
-    {{-- زر فتح المودال --}}
+
     <button class="btn btn-lg btn-success shadow-sm d-flex align-items-center gap-2 px-4 rounded-pill transition-all"
         wire:click="openModal"
         style="font-weight: 600; border: none; background: linear-gradient(45deg, #198754, #20c997);">
@@ -113,22 +113,39 @@
                     @endif
 
                     {{-- STEP 2 --}}
-                    @if($step === 2)
-                    <div class="upload-zone text-center p-4 border border-dashed rounded-3 mb-3" style="border-color: #d0d7de; background: #f8f9fa;">
-                        <i class="bi bi-cloud-arrow-up text-primary display-5"></i>
-                        <h6 class="mt-2 fw-bold">ارفع صور السيارة</h6>
-                        <input type="file" class="form-control mt-3" wire:model="photos" multiple>
-                        @error('photos.*') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
+                  @if($step === 2)
 
-                    <div class="d-flex flex-wrap gap-2 justify-content-center">
-                        @if($photos)
-                        @foreach($photos as $photo)
-                        <img src="{{ $photo->temporaryUrl() }}" class="img-thumbnail rounded-3 shadow-sm" style="width:120px; height:90px; object-fit:cover;">
-                        @endforeach
-                        @endif
-                    </div>
-                    @endif
+    <div class="upload-zone text-center p-4 border border-dashed rounded-3 mb-3"
+         style="border-color: #d0d7de; background: #f8f9fa;">
+
+        <i class="bi bi-cloud-arrow-up text-primary display-5"></i>
+        <h6 class="mt-2 fw-bold">ارفع صور السيارة</h6>
+
+        <input type="file" class="form-control mt-3" wire:model="photos" multiple>
+
+        {{-- خطأ عدد الصور --}}
+        @error('photos')
+            <small class="text-danger d-block mt-2">{{ $message }}</small>
+        @enderror
+
+        {{-- خطأ نوع/حجم كل صورة --}}
+        @error('photos.*')
+            <small class="text-danger d-block mt-2">{{ $message }}</small>
+        @enderror
+
+    </div>
+
+    {{-- عرض الصور المرفوعة --}}
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
+        @foreach($photos as $photo)
+            <img src="{{ $photo->temporaryUrl() }}"
+                 class="img-thumbnail rounded-3 shadow-sm"
+                 style="width:120px; height:90px; object-fit:cover;">
+        @endforeach
+    </div>
+
+@endif
+
 
                     {{-- STEP 3 --}}
                     @if($step === 3)

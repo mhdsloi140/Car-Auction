@@ -1,12 +1,16 @@
 <?php
 
 
+use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AuctionAdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SettingsAdminController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SettingsSecurityController;
 use App\Http\Controllers\Seller\AuctionController;
 use App\Http\Controllers\Seller\AuctionSellersController;
 use App\Http\Controllers\Seller\AuthController;
+use App\Http\Controllers\Seller\DashboardSellersController;
 use App\Http\Controllers\Users\AuctionUsersController;
 use App\Http\Controllers\Users\AuthUserController;
 use App\Http\Controllers\Users\DashboradUserController;
@@ -35,6 +39,11 @@ Route::prefix('seller')->group(function () {
         Route::resource('auction', AuctionSellersController::class);
         Route::get('details/{id}', [AuctionSellersController::class, 'details'])->name('auction.selles.details');
         // Route::get('/car/{id}/bids', \App\Livewire\Seller\CarDetails::class)->name('auction.selles.details');
+        Route::get('/seller/auctions/archive', [AuctionSellersController::class, 'sellerArchive'])
+            ->name('seller.auctions.archive');
+        Route::get('winner/{id}', [AuctionSellersController::class, 'winner'])->name('auction.sellers.winner');
+        Route::get('seller/dashboard', [DashboardSellersController::class, 'index'])->name('seller.dashboard');
+
     });
 });
 
@@ -55,12 +64,29 @@ Route::prefix('admin')->group(function () {
             ->middleware('permission:reject auction')
             ->name('auctions.reject');
         Route::delete('auction/{id} ', [AuctionAdminController::class, 'destroy'])->name('auction.admin.destroy');
-        Route::get('settings', [SettingsAdminController::class, 'index'])->name('admin.settings.index');
+        Route::get('settings', [SettingsAdminController::class, 'index'])->name('settings.admin.index');
         Route::get('users', [SettingsAdminController::class, 'users'])->name('admin.users.index');
         Route::get('brands', [SettingsAdminController::class, 'brands'])->name('admin.brands.index');
         Route::get('models', [SettingsAdminController::class, 'models'])->name('admin.models.index');
         Route::get('/settings/general', \App\Livewire\Admin\Settings\GeneralSettings::class)
             ->name('admin.settings.general');
+        Route::get('/settings/files', [SettingsAdminController::class, 'file'])
+            ->name('admin.settings.file');
+        Route::get('/admin/settings/files', [SettingsController::class, 'index'])->name('admin.settings.index');
+        Route::post('/admin/settings/files', [SettingsController::class, 'save'])->name('admin.settings.save');
+        Route::get('/admin/settings/security', [SettingsSecurityController::class, 'index'])
+            ->name('admin.settings.security');
+
+        Route::post('/admin/settings/security', [SettingsSecurityController::class, 'save'])
+            ->name('admin.settings.security.save');
+        Route::get('/admin/activity-logs', [ActivityLogController::class, 'index'])
+            ->name('admin.activity.logs');
+        Route::delete('/admin/activity-logs/delete', [ActivityLogController::class, 'delete'])
+            ->name('admin.activity.logs.delete');
+
+
+
+
 
 
     });

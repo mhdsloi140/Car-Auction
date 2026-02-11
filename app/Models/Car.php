@@ -36,11 +36,11 @@ class Car extends Model implements HasMedia
     {
         return $this->hasOne(Auction::class);
     }
+public function registerMediaCollections(): void
+{
+    $this
+        ->addMediaCollection('cars'); // بدون singleFile()
+}
 
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('cars')
-             ->useDisk('public')
-             ->singleFile(false);
-    }
+
 }

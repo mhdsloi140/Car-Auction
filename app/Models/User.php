@@ -11,7 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -45,7 +45,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-        public function cars()
+    public function cars()
     {
         return $this->hasMany(Car::class);
     }
@@ -53,4 +53,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Bid::class);
     }
+    public function auctions()
+    {
+
+        return $this->hasMany(\App\Models\Auction::class, 'seller_id');
+    }
+    public function notifications()
+{
+    return $this->hasMany(\App\Models\Notification::class);
+}
 }

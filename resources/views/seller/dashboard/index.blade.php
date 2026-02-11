@@ -1,4 +1,13 @@
 @extends('layouts.app')
+
 @section('content')
-    <h1>Dashboard</h1>
+<div class="container my-5">
+
+    @livewire('seller.dashboard.seller-stats')
+</div>
+<div class="container my-4" wire:poll.6s>
+
+    @livewire('seller.dashboard.notifications')
+</div>
+
 @endsection

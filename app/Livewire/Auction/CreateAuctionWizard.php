@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Brand;
 use App\Models\CarModel;
 use App\Models\Car;
+use App\Models\Setting;
 
 class CreateAuctionWizard extends Component
 {
@@ -27,11 +28,10 @@ class CreateAuctionWizard extends Component
     public ?string $specs = null;
     public array $photos = [];
 
-    // أسعار المزاد
+    
     public ?float $starting_price = null;
     public ?float $buy_now_price = null;
 
-    // قوائم الاختيارات
     public $brands = [];
     public $models = [];
     public array $years = [];
@@ -46,6 +46,15 @@ class CreateAuctionWizard extends Component
     {
         $this->brands = Brand::orderBy('name')->get();
         $this->years = range(now()->year, 1980);
+    }
+
+    private function getFileSettings()
+    {
+        return [
+            'max_images' => Setting::where('key', 'max_images')->value('value') ?? 10,
+            'max_image_size' => Setting::where('key', 'max_image_size')->value('value') ?? 5, // MB
+            'allowed_extensions' => Setting::where('key', 'allowed_extensions')->value('value') ?? 'jpg,png,jpeg,webp',
+        ];
     }
 
     public function updatedBrandId($value)
@@ -108,11 +117,30 @@ class CreateAuctionWizard extends Component
         }
 
         if ($this->step === 2) {
+
+            $settings = $this->getFileSettings();
+
+
+            $maxSizeKB = $settings['max_image_size'] * 1024;
+
+
+            $extensions = collect(explode(',', $settings['allowed_extensions']))
+                ->map(fn($ext) => trim($ext))
+                ->implode(',');
+
+
+            if (count($this->photos) > $settings['max_images']) {
+                $this->addError('photos', "الحد الأقصى لعدد الصور هو {$settings['max_images']} صورة فقط");
+                return;
+            }
+
             $this->validate([
-                'photos.*' => 'image|max:5120',
+                'photos' => "array|max:{$settings['max_images']}",
+                'photos.*' => "image|max:$maxSizeKB|mimes:$extensions",
                 'plate_number' => 'nullable|string|max:50',
             ]);
         }
+
 
         if ($this->step === 3) {
             $this->validate([
@@ -126,9 +154,17 @@ class CreateAuctionWizard extends Component
     {
         $this->validateStep();
 
+        $settings = $this->getFileSettings();
+
+        if (count($this->photos) > $settings['max_images']) {
+            $this->addError('photos', "الحد الأقصى لعدد الصور هو {$settings['max_images']} صورة فقط");
+            return;
+        }
+
         DB::beginTransaction();
 
         try {
+
             $car = Car::create([
                 'brand_id' => $this->brand_id,
                 'model_id' => $this->model_id,
@@ -140,14 +176,13 @@ class CreateAuctionWizard extends Component
                 'specs' => $this->specs,
             ]);
 
-            // رفع كل الصور
-            if ($this->photos && count($this->photos) > 0) {
+            // رفع الصور
+            if ($this->photos) {
                 foreach ($this->photos as $photo) {
                     $car->addMedia($photo)
-                        ->usingFileName($photo->getClientOriginalName())
+                        ->usingFileName(time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension())
                         ->toMediaCollection('cars');
                 }
-                $this->photos = [];
             }
 
             // إنشاء المزاد

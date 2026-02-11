@@ -39,6 +39,11 @@ return new class extends Migration {
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
+            $table->foreignId('winner_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+                    $table->decimal('final_price', 10, 2)->nullable();
 
             $table->timestamps();
         });

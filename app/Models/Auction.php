@@ -16,6 +16,12 @@ class Auction extends Model
         'end_at',
         'status',
         'approved_by',
+        'winner_id',
+        'final_price'
+    ];
+     protected $casts = [
+        'start_at' => 'datetime',
+        'end_at'   => 'datetime',
     ];
 
 
@@ -38,5 +44,10 @@ class Auction extends Model
     {
         return $this->hasMany(Bid::class);
     }
+    public function winner()
+{
+    return $this->belongsTo(User::class, 'winner_id');
+}
+
 }
 

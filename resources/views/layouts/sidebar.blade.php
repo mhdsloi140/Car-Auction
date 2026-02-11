@@ -36,21 +36,39 @@
             <ul class="nav nav-secondary">
 
                 <!-- Dashboard -->
+             @role('admin')
                 <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
-                    <a href="" class="nav-link">
+                    <a href="{{ route('admin.dashboard') }}" class="nav-link">
                         <i class="fas fa-home"></i>
-                        <p>لوحة التحكم</p>
+                        <p> الصفحة الرئيسية</p>
                     </a>
                 </li>
+                @endrole
 
-            
+                @role('seller')
+                <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('seller.dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <p> الصفحة الرئيسية</p>
+                    </a>
+                </li>
+                @endrole
 
                 <!-- Seller: Auctions -->
                 @role('seller')
-                <li class="nav-item {{ request()->is('auction*') ? 'active' : '' }}">
+                {{-- رابط المزادات الحالية --}}
+                <li class="nav-item {{ request()->routeIs('auction.index') ? 'active' : '' }}">
                     <a href="{{ route('auction.index') }}" class="nav-link d-flex align-items-center">
                         <i class="fas fa-gavel me-2"></i>
                         <span>المزادات</span>
+                    </a>
+                </li>
+
+                {{-- رابط أرشيف المزادات --}}
+                <li class="nav-item {{ request()->routeIs('seller.auctions.archive') ? 'active' : '' }}">
+                    <a href="{{ route('seller.auctions.archive') }}" class="nav-link d-flex align-items-center">
+                        <i class="fas fa-archive me-2"></i>
+                        <span>أرشيف المزادات</span>
                     </a>
                 </li>
                 @endrole
@@ -66,7 +84,7 @@
                 @endrole
                 @role('admin')
                 <li class="nav-item {{ request()->is('admin/settings*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.settings.index') }}" class="nav-link d-flex align-items-center">
+                    <a href="{{ route('settings.admin.index') }}" class="nav-link d-flex align-items-center">
                         <i class="fa fa-cog ms-2"></i>
                         <span>الإعدادات</span>
                     </a>

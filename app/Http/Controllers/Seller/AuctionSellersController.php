@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Models\Auction;
 use App\Models\Car;
+use App\Models\User;
 use App\Services\AuctionSellerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class AuctionSellersController extends Controller
 {
@@ -26,6 +29,21 @@ class AuctionSellersController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    public function sellerArchive()
+    {
+        $auctions = Auction::with(['car', 'winner'])
+            ->where('seller_id', Auth::id())
+            ->where('status', 'closed')
+            ->orderByDesc('end_at')
+            ->paginate(10);
+
+        return view('seller.auction.archive', compact('auctions'));
+    }
+    public function winner($id )
+    {
+        $user=User::find($id);
+ return view('seller.auction.showwinner', compact('user'));
+    }
     public function store(Request $request)
     {
         //
@@ -44,12 +62,12 @@ class AuctionSellersController extends Controller
     }
 
 
-public function details($id)
-{
-   $car = Car::findOrFail($id);
+    public function details($id)
+    {
+        $car = Car::findOrFail($id);
 
-    return view('seller.auction.details',compact('car'));
-}
+        return view('seller.auction.details', compact('car'));
+    }
     public function update(Request $request, string $id)
     {
         //

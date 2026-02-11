@@ -12,8 +12,12 @@ class SettingsAdminController extends Controller
      */
     public function index()
     {
-        $user_id=auth()->user()->id;
+        $user_id = auth()->user()->id;
         return view('admin.settings.index');
+    }
+    public function file()
+    {
+        return view('admin.settings.files');
     }
 
     /**

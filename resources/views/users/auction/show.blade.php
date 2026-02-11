@@ -4,11 +4,11 @@
 
 @section('content-user')
 
-<div class="container my-5">
+<div class="container my-5" style="direction: rtl; text-align: right;">
 
     <div class="row g-4">
 
-
+        {{-- صور السيارة --}}
         <div class="col-lg-6">
 
             @php
@@ -16,12 +16,12 @@
             @endphp
 
             @if($images->count() > 0)
-                <div id="carImagesSlider" class="carousel slide" data-bs-ride="carousel">
 
-                    <div class="carousel-inner">
+                {{-- الصورة الرئيسية (السلايدر) --}}
+                <div id="carImagesSlider" class="carousel slide shadow-sm rounded mb-3" data-bs-ride="carousel">
+
+                    <div class="carousel-inner rounded">
                         @foreach($images as $index => $image)
-
-
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                                 <img src="{{ $image->getUrl() }}"
                                      class="d-block w-100 rounded"
@@ -39,8 +39,26 @@
                     </button>
 
                 </div>
+
+                {{-- الصور المصغّرة --}}
+                <div class="d-flex gap-2 flex-wrap">
+
+                    @foreach($images as $index => $image)
+                        <img src="{{ $image->getUrl() }}"
+                             onclick="bootstrap.Carousel.getInstance(document.getElementById('carImagesSlider')).to({{ $index }})"
+                             class="rounded shadow-sm"
+                             style="width: 100px; height: 80px; object-fit: cover; cursor: pointer; border: 2px solid #ddd;">
+                    @endforeach
+
+                </div>
+
             @else
-                <img src="{{ asset('users/img/no-image.png') }}" class="img-fluid rounded w-100" alt="">
+
+                <img src="{{ asset('users/img/no-image.png') }}"
+                     class="img-fluid rounded w-100 shadow-sm"
+                     style="height: 420px; object-fit: cover;"
+                     alt="لا توجد صور">
+
             @endif
 
         </div>
@@ -48,36 +66,43 @@
         {{-- معلومات المزاد --}}
         <div class="col-lg-6">
 
+            {{-- عنوان السيارة --}}
             <h2 class="fw-bold mb-3">
                 {{ $auction->car->brand->name }}
                 {{ $auction->car->model->name }}
-                - {{ $auction->car->year }}
+                <span class="text-muted">({{ $auction->car->year }})</span>
             </h2>
 
+            {{-- رقم المزاد --}}
             <p class="text-muted mb-2">
                 رقم المزاد:
                 <strong>#{{ $auction->id }}</strong>
             </p>
 
+            {{-- حالة المزاد --}}
             <p class="mb-3">
                 حالة المزاد:
-                <span class="badge bg-{{ $auction->status === 'active' ? 'success' : 'secondary' }} px-3 py-2">
+                <span class="badge px-3 py-2 bg-{{ $auction->status === 'active' ? 'success' : 'secondary' }}">
                     {{ $auction->status === 'active' ? 'نشط' : 'غير متاح' }}
                 </span>
             </p>
 
             {{-- المواصفات --}}
             <div class="mb-4">
-                <h5 class="fw-bold">مواصفات السيارة:</h5>
-                <p class="text-muted">
-                    {!! nl2br(e($auction->car->specs ?? 'لا توجد مواصفات مضافة')) !!}
-                </p>
+                <h5 class="fw-bold mb-2">مواصفات السيارة:</h5>
+                <div class="p-3 bg-light rounded border">
+                    <p class="text-muted mb-0" style="white-space: pre-line;">
+                        {{ $auction->car->specs ?? 'لا توجد مواصفات مضافة' }}
+                    </p>
+                </div>
             </div>
 
             {{-- زر المزايدة --}}
             @auth
                 @if($auction->status === 'active')
-                    @livewire('user.place-bid', ['auction' => $auction])
+                    <div class="mt-4">
+                        @livewire('user.place-bid', ['auction' => $auction])
+                    </div>
                 @else
                     <div class="alert alert-warning mt-3">
                         هذا المزاد غير متاح حالياً
