@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container py-4" class="page-rtl" dir="rtl">
 
-    {{-- أزرار الإدارة أعلى الصفحة --}}
+    {{-- أزرار الإدارة --}}
     @role('admin')
     @if($auction->status === 'pending')
     <div class="d-flex justify-content-center gap-3 mb-4">
@@ -18,7 +18,7 @@
             </button>
         </form>
 
-        {{-- زر الرفض (Livewire) --}}
+        {{-- زر الرفض --}}
         <livewire:admin.reject-auction :auction="$auction" />
 
     </div>
@@ -40,7 +40,6 @@
                     </h3>
 
                     @php
-                    // ألوان الحالات
                     $statusColors = [
                     'pending' => 'bg-warning text-dark',
                     'active' => 'bg-success',
@@ -48,7 +47,6 @@
                     'rejected' => 'bg-danger',
                     ];
 
-                    // النصوص العربية للحالات
                     $statusLabels = [
                     'pending' => 'معلق',
                     'active' => 'نشط',
@@ -56,7 +54,6 @@
                     'rejected' => 'مرفوض',
                     ];
 
-                    // اختيار اللون والنص المناسب
                     $colorClass = $statusColors[$auction->status] ?? 'bg-primary';
                     $statusLabel = $statusLabels[$auction->status] ?? $auction->status;
                     @endphp
@@ -64,13 +61,12 @@
                     <span class="badge {{ $colorClass }} px-3 py-2">
                         {{ $statusLabel }}
                     </span>
-
                 </div>
             </div>
 
             <hr>
 
-
+            {{-- بيانات المزاد --}}
             <h5 class="fw-bold mb-3">
                 <i class="bi bi-info-circle"></i>
                 بيانات المزاد
@@ -118,22 +114,24 @@
                 صور السيارة
             </h5>
 
-
-            {{-- <div class="row g-3">
-                @foreach($car->getMedia('cars') as $photo)
+            <div class="row g-3">
+                @foreach($auction->car->getMedia('cars') as $index => $photo)
                 <div class="col-md-3 col-6">
-                    <div class="border rounded overflow-hidden shadow-sm" style="height:160px;">
+                    <div class="image-box shadow-sm rounded" style="height:180px; overflow:hidden; cursor:pointer;"
+                        data-bs-toggle="modal" data-bs-target="#imagesModal" onclick="openSlide({{ $index }})">
+
                         <img src="{{ $photo->getUrl() }}" class="img-fluid w-100 h-100" style="object-fit:cover;">
                     </div>
                 </div>
                 @endforeach
-            </div> --}}
+            </div>
+
 
 
         </div>
     </div>
 
-
+    {{-- زر حذف المزاد --}}
     <div class="text-center mb-5">
         <form action="{{ route('auction.admin.destroy', $auction->id) }}" method="POST">
             @csrf
@@ -144,6 +142,53 @@
             </button>
         </form>
     </div>
+    <!-- Modal لعرض الصورة -->
+  <div class="modal fade" id="imagesModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-dark">
+
+            <div class="modal-body p-0">
+
+                <div id="modalCarousel" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner">
+
+                        @foreach($auction->car->getMedia('cars') as $index => $photo)
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                <img src="{{ $photo->getUrl() }}" class="d-block w-100" style="max-height:80vh; object-fit:contain;">
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#modalCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#modalCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 </div>
+<script>
+    function showImage(url) {
+        document.getElementById('modalImage').src = url;
+    }
+</script>
+<script>
+    function openSlide(index) {
+        const carousel = bootstrap.Carousel.getOrCreateInstance(document.getElementById('modalCarousel'));
+        carousel.to(index);
+    }
+</script>
+
+
 @endsection

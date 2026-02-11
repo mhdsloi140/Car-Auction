@@ -2,6 +2,7 @@
 
 namespace App\Livewire\User;
 
+use App\Events\NewBidPlaced;
 use App\Jobs\PlaceBidJob;
 use Livewire\Component;
 use App\Models\Auction;
@@ -26,7 +27,7 @@ class PlaceBid extends Component
             'amount' => $this->amount,
         ]);
 
-
+broadcast(new NewBidPlaced($bid))->toOthers();
        dispatch(new PlaceBidJob(
             $this->auction->id,
             auth()->id(),

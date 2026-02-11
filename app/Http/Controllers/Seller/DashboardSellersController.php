@@ -12,7 +12,7 @@ class DashboardSellersController extends Controller
      */
     public function index()
     {
-        log_activity('test', 'اختبار تسجيل السجلات');
+     
 
 
         return view('seller.dashboard.index');

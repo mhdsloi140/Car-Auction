@@ -13,6 +13,7 @@ use App\Http\Controllers\Seller\AuthController;
 use App\Http\Controllers\Seller\DashboardSellersController;
 use App\Http\Controllers\Users\AuctionUsersController;
 use App\Http\Controllers\Users\AuthUserController;
+use App\Http\Controllers\Users\BidUserController;
 use App\Http\Controllers\Users\DashboradUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,13 +56,10 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashbordController::class, 'index'])->name('admin.dashboard');
         Route::resource('brand', BrandController::class);
-
         Route::get('/auction', [AuctionAdminController::class, 'index'])->name('admin.auction.index');
-        Route::get('/auctions/{auction}', [AuctionAdminController::class, 'show'])
-            ->name('auction.admin.show');
+        Route::get('/auctions/{auction}', [AuctionAdminController::class, 'show'])->name('auction.admin.show');
         Route::patch('/auctions/{id}/approve', [AuctionadminController::class, 'approve'])->name('auctions.approve');
-        Route::patch('/auctions/{id}/reject', [AuctionadminController::class, 'reject'])
-            ->middleware('permission:reject auction')
+        Route::patch('/auctions/{id}/reject', [AuctionadminController::class, 'reject'])->middleware('permission:reject auction')
             ->name('auctions.reject');
         Route::delete('auction/{id} ', [AuctionAdminController::class, 'destroy'])->name('auction.admin.destroy');
         Route::get('settings', [SettingsAdminController::class, 'index'])->name('settings.admin.index');
@@ -95,5 +93,10 @@ Route::prefix('users')->group(function () {
     Route::post('logout', [AuthUserController::class, 'logout'])->name('logout');
     Route::get('/auctions/{id}', [AuctionUsersController::class, 'show'])
         ->name('auction.users.show');
+
+Route::get('/auction/{id}/bid', [BidUserController::class, 'show'])
+    ->name('auction.bid')
+    ->middleware('auth');
+
 
 });

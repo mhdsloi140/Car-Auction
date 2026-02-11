@@ -32,8 +32,9 @@ class AuctionAdminController extends Controller
     public function show(string $id)
     {
         $auction = $this->auctionAdminService->show($id);
-        // dd($auction);
-        return view('admin.auction.show', compact('auction'));
+        $images = $auction->car->getMedia('cars');
+
+        return view('admin.auction.show', compact('auction','images'));
 
     }
 
