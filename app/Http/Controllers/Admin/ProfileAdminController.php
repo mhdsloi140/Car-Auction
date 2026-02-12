@@ -3,16 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateProfileAdminRequest;
+use App\Services\ProfileAdminService;
 use Illuminate\Http\Request;
 
 class ProfileAdminController extends Controller
 {
+    public function __construct(protected ProfileAdminService $profileAdminService)
+    {
+        //
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $user=$this->profileAdminService->index();
+        return view('admin.profile.index',compact('user'));
     }
 
     /**
@@ -34,9 +41,11 @@ class ProfileAdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProfileAdminRequest $request)
     {
-        //
+        $data=$request->validated();
+        $user=$this->profileAdminService->update($data);
+        return redirect()->back()->with('success','تم تحديث الملف الشخصي بنجاح ');
     }
 
     /**

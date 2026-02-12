@@ -5,13 +5,13 @@
 @section('content-user')
 
 <div class="container my-5" style="direction: rtl; text-align: right;">
-    {{-- عدّاد انتهاء المزاد --}}
+   
 <div class="mt-3">
     <h5 class="fw-bold">الوقت المتبقي لانتهاء المزاد:</h5>
     <div id="countdown" class="fs-4 text-danger fw-bold"></div>
 </div>
 
-{{-- تمرير وقت النهاية إلى JavaScript --}}
+
 <input type="hidden" id="auctionEndTime" value="{{ optional($auction->end_at)->format('Y-m-d\TH:i:s') }}">
 
 

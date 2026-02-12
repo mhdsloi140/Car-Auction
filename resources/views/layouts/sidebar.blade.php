@@ -117,12 +117,23 @@
                     </form>
                 </li>
                 @endrole
+                @role('seller')
                 <li class="nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">
-    <a href="{{ route('seller.profile') }}" class="nav-link d-flex align-items-center">
-        <i class="fas fa-user me-2"></i>
-        <span>الملف الشخصي</span>
-    </a>
-</li>
+                    <a href="{{ route('seller.profile') }}" class="nav-link d-flex align-items-center">
+                        <i class="fas fa-user me-2"></i>
+                        <span>الملف الشخصي</span>
+                    </a>
+                </li>
+                @endrole
+                @role('admin')
+                <li class="nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">
+                    <a href="{{ route('admin.profile') }}" class="nav-link d-flex align-items-center">
+                        <i class="fas fa-user me-2"></i>
+                        <span>الملف الشخصي</span>
+                    </a>
+                </li>
+                @endrole
+
 
             </ul>
 

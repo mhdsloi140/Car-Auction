@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AuctionAdminController;
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\ProfileAdminController;
 use App\Http\Controllers\Admin\SettingsAdminController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SettingsSecurityController;
@@ -78,15 +79,15 @@ Route::prefix('admin')->group(function () {
         Route::post('/admin/settings/files', [SettingsController::class, 'save'])->name('admin.settings.save');
         Route::get('/admin/settings/security', [SettingsSecurityController::class, 'index'])
             ->name('admin.settings.security');
-
         Route::post('/admin/settings/security', [SettingsSecurityController::class, 'save'])
             ->name('admin.settings.security.save');
         Route::get('/admin/activity-logs', [ActivityLogController::class, 'index'])
             ->name('admin.activity.logs');
         Route::delete('/admin/activity-logs/delete', [ActivityLogController::class, 'delete'])
             ->name('admin.activity.logs.delete');
+     Route::get('proflie',[ProfileAdminController::class,'index'])->name('admin.profile');
 
-
+        Route::post('profile',[ProfileAdminController::class,'update'])->name('admin.profile.update');
 
 
 

@@ -63,7 +63,7 @@ public function placeBid()
 
             $this->lastBidId = $latestBid->id;
 
-            // تجهيز بيانات الإشعار
+        
             $this->newBidAlert = [
                 'user_id' => $latestBid->user_id,
                 'amount' => $latestBid->amount,
