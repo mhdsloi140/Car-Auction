@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class AuctionAdminController extends Controller
 {
+
     public function __construct(protected AuctionAdminService $auctionAdminService)
     {
 

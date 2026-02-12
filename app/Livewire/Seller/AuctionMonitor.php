@@ -18,7 +18,7 @@ class AuctionMonitor extends Component
 
     public function render()
     {
-        $this->auction->load(['bids.user']); // جلب آخر المزايدات
+        $this->auction->load(['bids.user']);
         return view('livewire.seller.auction-monitor');
     }
 }

@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SellerLoginRequest;
 use App\Services\AuthSellerService;
-use Auth;
 use Illuminate\Http\Request;
 
-class AuthController extends Controller
+class AuthSellerController extends Controller
 {
+
     public function __construct(protected AuthSellerService $authSellerService)
     {
 
@@ -29,13 +29,10 @@ class AuthController extends Controller
 
         return redirect()->route('seller.dashboard');
     }
-
     public function logout()
     {
-        Auth::logout();
-      
-
-        return redirect()->route('seller.login.form')
-            ->with('success', 'تم تسجيل الخروج بنجاح.');
+        auth()->logout();
+        return redirect()->route('seller.login.form');
     }
+
 }

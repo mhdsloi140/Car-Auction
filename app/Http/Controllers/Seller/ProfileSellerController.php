@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateProfileSellerRequest;
+use App\Services\ProfileSellerService;
 use Illuminate\Http\Request;
 
 class ProfileSellerController extends Controller
@@ -10,9 +12,14 @@ class ProfileSellerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function __construct(protected ProfileSellerService $profileSellerService)
     {
         //
+    }
+    public function index()
+    {
+       $user=$this->profileSellerService->index();
+       return view('seller.profile.index',compact('user'));
     }
 
     /**
@@ -34,9 +41,12 @@ class ProfileSellerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProfileSellerRequest $request)
     {
-        //
+        $data=$request->validated();
+        $user=$this->profileSellerService->update($data);
+        return redirect()->back()->with('success','تم تحديث الملف الشخصي بنجاح');
+
     }
 
     /**

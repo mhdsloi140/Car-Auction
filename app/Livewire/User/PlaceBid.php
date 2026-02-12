@@ -2,41 +2,73 @@
 
 namespace App\Livewire\User;
 
-use App\Events\NewBidPlaced;
-use App\Jobs\PlaceBidJob;
 use Livewire\Component;
 use App\Models\Auction;
 use App\Models\Bid;
-use App\Jobs\ProcessBid;
 use Illuminate\Support\Facades\Auth;
-
+use App\Events\NewBidPlaced;
+use App\Jobs\PlaceBidJob;
 class PlaceBid extends Component
 {
     public Auction $auction;
     public $amount;
 
-    public function placeBid()
+    public $lastBidId = null;
+    public $newBidAlert = null;
+
+    public function mount(Auction $auction)
     {
-        $this->validate([
-            'amount' => 'required|numeric|min:1',
-        ]);
+        $this->auction = $auction;
 
-        $bid = new Bid([
-            'auction_id' => $this->auction->id,
-            'user_id' => Auth::id(),
-            'amount' => $this->amount,
-        ]);
 
-broadcast(new NewBidPlaced($bid))->toOthers();
-       dispatch(new PlaceBidJob(
-            $this->auction->id,
-            auth()->id(),
-            $this->amount
-        ));
+        $this->lastBidId = $auction->bids()->latest()->first()->id ?? null;
+    }
 
-        session()->flash('success', 'تم إرسال مزايدتك!');
+public function placeBid()
+{
+    $this->validate([
+        'amount' => 'required|numeric|min:1',
+    ]);
 
-        $this->amount = null;
+    // جلب أعلى مزايدة
+    $highestBid = $this->auction->bids()->max('amount');
+    $currentPrice = $highestBid ?? $this->auction->starting_price;
+
+    //  التحقق قبل إرسال الـ Job
+    if ($this->amount <= $currentPrice) {
+        $this->addError('amount', 'يجب أن تكون المزايدة أعلى من السعر الحالي (' . number_format($currentPrice) . ')');
+        return;
+    }
+
+
+    dispatch(new PlaceBidJob(
+        $this->auction->id,
+        auth()->id(),
+        $this->amount
+    ));
+
+    session()->flash('success', 'تم إرسال مزايدتك بنجاح');
+
+    $this->amount = null;
+}
+
+
+
+    // يتم استدعاؤها كل ثانيتين عبر Livewire Polling
+    public function checkForNewBids()
+    {
+        $latestBid = $this->auction->bids()->latest()->first();
+
+        if ($latestBid && $latestBid->id != $this->lastBidId) {
+
+            $this->lastBidId = $latestBid->id;
+
+            // تجهيز بيانات الإشعار
+            $this->newBidAlert = [
+                'user_id' => $latestBid->user_id,
+                'amount' => $latestBid->amount,
+            ];
+        }
     }
 
     public function render()

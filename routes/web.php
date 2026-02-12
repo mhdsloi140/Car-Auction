@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AuctionAdminController;
+use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SettingsAdminController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Seller\AuctionController;
 use App\Http\Controllers\Seller\AuctionSellersController;
 use App\Http\Controllers\Seller\AuthController;
 use App\Http\Controllers\Seller\DashboardSellersController;
+use App\Http\Controllers\Seller\ProfileSellerController;
 use App\Http\Controllers\Users\AuctionUsersController;
 use App\Http\Controllers\Users\AuthUserController;
 use App\Http\Controllers\Users\BidUserController;
@@ -34,25 +36,27 @@ Route::get('/', [DashboradUserController::class, 'index'])->name('home');
 Route::prefix('seller')->group(function () {
     Route::get('/login', [AuthController::class, 'index'])->name('seller.login.form');
     Route::post('/login', [AuthController::class, 'login'])->name('seller.login.submit');
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('seller.logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('seller.logout');
     Route::middleware(['auth', 'role:seller'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Seller\DashbordController::class, 'index'])->name('seller.dashboard');
         Route::resource('auction', AuctionSellersController::class);
         Route::get('details/{id}', [AuctionSellersController::class, 'details'])->name('auction.selles.details');
-        // Route::get('/car/{id}/bids', \App\Livewire\Seller\CarDetails::class)->name('auction.selles.details');
         Route::get('/seller/auctions/archive', [AuctionSellersController::class, 'sellerArchive'])
             ->name('seller.auctions.archive');
         Route::get('winner/{id}', [AuctionSellersController::class, 'winner'])->name('auction.sellers.winner');
         Route::get('seller/dashboard', [DashboardSellersController::class, 'index'])->name('seller.dashboard');
+        Route::get('profile',[ProfileSellerController::class,'index'])->name('seller.profile');
+        Route::post('profile',[ProfileSellerController::class,'update'])->name('seller.profile.update');
 
     });
 });
 
 Route::prefix('admin')->group(function () {
 
-    Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'index'])->name('admin.login');
-    Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login'])
+    Route::get('/login', [AuthAdminController::class, 'index'])->name('admin.login');
+    Route::post('/login', [AuthAdminController::class, 'login'])
         ->name('admin.login.submit');
+  Route::post('logout',[AuthAdminController::class,'logout'])->name('admin.logout');
     Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashbordController::class, 'index'])->name('admin.dashboard');
         Route::resource('brand', BrandController::class);

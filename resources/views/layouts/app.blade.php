@@ -8,9 +8,8 @@
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
 
     <!-- Favicon -->
-    <link rel="icon"
-          href="{{ setting('site_logo') ?: asset('assets/img/kaiadmin/favicon.ico') }}"
-          type="image/x-icon" />
+    <link rel="icon" href="{{ setting('site_logo') ?: asset('assets/img/kaiadmin/favicon.ico') }}"
+        type="image/x-icon" />
 
     <!-- Fonts and icons -->
     <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>
@@ -43,13 +42,32 @@
     <!-- Tom Select -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Theme Colors -->
     <style>
         :root {
-            --primary-color: {{ setting('primary_color', '#198754') }};
-            --secondary-color: {{ setting('secondary_color', '#20c997') }};
+            --primary-color: {
+                    {
+                    setting('primary_color', '#198754')
+                }
+            }
+
+            ;
+
+            --secondary-color: {
+                    {
+                    setting('secondary_color', '#20c997')
+                }
+            }
+
+            ;
+        }
+
+        .sidebar .logout-btn {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
         }
     </style>
 
@@ -73,9 +91,8 @@
 
                         <a href="{{ route('admin.dashboard') }}" class="logo">
                             <img src="{{ setting('site_logo') ?: asset('assets/img/kaiadmin/logo_light.svg') }}"
-                                 alt="Logo"
-                                 class="navbar-brand"
-                                 style="height: 40px; width: auto; object-fit: contain;" />
+                                alt="Logo" class="navbar-brand"
+                                style="height: 40px; width: auto; object-fit: contain;" />
                         </a>
 
                         <div class="nav-toggle">
@@ -102,17 +119,17 @@
             </div>
             <!-- End Header -->
 
-           <div class="container">
-    <div class="main-content">
-        @if (isset($slot))
-            {{ $slot }}
-        @else
-            @yield('content')
-        @endif
-    </div>
-</div>
+            <div class="container">
+                <div class="main-content">
+                    @if (isset($slot))
+                    {{ $slot }}
+                    @else
+                    @yield('content')
+                    @endif
+                </div>
+            </div>
 
-@livewireScripts
+            @livewireScripts
 
 
         </div>
@@ -120,9 +137,10 @@
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"></script>
-            @stack('scripts')
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script>
+    @stack('scripts')
 
 </body>
+
 </html>

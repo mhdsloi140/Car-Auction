@@ -36,7 +36,7 @@
             <ul class="nav nav-secondary">
 
                 <!-- Dashboard -->
-             @role('admin')
+                @role('admin')
                 <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}" class="nav-link">
                         <i class="fas fa-home"></i>
@@ -91,6 +91,38 @@
                 </li>
                 @endrole
 
+                @role('admin')
+
+                <li class="nav-item logout-btn">
+                    <form action="{{ route('admin.logout') }}" method="POST" class="w-100">
+                        @csrf
+                        <button type="submit" class="nav-link d-flex align-items-center text-start w-100"
+                            style="background:none; border:none;">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            <span>تسجيل الخروج</span>
+                        </button>
+                    </form>
+                </li>
+                @endrole
+                @role('seller')
+
+                <li class="nav-item logout-btn">
+                    <form action="{{ route('seller.logout') }}" method="POST" class="w-100">
+                        @csrf
+                        <button type="submit" class="nav-link d-flex align-items-center text-start w-100"
+                            style="background:none; border:none;">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            <span>تسجيل الخروج</span>
+                        </button>
+                    </form>
+                </li>
+                @endrole
+                <li class="nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">
+    <a href="{{ route('seller.profile') }}" class="nav-link d-flex align-items-center">
+        <i class="fas fa-user me-2"></i>
+        <span>الملف الشخصي</span>
+    </a>
+</li>
 
             </ul>
 

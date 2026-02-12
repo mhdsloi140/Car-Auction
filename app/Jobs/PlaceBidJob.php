@@ -26,34 +26,41 @@ class PlaceBidJob implements ShouldQueue
        $lock = Cache::lock("auction:{$this->auctionId}", 5);
 
         if (! $lock->get()) {
-            // فيه مزايدة ثانية شغالة
+
             return;
         }
 
-        try {
-            DB::transaction(function () {
+      try {
+        DB::transaction(function () {
 
-                $auction = Auction::lockForUpdate()->findOrFail($this->auctionId);
+            $auction = Auction::lockForUpdate()->findOrFail($this->auctionId);
 
-                if ($auction->status !== 'active') {
-                    throw new \Exception('Auction not active');
-                }
+            if ($auction->status !== 'active') {
+                throw new \Exception('Auction not active');
+            }
 
-                if ($this->amount <= $auction->current_price) {
-                    throw new \Exception('Bid too low');
-                }
 
-                Bid::create([
-                    'auction_id' => $auction->id,
-                    'user_id'    => $this->userId,
-                    'amount'     => $this->amount,
-                ]);
+            $highestBid = $auction->bids()->max('amount');
 
-                $auction->update([
-                    'current_price' => $this->amount,
-                ]);
-            });
-        } finally {
+            $currentPrice = $highestBid ?? $auction->starting_price;
+
+
+            if ($this->amount <= $currentPrice) {
+                throw new \Exception('يجب أن يكون العرض أعلى من أعلى عرض حالي');
+            }
+
+            Bid::create([
+                'auction_id' => $auction->id,
+                'user_id'    => $this->userId,
+                'amount'     => $this->amount,
+            ]);
+
+            $auction->update([
+                'current_price' => $this->amount,
+            ]);
+        });
+
+    } finally {
             $lock->release();
         }
     }
