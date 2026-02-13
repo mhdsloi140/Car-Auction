@@ -32,7 +32,8 @@ return new class extends Migration {
                 'approved',
                 'rejected',
                 'active',
-                'closed'
+                'closed',
+                'completed'
             ])->default('pending');
 
             $table->foreignId('approved_by')

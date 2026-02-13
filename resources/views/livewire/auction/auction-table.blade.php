@@ -1,6 +1,6 @@
 <div class="card p-3 shadow-sm">
     <h3 class="mb-3" style="text-align: center">قائمة المزادات</h3>
-     <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
+    <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
         <label class="fw-bold mb-0">فلترة حسب الحالة:</label>
         <select wire:model="statusFilter" class="form-select w-auto">
             <option value="">كل المزادات</option>
@@ -13,7 +13,7 @@
     </div>
 
 
-  <div class="table-responsive">
+    <div class="table-responsive">
         <table class="table table-bordered table-striped text-center align-middle">
             <thead class="table-primary">
                 <tr>
@@ -32,18 +32,29 @@
                     <td>{{ $auction->car->name }} - {{ $auction->car->brand }} ({{ $auction->car->year }})</td>
                     <td>{{ $auction->start_price }}</td>
                     <td>
-                        @if($auction->status == 'pending')
-                            <span class="badge bg-warning text-dark">قيد الانتظار</span>
-                        @elseif($auction->status == 'approved')
-                            <span class="badge bg-success">موافق عليه</span>
-                        @elseif($auction->status == 'rejected')
-                            <span class="badge bg-danger">مرفوض</span>
-                        @elseif($auction->status == 'active')
-                            <span class="badge bg-primary">نشط</span>
+                        @if($auction->status === 'pending')
+                        <span class="badge bg-warning text-dark">قيد الانتظار</span>
+
+                        @elseif($auction->status === 'approved')
+                        <span class="badge bg-info text-dark">موافق عليه</span>
+
+                        @elseif($auction->status === 'active')
+                        <span class="badge bg-primary">نشط</span>
+
+                        @elseif($auction->status === 'closed')
+                        <span class="badge bg-secondary">مغلق</span>
+
+                        @elseif($auction->status === 'completed')
+                        <span class="badge bg-success">مكتمل</span>
+
+                        @elseif($auction->status === 'rejected')
+                        <span class="badge bg-danger">مرفوض</span>
+
                         @else
-                            <span class="badge bg-secondary">مغلق</span>
+                        <span class="badge bg-dark">غير معروف</span>
                         @endif
                     </td>
+
                 </tr>
                 @empty
                 <tr>

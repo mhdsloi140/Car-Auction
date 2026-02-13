@@ -21,32 +21,32 @@ class AdminLoginRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    { 
+    {
         return [
-           'email' => ['required', 'email','exists:users,email'],
+            'phone' => ['required', 'string', 'exists:users,phone'],
             'password' => ['required', 'string'],
         ];
     }
     public function afterValidation()
     {
         $data = $this->validated();
-        $user = User::where('email', $data['email'])->first();
+        $user = User::where('phone', $data['phone'])->first();
         if (!Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'password' => 'The provided credentials are incorrect.',
+                'password' => 'البيانات المقدمة غير صحيحة.',
             ]);
         }
         return $data;
     }
-     public function messages(): array
+    public function messages(): array
     {
-        return [
-            'email.required' => 'البريد الإلكتروني مطلوب',
-            'email.email' => 'البريد الإلكتروني غير صحيح',
-            'email.exists' => 'هذا البريد الإلكتروني غير مسجل',
-            'password.required' => 'كلمة المرور مطلوبة',
-            'password.string' => 'كلمة المرور يجب أن تكون نصية',
-            'password.min' => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
-        ];
+        return
+            [
+                'phone.required' => 'رقم الهاتف مطلوب',
+                'phone.string' => 'رقم الهاتف غير صحيح',
+                'phone.exists' => 'هذا الرقم غير مسجل',
+                'password.required' => 'كلمة المرور مطلوبة',
+                'password.string' => 'كلمة المرور يجب أن تكون نصية',
+            ];
     }
 }

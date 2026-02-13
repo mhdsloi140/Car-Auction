@@ -20,10 +20,16 @@
 
         {{-- زر الرفض --}}
         <livewire:admin.reject-auction :auction="$auction" />
-
+        <div class="text-center mb-4">
+            <button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#editPriceModal">
+                تعديل سعر المزاد
+            </button>
+        </div>
     </div>
     @endif
     @endrole
+
+
 
 
     {{-- بطاقة تفاصيل المزاد --}}
@@ -143,39 +149,74 @@
         </form>
     </div>
     <!-- Modal لعرض الصورة -->
-  <div class="modal fade" id="imagesModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content bg-dark">
+    <div class="modal fade" id="imagesModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-dark">
 
-            <div class="modal-body p-0">
+                <div class="modal-body p-0">
 
-                <div id="modalCarousel" class="carousel slide" data-bs-ride="false">
-                    <div class="carousel-inner">
+                    <div id="modalCarousel" class="carousel slide" data-bs-ride="false">
+                        <div class="carousel-inner">
 
-                        @foreach($auction->car->getMedia('cars') as $index => $photo)
+                            @foreach($auction->car->getMedia('cars') as $index => $photo)
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ $photo->getUrl() }}" class="d-block w-100" style="max-height:80vh; object-fit:contain;">
+                                <img src="{{ $photo->getUrl() }}" class="d-block w-100"
+                                    style="max-height:80vh; object-fit:contain;">
                             </div>
-                        @endforeach
+                            @endforeach
+
+                        </div>
+
+                        <button class="carousel-control-prev" type="button" data-bs-target="#modalCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+
+                        <button class="carousel-control-next" type="button" data-bs-target="#modalCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
 
                     </div>
-
-                    <button class="carousel-control-prev" type="button" data-bs-target="#modalCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-
-                    <button class="carousel-control-next" type="button" data-bs-target="#modalCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
 
                 </div>
 
             </div>
+        </div>
+    </div>
+
+<!-- Modal تعديل السعر -->
+<div class="modal fade" id="editPriceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form action="{{ route('auction.update.price', $auction->id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل سعر المزاد</h5>
+                    <button type="button" class="btn-close me-auto" style="margin-left: 30px" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <label class="fw-bold mb-2">السعر الجديد:</label>
+                    <input type="number" name="new_price" class="form-control" min="1"
+                           value="{{ $auction->starting_price }}" required>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التعديل</button>
+                </div>
+
+            </form>
 
         </div>
     </div>
 </div>
-
 
 </div>
 <script>

@@ -46,9 +46,12 @@ Route::prefix('seller')->group(function () {
             ->name('seller.auctions.archive');
         Route::get('winner/{id}', [AuctionSellersController::class, 'winner'])->name('auction.sellers.winner');
         Route::get('seller/dashboard', [DashboardSellersController::class, 'index'])->name('seller.dashboard');
-        Route::get('profile',[ProfileSellerController::class,'index'])->name('seller.profile');
-        Route::post('profile',[ProfileSellerController::class,'update'])->name('seller.profile.update');
-
+        Route::get('profile', [ProfileSellerController::class, 'index'])->name('seller.profile');
+        Route::post('profile', [ProfileSellerController::class, 'update'])->name('seller.profile.update');
+        Route::patch('/auction/{auction}/reject', [AuctionSellersController::class, 'reject'])
+            ->name('auction.sellers.reject');
+        Route::patch('/auction/{auction}/complete', [AuctionSellersController::class, 'complete'])->name('auction.sellers.complete');
+       
     });
 });
 
@@ -57,7 +60,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/login', [AuthAdminController::class, 'index'])->name('admin.login');
     Route::post('/login', [AuthAdminController::class, 'login'])
         ->name('admin.login.submit');
-  Route::post('logout',[AuthAdminController::class,'logout'])->name('admin.logout');
+    Route::post('logout', [AuthAdminController::class, 'logout'])->name('admin.logout');
     Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashbordController::class, 'index'])->name('admin.dashboard');
         Route::resource('brand', BrandController::class);
@@ -85,11 +88,11 @@ Route::prefix('admin')->group(function () {
             ->name('admin.activity.logs');
         Route::delete('/admin/activity-logs/delete', [ActivityLogController::class, 'delete'])
             ->name('admin.activity.logs.delete');
-     Route::get('proflie',[ProfileAdminController::class,'index'])->name('admin.profile');
+        Route::get('proflie', [ProfileAdminController::class, 'index'])->name('admin.profile');
 
-        Route::post('profile',[ProfileAdminController::class,'update'])->name('admin.profile.update');
+        Route::post('profile', [ProfileAdminController::class, 'update'])->name('admin.profile.update');
 
-
+        Route::patch('/auction/{auction}/update-price', [AuctionAdminController::class, 'updatePrice'])->name('auction.update.price');
 
 
     });
@@ -99,9 +102,9 @@ Route::prefix('users')->group(function () {
     Route::get('/auctions/{id}', [AuctionUsersController::class, 'show'])
         ->name('auction.users.show');
 
-Route::get('/auction/{id}/bid', [BidUserController::class, 'show'])
-    ->name('auction.bid')
-    ->middleware('auth');
+    Route::get('/auction/{id}/bid', [BidUserController::class, 'show'])
+        ->name('auction.bid')
+        ->middleware('auth');
 
 
 });

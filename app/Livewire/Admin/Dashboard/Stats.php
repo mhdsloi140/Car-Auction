@@ -20,6 +20,7 @@ class Stats extends Component
             'pending'      => Auction::where('status', 'pending')->count(),
             'rejected'     => Auction::where('status', 'rejected')->count(),
             'closed'       => Auction::where('status', 'closed')->count(),
+            'completed'    => Auction::where('status', 'completed')->count(),
             'totalBids'    => Bid::sum('amount'),
         ]);
     }

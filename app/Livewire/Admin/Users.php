@@ -21,7 +21,7 @@ class Users extends Component
     {
         return [
             'name'  => 'required|string',
-            'email' => 'required|email',
+
             'phone' => 'required|numeric|unique:users,phone,' . $this->user_id,
             'role'  => 'required|string',
         ];
@@ -31,9 +31,6 @@ class Users extends Component
     {
         return [
             'name.required'  => 'الاسم مطلوب',
-            'email.required' => 'البريد الإلكتروني مطلوب',
-            'email.email'    => 'البريد الإلكتروني غير صحيح',
-            'phone.required' => 'رقم الهاتف مطلوب',
             'phone.numeric'  => 'رقم الهاتف يجب أن يكون أرقام فقط',
             'phone.unique'   => 'رقم الهاتف مستخدم مسبقًا',
             'role.required'  => 'يجب اختيار الصلاحية',
@@ -74,7 +71,7 @@ class Users extends Component
 
             $user->update([
                 'name'  => $this->name,
-                'email' => $this->email,
+                
                 'phone' => $this->phone,
             ]);
 
@@ -85,7 +82,7 @@ class Users extends Component
 
             $user = User::create([
                 'name'     => $this->name,
-                'email'    => $this->email,
+
                 'phone'    => $this->phone,
                 'password' => Hash::make('password'),
             ]);
@@ -124,7 +121,7 @@ class Users extends Component
     {
         $query = User::query();
 
-       
+
         $query->whereDoesntHave('roles', function ($q) {
             $q->where('name', 'admin');
         });

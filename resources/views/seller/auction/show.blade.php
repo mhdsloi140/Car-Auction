@@ -49,7 +49,7 @@
                 <div class="col-md-4 mb-2">
                     <strong>سعر الشراء الفوري:</strong>
                     <span class="text-danger">
-                        {{ $car->auction->buy_now_price ? number_format($car->auction->buy_now_price) . ' ريال' : 'لا يوجد' }}
+                        {{ $car->auction->buy_now_price ? number_format($car->auction->buy_now_price) . ' $' : 'لا يوجد' }}
                     </span>
                 </div>
 

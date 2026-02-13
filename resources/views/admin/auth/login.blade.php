@@ -29,11 +29,11 @@
 
                                 <h3 class="mb-5">تسجيل الدخول</h3>
 
-                                
+
                                 <div class="form-outline mb-4 text-start">
-                                    <label class="form-label" for="email">البريد الإلكتروني</label>
-                                    <input type="email" id="email" name="email" class="form-control form-control-lg" />
-                                    @error('email')
+                                    <label class="form-label" for="phone"> رقم الهاتف</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control form-control-lg" />
+                                    @error('phnoe')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>

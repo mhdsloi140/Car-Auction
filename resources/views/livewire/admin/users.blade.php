@@ -26,7 +26,8 @@
                 <thead>
                     <tr>
                         <th>الاسم</th>
-                        <th>البريد</th>
+                        <th>رقم الهاتف</th>
+
                         <th>الدور</th>
                         <th>العمليات</th>
                     </tr>
@@ -36,7 +37,8 @@
                     @foreach($users as $user)
                     <tr>
                         <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->phone }}</td>
+
                         @php
                         $roleNames = [
                         'seller' => 'بائع',
@@ -95,10 +97,7 @@
                         <input type="text" class="form-control" wire:model="name">
                     </div>
 
-                    <div class="mb-3">
-                        <label>البريد</label>
-                        <input type="email" class="form-control" wire:model="email">
-                    </div>
+
                     <div class="mb-3">
                         <label>رقم الهاتف</label>
                         <input type="text" class="form-control" wire:model.defer="phone">

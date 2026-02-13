@@ -10,12 +10,12 @@ class AuthAdminService
     public function login($data)
     {
 
-        if (!Auth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
-            return [
-                'status' => false,
-                'message' => 'بيانات الدخول غير صحيحة'
-            ];
-        }
+        if (!Auth::attempt(['phone' => $data['phone'], 'password' => $data['password']])) {
+        return [
+            'status' => false,
+            'message' => 'بيانات الدخول غير صحيحة'
+        ];
+    }
 
         $user = Auth::user();
 

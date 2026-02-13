@@ -31,19 +31,35 @@ class AuctionSellersController extends Controller
      */
     public function sellerArchive()
     {
-        $auctions = Auction::with(['car', 'winner'])
-            ->where('seller_id', Auth::id())
-            ->where('status', 'closed')
-            ->orderByDesc('end_at')
-            ->paginate(10);
+     $auctions = Auction::with(['car', 'winner'])
+    ->where('seller_id', Auth::id())
+    ->whereIn('status', ['closed', 'rejected'])
+    ->orderByDesc('end_at')
+    ->paginate(10);
+
 
         return view('seller.auction.archive', compact('auctions'));
     }
-    public function winner($id )
+    public function winner($id)
     {
-        $user=User::find($id);
- return view('seller.auction.showwinner', compact('user'));
+        $user = User::find($id);
+        return view('seller.auction.showwinner', compact('user'));
     }
+    public function complete(Auction $auction)
+    {
+        $auction->update([ 'status' => 'completed' ]);
+         return back()->with('success', 'تم قبول الفائز وتغيير حالة المزاد إلى مكتمل');
+    }
+
+    public function reject(Auction $auction)
+    {
+        $auction->update([
+            'status' => 'rejected'
+        ]);
+
+        return back()->with('success', 'تم رفض المزاد بنجاح');
+    }
+
     public function store(Request $request)
     {
         //

@@ -86,7 +86,7 @@
                             {{-- الاسم + الوقت --}}
                             <div>
                                 <div class="fw-bold">
-                                    {{ $bid->user->name }}
+                                    {{ $bid->user->id}}
                                     @if($index === 0)
                                     <span class="badge bg-warning text-dark ms-2">الاعلى</span>
                                     @endif

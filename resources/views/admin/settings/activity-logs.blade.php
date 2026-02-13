@@ -7,6 +7,50 @@
 <div class="container my-5" style="direction: rtl; text-align: right;">
 
     <h3 class="fw-bold mb-4">سجلات النشاطات</h3>
+    <form method="GET" action="{{ route('admin.activity.logs') }}" class="mb-4">
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <label class="fw-bold">المستخدم</label>
+            <input type="text" name="user" class="form-control"
+                   value="{{ request('user') }}" placeholder="اسم المستخدم">
+        </div>
+
+        <div class="col-md-3">
+            <label class="fw-bold">العملية</label>
+            <input type="text" name="action" class="form-control"
+                   value="{{ request('action') }}" placeholder="نوع العملية">
+        </div>
+
+    
+
+
+
+        <div class="col-md-3">
+            <label class="fw-bold">من تاريخ</label>
+            <input type="date" name="from" class="form-control"
+                   value="{{ request('from') }}">
+        </div>
+
+        <div class="col-md-3">
+            <label class="fw-bold">إلى تاريخ</label>
+            <input type="date" name="to" class="form-control"
+                   value="{{ request('to') }}">
+        </div>
+
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-primary px-4">تطبيق الفلترة</button>
+
+        <a href="{{ route('admin.activity.logs') }}" class="btn btn-secondary px-4">
+            إعادة التعيين
+        </a>
+    </div>
+
+</form>
+
 
     <form id="delete-form" action="{{ route('admin.activity.logs.delete') }}" method="POST">
         @csrf
@@ -52,9 +96,11 @@
                 </table>
             </div>
 
-            <div class="p-3 d-flex justify-content-between align-items-center">
-                {{ $logs->links() }}
+               <div class="d-flex justify-content-center mt-3">
+        {{ $logs->links('pagination::bootstrap-5') }}
+    </div>
 
+            <div class="p-3 d-flex justify-content-between align-items-center">
                 <button type="button" class="btn btn-danger" id="delete-selected">
                     حذف السجلات المحددة
                 </button>

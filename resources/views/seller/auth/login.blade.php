@@ -31,9 +31,9 @@
 
                                 {{-- البريد الإلكتروني --}}
                                 <div class="form-outline mb-4 text-start">
-                                    <label class="form-label" for="email">البريد الإلكتروني</label>
-                                    <input type="email" id="email" name="email" class="form-control form-control-lg" />
-                                    @error('email')
+                                    <label class="form-label" for="email">رقم الهاتف</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control form-control-lg" />
+                                    @error('phone')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>

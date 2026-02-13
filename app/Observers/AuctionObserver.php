@@ -9,7 +9,7 @@ class AuctionObserver
     public function created(Auction $auction)
     {
         log_activity(
-            'تنشاء مزاد',
+            'إنشاء مزاد',
             "تم إنشاء مزاد للسيارة رقم {$auction->car_id} بواسطة المستخدم رقم {$auction->seller_id}"
         );
     }

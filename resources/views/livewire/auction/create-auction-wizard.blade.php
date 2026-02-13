@@ -9,7 +9,8 @@
     </button>
 
     @if($showModal)
-    <div class="modal fade show d-block p-4" style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);" wire:ignore.self>
+    <div class="modal fade show d-block p-4" style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);"
+        wire:ignore.self>
 
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 1.25rem; overflow: hidden;">
@@ -25,7 +26,8 @@
                             @endif
                         </span>
                     </h5>
-                    <button type="button" class="btn-close position-absolute start-0 ms-3 mt-2" wire:click="closeModal"></button>
+                    <button type="button" class="btn-close position-absolute start-0 ms-3 mt-2"
+                        wire:click="closeModal"></button>
                 </div>
 
                 {{-- PROGRESS BAR --}}
@@ -76,7 +78,8 @@
                             <label class="form-label fw-bold small">عدد الكيلومترات</label>
                             <select class="form-select" wire:model.defer="mileage">
                                 <option value="">اختر عدد الكيلومترات</option>
-                                @foreach([500,1000,1500,2000,3000,4000,5000,6000,8000,10000,12500,15000,20000,22500,25000] as $km)
+                                @foreach([500,1000,1500,2000,3000,4000,5000,6000,8000,10000,12500,15000,20000,22500,25000]
+                                as $km)
                                 <option value="{{ $km }}">ما يصل إلى {{ $km }} كم</option>
                                 @endforeach
                             </select>
@@ -87,9 +90,29 @@
                             <label class="form-label fw-bold small">المدينة</label>
                             <select class="form-select" wire:model.defer="city">
                                 <option value="">اختر المدينة</option>
-                                @foreach(['دمشق','ريف دمشق','حلب','حمص','حماة','اللاذقية','طرطوس','درعا','السويداء','القنيطرة','إدلب','الرقة','دير الزور','الحسكة'] as $city)
+                                @foreach([
+                                'بغداد',
+                                'البصرة',
+                                'نينوى',
+                                'أربيل',
+                                'السليمانية',
+                                'دهوك',
+                                'النجف',
+                                'كربلاء',
+                                'الأنبار',
+                                'ديالى',
+                                'صلاح الدين',
+                                'واسط',
+                                'ميسان',
+                                'ذي قار',
+                                'المثنى',
+                                'بابل',
+                                'القادسية',
+                                'كركوك'
+                                ] as $city)
                                 <option value="{{ $city }}">{{ $city }}</option>
                                 @endforeach
+
                             </select>
                             @error('city') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
@@ -98,7 +121,9 @@
                             <label class="form-label fw-bold small d-block mb-2">مواصفات</label>
                             <div class="d-flex gap-2">
                                 @foreach(['gcc'=>'خليجية','non_gcc'=>'غير خليجية','unknown'=>'لا أعلم'] as $key=>$label)
-                                <button type="button" class="btn flex-grow-1 py-2 {{ $specs === $key ? 'btn-success' : 'btn-outline-secondary' }}" wire:click="$set('specs','{{ $key }}')">{{ $label }}</button>
+                                <button type="button"
+                                    class="btn flex-grow-1 py-2 {{ $specs === $key ? 'btn-success' : 'btn-outline-secondary' }}"
+                                    wire:click="$set('specs','{{ $key }}')">{{ $label }}</button>
                                 @endforeach
                             </div>
                             @error('specs') <small class="text-danger">{{ $message }}</small> @enderror
@@ -113,38 +138,37 @@
                     @endif
 
                     {{-- STEP 2 --}}
-                  @if($step === 2)
+                    @if($step === 2)
 
-    <div class="upload-zone text-center p-4 border border-dashed rounded-3 mb-3"
-         style="border-color: #d0d7de; background: #f8f9fa;">
+                    <div class="upload-zone text-center p-4 border border-dashed rounded-3 mb-3"
+                        style="border-color: #d0d7de; background: #f8f9fa;">
 
-        <i class="bi bi-cloud-arrow-up text-primary display-5"></i>
-        <h6 class="mt-2 fw-bold">ارفع صور السيارة</h6>
+                        <i class="bi bi-cloud-arrow-up text-primary display-5"></i>
+                        <h6 class="mt-2 fw-bold">ارفع صور السيارة</h6>
 
-        <input type="file" class="form-control mt-3" wire:model="photos" multiple>
+                        <input type="file" class="form-control mt-3" wire:model="photos" multiple>
 
-        {{-- خطأ عدد الصور --}}
-        @error('photos')
-            <small class="text-danger d-block mt-2">{{ $message }}</small>
-        @enderror
+                        {{-- خطأ عدد الصور --}}
+                        @error('photos')
+                        <small class="text-danger d-block mt-2">{{ $message }}</small>
+                        @enderror
 
-        {{-- خطأ نوع/حجم كل صورة --}}
-        @error('photos.*')
-            <small class="text-danger d-block mt-2">{{ $message }}</small>
-        @enderror
+                        {{-- خطأ نوع/حجم كل صورة --}}
+                        @error('photos.*')
+                        <small class="text-danger d-block mt-2">{{ $message }}</small>
+                        @enderror
 
-    </div>
+                    </div>
 
-    {{-- عرض الصور المرفوعة --}}
-    <div class="d-flex flex-wrap gap-2 justify-content-center">
-        @foreach($photos as $photo)
-            <img src="{{ $photo->temporaryUrl() }}"
-                 class="img-thumbnail rounded-3 shadow-sm"
-                 style="width:120px; height:90px; object-fit:cover;">
-        @endforeach
-    </div>
+                    {{-- عرض الصور المرفوعة --}}
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        @foreach($photos as $photo)
+                        <img src="{{ $photo->temporaryUrl() }}" class="img-thumbnail rounded-3 shadow-sm"
+                            style="width:120px; height:90px; object-fit:cover;">
+                        @endforeach
+                    </div>
 
-@endif
+                    @endif
 
 
                     {{-- STEP 3 --}}
@@ -154,8 +178,9 @@
                             <div class="card bg-light border-0 p-4 shadow-sm mb-3">
                                 <label class="fw-bold mb-2">السعر الابتدائي</label>
                                 <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white">ريال</span>
-                                    <input type="number" class="form-control text-center fw-bold" wire:model.defer="starting_price">
+                                    <span class="input-group-text bg-white">$</span>
+                                    <input type="number" class="form-control text-center fw-bold"
+                                        wire:model.defer="starting_price">
                                 </div>
                                 @error('starting_price') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
@@ -163,8 +188,9 @@
                             <div class="card bg-light border-0 p-4 shadow-sm">
                                 <label class="fw-bold mb-2">سعر الشراء الفوري (اختياري)</label>
                                 <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white">ريال</span>
-                                    <input type="number" class="form-control text-center fw-bold" wire:model.defer="buy_now_price">
+                                    <span class="input-group-text bg-white">$</span>
+                                    <input type="number" class="form-control text-center fw-bold"
+                                        wire:model.defer="buy_now_price">
                                 </div>
                                 @error('buy_now_price') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
@@ -178,14 +204,16 @@
                 <div class="modal-footer border-0 px-4 pb-4">
                     <div class="d-flex w-100 gap-2">
                         @if($step > 1)
-                        <button class="btn btn-outline-secondary px-4 py-2 flex-grow-1" wire:click="previousStep">السابق</button>
+                        <button class="btn btn-outline-secondary px-4 py-2 flex-grow-1"
+                            wire:click="previousStep">السابق</button>
                         @endif
 
-                        @if($step < 3)
-                        <button class="btn btn-primary px-4 py-2 flex-grow-1 shadow" wire:click="nextStep">استمرار</button>
-                        @else
-                        <button class="btn btn-success px-4 py-2 flex-grow-1 shadow" wire:click="save">نشر المزاد الآن</button>
-                        @endif
+                        @if($step < 3) <button class="btn btn-primary px-4 py-2 flex-grow-1 shadow"
+                            wire:click="nextStep">استمرار</button>
+                            @else
+                            <button class="btn btn-success px-4 py-2 flex-grow-1 shadow" wire:click="save">نشر المزاد
+                                الآن</button>
+                            @endif
                     </div>
                 </div>
 

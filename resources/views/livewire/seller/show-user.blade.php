@@ -18,7 +18,7 @@
                             <span style="background-color: {{ $color }}; color: #fff; width: 35px; height: 35px; display:inline-flex; justify-content:center; align-items:center; border-radius:50%; margin-right:5px;">
                                 {{ $avatarText }}
                             </span>
-                            {{ $user->name }}
+                            {{ $user->id }}
                         </h5>
                         <button type="button" class="btn-close" wire:click="closeModal"></button>
                     </div>
