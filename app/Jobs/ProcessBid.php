@@ -56,7 +56,7 @@ class ProcessBid implements ShouldQueue
                 // حفظ المزايدة
                 $this->bid->save();
 
-                // تحديث السعر الأعلى في المزاد (اختياري)
+              
                 $auction->update([
                     'highest_bid' => $this->bid->amount
                 ]);

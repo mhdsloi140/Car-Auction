@@ -19,18 +19,18 @@ class PlaceBidJob implements ShouldQueue
         public int $auctionId,
         public int $userId,
         public float $amount
-    ) {}
+    ) {
+    }
 
-    public function handle()
-    {
-       $lock = Cache::lock("auction:{$this->auctionId}", 5);
+   public function handle()
+{
+    $lock = Cache::lock("auction:{$this->auctionId}", 5);
 
-        if (! $lock->get()) {
+    if (!$lock->get()) {
+        return;
+    }
 
-            return;
-        }
-
-      try {
+    try {
         DB::transaction(function () {
 
             $auction = Auction::lockForUpdate()->findOrFail($this->auctionId);
@@ -39,29 +39,42 @@ class PlaceBidJob implements ShouldQueue
                 throw new \Exception('Auction not active');
             }
 
-
-            $highestBid = $auction->bids()->max('amount');
-
-            $currentPrice = $highestBid ?? $auction->starting_price;
-
-
-            if ($this->amount <= $currentPrice) {
-                throw new \Exception('يجب أن يكون العرض أعلى من أعلى عرض حالي');
+            if ($auction->end_at && now()->greaterThan($auction->end_at)) {
+                throw new \Exception('Auction ended');
             }
 
+            // السعر الحالي
+            $highestBid = $auction->bids()->max('amount');
+            $currentPrice = $highestBid ?? $auction->starting_price;
+
+            // السعر النهائي
+            $finalAmount = $currentPrice + $this->amount;
+
+            // التحقق الصحيح
+            if ($finalAmount <= $currentPrice) {
+                throw new \Exception('Bid must be higher than current price');
+            }
+
+            // إنشاء المزايدة بالسعر النهائي
             Bid::create([
                 'auction_id' => $auction->id,
-                'user_id'    => $this->userId,
-                'amount'     => $this->amount,
+                'user_id' => $this->userId,
+                'amount' => $finalAmount,
             ]);
 
+            // تحديث المزاد
             $auction->update([
-                'current_price' => $this->amount,
+                'current_price' => $finalAmount,
+                'end_at' => $auction->end_at
+                    ? $auction->end_at->addSeconds(30)
+                    : now()->addSeconds(30),
             ]);
+
         });
 
     } finally {
-            $lock->release();
-        }
+        $lock->release();
     }
+}
+
 }
