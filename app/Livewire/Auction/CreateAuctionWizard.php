@@ -9,6 +9,8 @@ use App\Models\Brand;
 use App\Models\CarModel;
 use App\Models\Car;
 use App\Models\Setting;
+use App\Services\UltraMsgService;
+use App\Models\User;
 
 class CreateAuctionWizard extends Component
 {
@@ -17,8 +19,7 @@ class CreateAuctionWizard extends Component
     public int $step = 1;
     public bool $showModal = false;
 
-    // بيانات السيارة
-    public ?int $brand_id = null;
+      public ?int $brand_id = null;
     public ?int $model_id = null;
     public ?int $year = null;
     public string $city = '';
@@ -28,7 +29,7 @@ class CreateAuctionWizard extends Component
     public ?string $specs = null;
     public array $photos = [];
 
-    
+
     public ?float $starting_price = null;
     public ?float $buy_now_price = null;
 
@@ -150,60 +151,83 @@ class CreateAuctionWizard extends Component
         }
     }
 
-    public function save()
-    {
-        $this->validateStep();
+ public function save()
+{
+    $this->validateStep();
 
-        $settings = $this->getFileSettings();
+    $settings = $this->getFileSettings();
 
-        if (count($this->photos) > $settings['max_images']) {
-            $this->addError('photos', "الحد الأقصى لعدد الصور هو {$settings['max_images']} صورة فقط");
-            return;
-        }
-
-        DB::beginTransaction();
-
-        try {
-
-            $car = Car::create([
-                'brand_id' => $this->brand_id,
-                'model_id' => $this->model_id,
-                'year' => $this->year,
-                'city' => $this->city,
-                'mileage' => $this->mileage,
-                'plate_number' => $this->plate_number,
-                'description' => $this->description,
-                'specs' => $this->specs,
-            ]);
-
-            // رفع الصور
-            if ($this->photos) {
-                foreach ($this->photos as $photo) {
-                    $car->addMedia($photo)
-                        ->usingFileName(time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension())
-                        ->toMediaCollection('cars');
-                }
-            }
-
-            // إنشاء المزاد
-            $car->auction()->create([
-                'seller_id' => auth()->id(),
-                'starting_price' => $this->starting_price,
-                'buy_now_price' => $this->buy_now_price,
-                'status' => 'pending',
-            ]);
-
-            DB::commit();
-
-            session()->flash('success', 'تم إنشاء المزاد بنجاح');
-            $this->closeModal();
-            $this->dispatch('auctionCreated');
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            dd($e->getMessage());
-        }
+    if (count($this->photos) > $settings['max_images']) {
+        $this->addError('photos', "الحد الأقصى لعدد الصور هو {$settings['max_images']} صورة فقط");
+        return;
     }
+
+    DB::beginTransaction();
+
+    try {
+
+        $car = Car::create([
+            'brand_id' => $this->brand_id,
+            'model_id' => $this->model_id,
+            'year' => $this->year,
+            'city' => $this->city,
+            'mileage' => $this->mileage,
+            'plate_number' => $this->plate_number,
+            'description' => $this->description,
+            'specs' => $this->specs,
+        ]);
+
+        // رفع الصور
+        if ($this->photos) {
+            foreach ($this->photos as $photo) {
+                $car->addMedia($photo)
+                    ->usingFileName(time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension())
+                    ->toMediaCollection('cars');
+            }
+        }
+
+        // إنشاء المزاد
+        $auction = $car->auction()->create([
+            'seller_id' => auth()->id(),
+            'starting_price' => $this->starting_price,
+            'buy_now_price' => $this->buy_now_price,
+            'status' => 'pending',
+        ]);
+
+        DB::commit();
+
+        /*
+        |--------------------------------------------------------------------------
+        | إرسال رسالة للمدير بوجود مزاد جديد
+        |--------------------------------------------------------------------------
+        */
+
+        $url = route('auction.show', $auction->id);
+        $ultra = new UltraMsgService();
+
+
+        $admins = User::role('admin')->get();
+
+        foreach ($admins as $admin) {
+            if (!$admin->phone) continue;
+
+            $phone = preg_replace('/^0/', '', $admin->phone);
+            $fullPhone = '+963' . $phone; 
+
+            $msg = "يوجد مزاد جديد بانتظار الموافقة.\nرابط المزاد:\n{$url}";
+
+            $ultra->sendMessage($fullPhone, $msg);
+        }
+
+        session()->flash('success', 'تم إنشاء المزاد بنجاح');
+        $this->closeModal();
+        $this->dispatch('auctionCreated');
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        dd($e->getMessage());
+    }
+}
 
     public function render()
     {

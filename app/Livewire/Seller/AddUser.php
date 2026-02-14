@@ -5,6 +5,7 @@ namespace App\Livewire\Seller;
 use Livewire\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Services\UltraMsgService;
 
 class AddUser extends Component
 {
@@ -24,23 +25,31 @@ class AddUser extends Component
         'phone.unique' => 'رقم الجوال مستخدم من قبل',
 
     ];
+    private function generatePassword($length = 10)
+    {
+        return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $length);
+    }
 
-   public function addUser()
-{
-    $this->validate();
+    public function addUser()
+    {
+        $this->validate();
+        $password = $this->generatePassword(10);
+        $user = User::create([
+            'name' => $this->name,
+            'phone' => $this->phone,
+            'password' => Hash::make($password),
+        ]);
 
-    $user = User::create([
-        'name' => $this->name,
-        'phone' => $this->phone,
-        'password' => Hash::make('  '),
-    ]);
+        $user->assignRole('user');
+        $phone = preg_replace('/^0/', '', $this->phone);
+        $fullPhone = '00963' . $phone;
+        $msg = "مرحباً {$this->name}، تم إنشاء حسابك بنجاح.\nكلمة المرور الخاصة بك هي: {$password}";
+        $ultra = new UltraMsgService();
+        $ultra->sendMessage($fullPhone, $msg);
+        session()->flash('success', 'تم إضافة المستخدم بنجاح وتم إرسال كلمة المرور إلى جواله');
+        $this->reset(['name', 'phone']);
+    }
 
-    $user->assignRole('user');
-
-    session()->flash('success', 'تم إضافة المستخدم بنجاح');
-
-    $this->reset(['name','phone']);
-}
 
     public function render()
     {

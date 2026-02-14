@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use App\Services\UltraMsgService;
 
 class Users extends Component
 {
@@ -21,7 +22,6 @@ class Users extends Component
     {
         return [
             'name'  => 'required|string',
-
             'phone' => 'required|numeric|unique:users,phone,' . $this->user_id,
             'role'  => 'required|string',
         ];
@@ -36,6 +36,11 @@ class Users extends Component
             'role.required'  => 'يجب اختيار الصلاحية',
         ];
     }
+
+    private function generatePassword($length = 10)
+{
+    return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $length);
+}
 
     public function showCreateModal()
     {
@@ -53,46 +58,56 @@ class Users extends Component
 
         $this->user_id = $id;
         $this->name    = $user->name;
-        $this->email   = $user->email;
+
         $this->phone   = $user->phone;
         $this->role    = $user->roles->first()?->name;
 
         $this->modalFormVisible = true;
     }
 
-    public function save()
-    {
-        $this->validate();
+ public function save()
+{
+    $this->validate();
 
-        if ($this->isEdit) {
+    if ($this->isEdit) {
 
+        $user = User::findOrFail($this->user_id);
 
-            $user = User::findOrFail($this->user_id);
+        $user->update([
+            'name'  => $this->name,
+            'phone' => $this->phone,
+        ]);
 
-            $user->update([
-                'name'  => $this->name,
-                
-                'phone' => $this->phone,
-            ]);
+        $user->syncRoles([$this->role]);
 
-            $user->syncRoles([$this->role]);
+    } else {
 
-        } else {
+        // توليد كلمة مرور عشوائية
+        $password = $this->generatePassword(10);
 
+        // إنشاء المستخدم
+        $user = User::create([
+            'name'     => $this->name,
+            'phone'    => $this->phone,
+            'password' => Hash::make($password),
+        ]);
 
-            $user = User::create([
-                'name'     => $this->name,
+        $user->assignRole($this->role);
 
-                'phone'    => $this->phone,
-                'password' => Hash::make('password'),
-            ]);
+        // تجهيز رقم الجوال مع كود الدولة
+        $phone = preg_replace('/^0/', '', $this->phone);
+        $fullPhone = '00963' . $phone;
 
-            $user->assignRole($this->role);
-        }
-
-        $this->modalFormVisible = false;
-        $this->resetFields();
+        // إرسال كلمة المرور عبر واتساب
+        $msg = "مرحباً {$this->name}، تم إنشاء حسابك بنجاح.\nكلمة المرور الخاصة بك هي: {$password}";
+        $ultra = new UltraMsgService();
+        $ultra->sendMessage($fullPhone, $msg);
     }
+session()->flash('success', 'تم إضافة المستخدم بنجاح وتم إرسال كلمة المرور إلى رقم الجوال');
+    $this->modalFormVisible = false;
+    $this->resetFields();
+}
+
 
     public function delete($id)
     {
@@ -110,7 +125,7 @@ class Users extends Component
     public function resetFields()
     {
         $this->name    = '';
-        $this->email   = '';
+
         $this->phone   = '';
         $this->password = '';
         $this->role    = '';

@@ -1,59 +1,168 @@
-<div wire:ignore.self class="modal" id="loginModal">
-    <div class="modal-content">
+<div>
 
-        <button class="modal-close" onclick="window.dispatchEvent(new Event('closeModal'))">×</button>
+    <div wire:ignore.self class="modal" id="loginModal">
+        <div class="modal-content">
 
-        <h3>مرحباً بك</h3>
+            <button class="modal-close" onclick="window.dispatchEvent(new Event('closeModal'))">×</button>
 
-        {{-- STEP 1: رقم الهاتف --}}
-        @if ($step === 1)
+            <h3>مرحباً بك</h3>
+
+            {{-- STEP 1: إدخال رقم الجوال --}}
+            @if ($step === 1)
             <p>أدخل رقم جوالك</p>
+
             <div class="phone-input-group">
                 <span class="country-code">+966</span>
                 <input type="text" wire:model.defer="phone" class="phone-input" placeholder="5xxxxxxxx" dir="ltr">
             </div>
 
             @error('phone')
-                <div style="color:red;margin-top:5px">{{ $message }}</div>
+            <div class="error">{{ $message }}</div>
             @enderror
 
             <button wire:click="checkPhone" wire:loading.attr="disabled" class="send-code-btn">
                 <span wire:loading.remove wire:target="checkPhone">متابعة</span>
                 <span wire:loading wire:target="checkPhone"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>
             </button>
-        @endif
+            @endif
 
-        {{-- STEP 2: كلمة المرور --}}
-        @if ($step === 2)
+
+            {{-- STEP 2: إدخال كلمة المرور --}}
+            @if ($step === 2)
             <p>أدخل كلمة المرور</p>
-            <input type="password" wire:model.defer="password" class="phone-input" style="margin-top:10px; border:1px solid #ccc; border-radius:8px; padding:12px;">
+            <div class="password-wrapper">
+                <input type="password" wire:model.defer="password" class="phone-input password-field"
+                    id="passwordInput">
+
+                <span class="toggle-password" onclick="togglePassword()">
+                    <i class="fas fa-eye" id="toggleIcon"></i>
+                </span>
+            </div>
+
 
             @error('password')
-                <div style="color:red;margin-top:5px">{{ $message }}</div>
+            <div class="error">{{ $message }}</div>
             @enderror
 
             <button wire:click="login" wire:loading.attr="disabled" class="send-code-btn">
                 <span wire:loading.remove wire:target="login">تسجيل الدخول</span>
                 <span wire:loading wire:target="login"><i class="fas fa-spinner fa-spin"></i> جاري الدخول...</span>
             </button>
-        @endif
 
+            <p class="forgot-link">
+                <a href="#" wire:click.prevent="forgotPassword">هل نسيت كلمة المرور؟</a>
+            </p>
+            @endif
+
+
+            {{-- STEP 3: إدخال رقم الجوال لاستعادة كلمة المرور --}}
+            @if ($step === 3)
+            <p>أدخل رقم جوالك لاستعادة كلمة المرور</p>
+
+            <div class="phone-input-group">
+                <span class="country-code">+966</span>
+                <input type="text" wire:model.defer="reset_phone" class="phone-input" placeholder="5xxxxxxxx" dir="ltr">
+            </div>
+
+            @error('reset_phone')
+            <div class="error">{{ $message }}</div>
+            @enderror
+
+            <button wire:click="sendResetCode" class="send-code-btn">
+                إرسال الكود
+            </button>
+            @endif
+
+
+            {{-- STEP 4: إدخال كود التحقق --}}
+            @if ($step === 4)
+            <p>أدخل كود التحقق المرسل إلى جوالك</p>
+
+            <input type="text" wire:model.defer="reset_code" class="phone-input" placeholder="******" dir="ltr">
+
+            @error('reset_code')
+            <div class="error">{{ $message }}</div>
+            @enderror
+
+            <button wire:click="verifyResetCode" class="send-code-btn">
+                تحقق
+            </button>
+            @endif
+
+
+
+            {{-- STEP 5: إدخال كلمة مرور جديدة --}}
+            @if ($step === 5)
+            <p>أدخل كلمة المرور الجديدة</p>
+
+            <input type="password" wire:model.defer="new_password" class="phone-input">
+
+            @error('new_password')
+            <div class="error">{{ $message }}</div>
+            @enderror
+
+            <button wire:click="saveNewPassword" class="send-code-btn">
+                حفظ كلمة المرور
+            </button>
+            @endif
+
+        </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const openBtn = document.getElementById('openLoginBtn');
-        if(openBtn){
-            openBtn.addEventListener('click', function(){
-                document.getElementById('loginModal').classList.add('active');
-                document.body.style.overflow = 'hidden';
+
+    {{-- Script التحكم في فتح وإغلاق المودال --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const openBtn = document.getElementById('openLoginBtn');
+
+            if (openBtn) {
+                openBtn.addEventListener('click', function () {
+                    document.getElementById('loginModal').classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+
+            window.addEventListener('closeModal', () => {
+                document.getElementById('loginModal').classList.remove('active');
+                document.body.style.overflow = 'auto';
             });
+        });
+    </script>
+
+
+    <style>
+        .error {
+            color: red;
+            margin-top: 5px;
+            font-size: 14px;
         }
 
-        window.addEventListener('closeModal', () => {
-            document.getElementById('loginModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-    });
-</script>
+        .forgot-link {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .forgot-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+    </style>
+    <script>
+        function togglePassword() {
+    const input = document.getElementById('passwordInput');
+    const icon = document.getElementById('toggleIcon');
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = "password";
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+    </script>
+
+
+</div>

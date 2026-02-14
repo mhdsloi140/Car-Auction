@@ -809,7 +809,7 @@ body {
     gap: 15px;
     justify-content: center; /* توسيط العناصر داخل الشبكة */
     max-width: 900px; /* يتحكم بعرض القسم */
-   
+
         }
         .brand-card {
             background: #fff;
@@ -1050,3 +1050,25 @@ body {
         .empty-state p {
             color: #777;
         }
+
+        .password-field {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 12px;
+     border-radius: 60px;
+    width: 100%;
+    color: #000;
+}
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #777;
+    font-size: 18px;
+}

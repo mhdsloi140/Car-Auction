@@ -1,5 +1,10 @@
 <div class="container-fluid" dir="rtl" style="padding-top:20px ">
 
+    @if (session()->has('success'))
+    <div class="alert alert-success text-center">
+        {{ session('success') }}
+    </div>
+    @endif
 
     <div class="d-flex justify-content-between mb-3">
 

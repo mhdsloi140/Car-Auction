@@ -2,7 +2,7 @@
 
 @section('title', 'المزايدة')
 
-@section('content-user')
+@section('content')
 
 <div class="container my-5" style="direction: rtl; text-align: right;">
 
