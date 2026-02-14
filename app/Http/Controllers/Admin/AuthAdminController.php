@@ -32,7 +32,7 @@ class AuthAdminController extends Controller
   public function logout()
   {
      auth()->logout();
-     return redirect()->route('admin.login');
+     return redirect()->route('home');
   }
 
 

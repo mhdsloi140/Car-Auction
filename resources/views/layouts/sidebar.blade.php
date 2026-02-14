@@ -1,23 +1,17 @@
 <!-- Sidebar -->
 <div class="sidebar" dir="rtl" data-background-color="dark">
 
-
     <div class="sidebar-logo">
         <div class="logo-header d-flex justify-content-between align-items-center" data-background-color="dark">
 
-
             <div class="nav-toggle d-flex align-items-center">
-
-
                 <button class="btn btn-toggle toggle-sidebar">
                     <i class="gg-menu-right"></i>
                 </button>
 
-
                 <button class="btn btn-toggle sidenav-toggler">
                     <i class="gg-menu-left"></i>
                 </button>
-
             </div>
 
             <!-- زر المزيد -->
@@ -28,7 +22,6 @@
         </div>
     </div>
 
-
     <!-- Sidebar Content -->
     <div class="sidebar-wrapper scrollbar scrollbar-inner">
         <div class="sidebar-content">
@@ -37,26 +30,25 @@
 
                 <!-- Dashboard -->
                 @role('admin')
-                <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}" class="nav-link">
                         <i class="fas fa-home"></i>
-                        <p> الصفحة الرئيسية</p>
+                        <p>الصفحة الرئيسية</p>
                     </a>
                 </li>
                 @endrole
 
                 @role('seller')
-                <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('seller.dashboard') }}" class="nav-link">
                         <i class="fas fa-home"></i>
-                        <p> الصفحة الرئيسية</p>
+                        <p>الصفحة الرئيسية</p>
                     </a>
                 </li>
                 @endrole
 
                 <!-- Seller: Auctions -->
                 @role('seller')
-                {{-- رابط المزادات الحالية --}}
                 <li class="nav-item {{ request()->routeIs('auction.index') ? 'active' : '' }}">
                     <a href="{{ route('auction.index') }}" class="nav-link d-flex align-items-center">
                         <i class="fas fa-gavel me-2"></i>
@@ -64,7 +56,6 @@
                     </a>
                 </li>
 
-                {{-- رابط أرشيف المزادات --}}
                 <li class="nav-item {{ request()->routeIs('seller.auctions.archive') ? 'active' : '' }}">
                     <a href="{{ route('seller.auctions.archive') }}" class="nav-link d-flex align-items-center">
                         <i class="fas fa-archive me-2"></i>
@@ -73,7 +64,7 @@
                 </li>
                 @endrole
 
-                <!-- Admin: Auctions -->
+                <!-- Admin: Auctions & Settings -->
                 @role('admin')
                 <li class="nav-item {{ request()->is('admin/auction*') ? 'active' : '' }}">
                     <a href="{{ route('admin.auction.index') }}" class="nav-link d-flex align-items-center">
@@ -81,8 +72,7 @@
                         <span>إدارة المزادات</span>
                     </a>
                 </li>
-                @endrole
-                @role('admin')
+
                 <li class="nav-item {{ request()->is('admin/settings*') ? 'active' : '' }}">
                     <a href="{{ route('settings.admin.index') }}" class="nav-link d-flex align-items-center">
                         <i class="fa fa-cog ms-2"></i>
@@ -91,42 +81,18 @@
                 </li>
                 @endrole
 
-                @role('admin')
-
-                <li class="nav-item logout-btn">
-                    <form action="{{ route('admin.logout') }}" method="POST" class="w-100">
-                        @csrf
-                        <button type="submit" class="nav-link d-flex align-items-center text-start w-100"
-                            style="background:none; border:none;">
-                            <i class="fas fa-sign-out-alt me-2"></i>
-                            <span>تسجيل الخروج</span>
-                        </button>
-                    </form>
-                </li>
-                @endrole
+                <!-- Profile -->
                 @role('seller')
-
-                <li class="nav-item logout-btn">
-                    <form action="{{ route('seller.logout') }}" method="POST" class="w-100">
-                        @csrf
-                        <button type="submit" class="nav-link d-flex align-items-center text-start w-100"
-                            style="background:none; border:none;">
-                            <i class="fas fa-sign-out-alt me-2"></i>
-                            <span>تسجيل الخروج</span>
-                        </button>
-                    </form>
-                </li>
-                @endrole
-                @role('seller')
-                <li class="nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('seller.profile') ? 'active' : '' }}">
                     <a href="{{ route('seller.profile') }}" class="nav-link d-flex align-items-center">
                         <i class="fas fa-user me-2"></i>
                         <span>الملف الشخصي</span>
                     </a>
                 </li>
                 @endrole
+
                 @role('admin')
-                <li class="nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
                     <a href="{{ route('admin.profile') }}" class="nav-link d-flex align-items-center">
                         <i class="fas fa-user me-2"></i>
                         <span>الملف الشخصي</span>
@@ -134,6 +100,32 @@
                 </li>
                 @endrole
 
+                <!-- Logout Buttons -->
+                @role('admin')
+                <li class="nav-item logout-btn">
+                    <form action="{{ route('logout') }}" method="POST" class="w-100">
+                        @csrf
+                        <button type="submit" class="nav-link d-flex align-items-center text-start w-100"
+                            style="background:none; border:none;">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            <span>تسجيل الخروج</span>
+                        </button>
+                    </form>
+                </li>
+                @endrole
+
+                @role('seller')
+                <li class="nav-item logout-btn">
+                    <form action="{{ route('logout') }}" method="POST" class="w-100">
+                        @csrf
+                        <button type="submit" class="nav-link d-flex align-items-center text-start w-100"
+                            style="background:none; border:none;">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            <span>تسجيل الخروج</span>
+                        </button>
+                    </form>
+                </li>
+                @endrole
 
             </ul>
 

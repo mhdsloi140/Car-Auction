@@ -32,7 +32,7 @@ class AuthSellerController extends Controller
     public function logout()
     {
         auth()->logout();
-        return redirect()->route('seller.login.form');
+        return redirect()->route('home');
     }
 
 }

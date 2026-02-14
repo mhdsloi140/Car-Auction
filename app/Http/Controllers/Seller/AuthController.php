@@ -33,7 +33,7 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-      
+
 
         return redirect()->route('seller.login.form')
             ->with('success', 'تم تسجيل الخروج بنجاح.');
