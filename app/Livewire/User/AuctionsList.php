@@ -38,7 +38,7 @@ class AuctionsList extends Component
             'brands' => Brand::all(),
 
             'auctions' => Auction::with(['car.brand'])
-            ->where('status', 'active')
+             ->where('status', 'active')
                 ->when($this->selectedBrand, function ($q) {
                     $q->whereHas('car', fn($q) => $q->where('brand_id', $this->selectedBrand));
                 })

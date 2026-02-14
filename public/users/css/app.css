@@ -781,3 +781,272 @@ body {
         margin-top: 15px;
     }
 }
+        .brand-section {
+            /* padding: 0 15px;
+             */
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+        }
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .brand-grid {
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center; /* توسيط العناصر داخل الشبكة */
+    max-width: 900px; /* يتحكم بعرض القسم */
+   
+        }
+        .brand-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 15px 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+        .brand-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+        }
+        .brand-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+        .brand-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 24px;
+        }
+        .brand-logo-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 2px solid #f0f0f0;
+            padding: 5px;
+            background: #fff;
+        }
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .brand-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* بطاقات المزادات */
+        .auction-card {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .auction-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+        .auction-card-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+        .auction-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .auction-card:hover .auction-card-image img {
+            transform: scale(1.1);
+        }
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .auction-card:hover .card-overlay {
+            opacity: 1;
+        }
+        .btn-view {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 20px;
+            transform: scale(0.8);
+            transition: all 0.3s;
+        }
+        .auction-card:hover .btn-view {
+            transform: scale(1);
+        }
+        .badge-live {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        .badge-ended {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #6c757d;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .auction-card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .brand-model {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .brand-model .brand {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 16px;
+        }
+        .brand-model .model {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        .car-year {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .current-bid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .current-bid .label {
+            font-weight: 500;
+            color: #555;
+        }
+        .current-bid .price {
+            font-weight: 800;
+            color: #28a745;
+            font-size: 18px;
+        }
+        .time-remaining {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #dc3545;
+            margin-bottom: 15px;
+            background: #fff5f5;
+            padding: 8px 12px;
+            border-radius: 50px;
+        }
+        .time-remaining i {
+            font-size: 16px;
+        }
+        .btn-bid {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-align: center;
+            transition: all 0.3s;
+            display: block;
+            margin-top: auto;
+            text-decoration: none;
+        }
+        .btn-bid:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            color: #fff;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #f8f9fa;
+            border-radius: 20px;
+        }
+        .empty-state i {
+            font-size: 80px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .empty-state h4 {
+            font-weight: 700;
+            color: #333;
+        }
+        .empty-state p {
+            color: #777;
+        }
