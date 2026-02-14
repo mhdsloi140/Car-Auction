@@ -100,6 +100,16 @@
                 </li>
                 @endrole
 
+                @role('seller')
+                <li class="nav-item {{ request()->routeIs('sellers.add.user') ? 'active' : '' }}">
+                        <a href="{{ route('sellers.add.user') }}" class="nav-link d-flex align-items-center"
+                        style="gap:8px;">
+                        <i class="fas fa-user-plus" style="font-size:16px;"></i>
+                        <span>إضافة مستخدم</span>
+                    </a>
+                </li>
+                @endrole
+
                 <!-- Logout Buttons -->
                 @role('admin')
                 <li class="nav-item logout-btn">

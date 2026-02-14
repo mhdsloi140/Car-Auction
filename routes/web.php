@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Seller\AddUserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AuctionAdminController;
@@ -34,7 +35,7 @@ Route::get('/login', \App\Livewire\User\Login::class)->name('login');
 // ==================== تسجيل الخروج موحد ====================
 Route::post('/logout', function () {
     auth()->logout();
-    return redirect()->route('login');
+    return redirect()->route('home');
 })->name('logout')->middleware('auth');
 // ==================== Seller Routes ====================
 Route::prefix('seller')->middleware(['auth', 'role:seller'])->group(function () {
@@ -47,6 +48,7 @@ Route::prefix('seller')->middleware(['auth', 'role:seller'])->group(function () 
     Route::post('profile', [ProfileSellerController::class, 'update'])->name('seller.profile.update');
     Route::patch('/auction/{auction}/reject', [AuctionSellersController::class, 'reject'])->name('auction.sellers.reject');
     Route::patch('/auction/{auction}/complete', [AuctionSellersController::class, 'complete'])->name('auction.sellers.complete');
+    Route::get('add-user', [AddUserController::class, 'index'])->name('sellers.add.user');
 });
 
 // ==================== Admin Routes ====================

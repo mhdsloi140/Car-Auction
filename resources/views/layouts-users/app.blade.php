@@ -233,7 +233,7 @@
     <!-- مودال تسجيل الدخول - فقط رقم الجوال -->
 
 
-    @yield('content')
+    @yield(section: 'content')
     @livewire('user.login')
 
     @livewireScripts
