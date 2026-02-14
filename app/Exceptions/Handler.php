@@ -27,4 +27,19 @@ class Handler extends ExceptionHandler
             //
         });
     }
+public function render($request, Throwable $exception)
+{
+    if ($exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+        return response()->view('errors.404', [], 404);
+    }
+
+    if ($exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+        $status = $exception->getStatusCode();
+        if (in_array($status, [403, 419, 500])) {
+            return response()->view("errors.$status", [], $status);
+        }
+    }
+
+    return parent::render($request, $exception);
+}
 }
