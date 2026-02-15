@@ -21,6 +21,14 @@ class Car extends Model implements HasMedia
         'description',
         'specs',
     ];
+    public function getSpecsLabelAttribute()
+{
+    return [
+        'gcc' => 'خليجية',
+        'non_gcc' => 'غير خليجية',
+        'unknown' => 'لا أعلم',
+    ][$this->specs] ?? null;
+}
 
     public function brand()
     {

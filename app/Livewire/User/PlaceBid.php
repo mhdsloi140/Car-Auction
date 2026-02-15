@@ -10,23 +10,30 @@ use App\Jobs\PlaceBidJob;
 class PlaceBid extends Component
 {
     public Auction $auction;
+
     public $amount = null;
+    public $selectedIncrement = null;
+
+    public $increments = [100, 200, 500, 1000];
+
+    public $currentPrice;
+    public $bidsCount = 0;
+    public $latestBids = [];
 
     public $lastBidId = null;
     public $newBidAlert = null;
-    public $currentPrice;
-
-    public $increments = [100, 200, 500, 1000];
-    public $selectedIncrement = null;
 
     public function mount(Auction $auction)
     {
         $this->auction = $auction;
 
-        $latestBid = $auction->bids()->latest()->first();
-        $this->lastBidId = $latestBid->id ?? null;
+        $lastBid = $auction->bids()->latest()->first();
 
-        $this->currentPrice = $latestBid->amount ?? $auction->starting_price;
+        $this->currentPrice = $lastBid->amount ?? $auction->starting_price;
+        $this->lastBidId = $lastBid->id ?? null;
+
+        $this->bidsCount = $auction->bids()->count();
+        $this->latestBids = $auction->bids()->latest()->take(10)->get();
     }
 
     public function setBidAmount($inc)
@@ -40,39 +47,31 @@ class PlaceBid extends Component
         $this->resetErrorBag();
 
         if (!$this->selectedIncrement) {
-            $this->addError('amount', 'يرجى اختيار قيمة المزايدة أولاً');
+            $this->addError('amount', 'يرجى اختيار قيمة الزيادة أولاً');
             return;
         }
+\Log::info('Dispatching PlaceBidJob', [
+    'auction_id' => $this->auction->id,
+    'user_id' => auth()->id(),
+    'increment' => $this->selectedIncrement,
+]);
 
-        // تحديث السعر الحالي قبل الإرسال
+        // تحديث السعر قبل الإرسال
         $this->auction->refresh();
         $lastBid = $this->auction->bids()->latest()->first();
         $currentPrice = $lastBid->amount ?? $this->auction->starting_price;
 
-        // نرسل فقط الزيادة للـ Job
-        $increment = $this->selectedIncrement;
-
-        if ($increment <= 0) {
-            $this->addError('amount', 'قيمة الزيادة غير صحيحة');
-            return;
-        }
-
-        // إرسال المزايدة للـ Job
+        // إرسال الزيادة فقط للـ Job
         dispatch(new PlaceBidJob(
             $this->auction->id,
             auth()->id(),
-            $increment
+            $this->selectedIncrement
         ));
 
         session()->flash('success', 'تمت المزايدة بنجاح');
 
-        // تحديث بيانات المزاد بعد تنفيذ الـ Job
+        // تحديث الواجهة بعد الإرسال
         $this->auction->refresh();
-
-        // إرسال الوقت الجديد للواجهة
-        if ($this->auction->end_at) {
-            $this->dispatch('update-end-time', endTime: $this->auction->end_at->format('Y-m-d\TH:i:s'));
-        }
     }
 
     public function checkForNewBids()
@@ -81,21 +80,29 @@ class PlaceBid extends Component
 
         $latestBid = $this->auction->bids()->latest()->first();
 
-        // تحديث الوقت في الواجهة
-        if ($this->auction->end_at) {
-            $this->dispatch('update-end-time', endTime: $this->auction->end_at->format('Y-m-d\TH:i:s'));
-        }
-
         if ($latestBid && $latestBid->id != $this->lastBidId) {
 
             $this->lastBidId = $latestBid->id;
 
+            // تنبيه مزايدة جديدة
             $this->newBidAlert = [
                 'user_id' => $latestBid->user_id,
-                'amount' => $latestBid->amount,
+                'amount'  => $latestBid->amount,
             ];
 
+            // تحديث السعر
             $this->currentPrice = $latestBid->amount;
+
+            // تحديث عدد المزايدات
+            $this->bidsCount = $this->auction->bids()->count();
+
+            // تحديث قائمة آخر المزايدات
+            $this->latestBids = $this->auction->bids()->latest()->take(10)->get();
+        }
+
+        // تحديث الوقت في الواجهة
+        if ($this->auction->end_at) {
+$this->dispatch('update-end-time', endTime: $this->auction->end_at->setTimezone('UTC')->toIso8601String());
         }
     }
 
@@ -103,6 +110,8 @@ class PlaceBid extends Component
     {
         return view('livewire.user.place-bid', [
             'currentPrice' => $this->currentPrice,
+            'latestBids'   => $this->latestBids,
+            'bidsCount'    => $this->bidsCount,
         ]);
     }
 }
