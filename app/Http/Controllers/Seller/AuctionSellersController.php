@@ -33,7 +33,7 @@ class AuctionSellersController extends Controller
     {
      $auctions = Auction::with(['car', 'winner'])
     ->where('seller_id', Auth::id())
-    ->whereIn('status', ['closed', 'rejected'])
+    ->whereIn('status', ['closed', 'rejected','completed'])
     ->orderByDesc('end_at')
     ->paginate(10);
 

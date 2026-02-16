@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Seller\AddUserController;
+use App\Http\Controllers\User\ProfileUserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AuctionAdminController;
@@ -85,4 +86,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 Route::prefix('users')->middleware(['auth', 'role:user'])->group(function () {
     Route::get('/auctions/{id}', [AuctionUsersController::class, 'show'])->name('auction.users.show');
     Route::get('/auction/{id}/bid', [BidUserController::class, 'show'])->name('auction.bid');
+    // Route::get('profile',[ProfileUserController::class,'index'])->name('user.profile');
+    // Route::post('profile/update',[ProfileUserController::class,'update'])->name('user.profile.update');
+    // Route::post('/profile/password', [ProfileUserController::class, 'updatePassword'])->name('user.profile.password');
+    Route::get('profile', [ProfileUserController::class, 'index'])
+    ->name('user.profile');
+
+Route::post('profile/update', [ProfileUserController::class, 'update'])
+    ->name('user.profile.update');
+
+Route::post('profile/password', [ProfileUserController::class, 'updatePassword'])
+    ->name('user.profile.password');
 });

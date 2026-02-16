@@ -14,6 +14,7 @@
                     <th>السيارة</th>
                     <th>السعر الابتدائي</th>
                     <th>السعر النهائي</th>
+                    <th>حالة المزاد</th>
                     <th>الإجراءات</th>
                     <th>تاريخ الانتهاء</th>
                 </tr>
@@ -39,78 +40,124 @@
                         @endif
                     </td>
 
-                    {{-- الإجراءات: قبول / رفض --}}
-                  <td>
-    {{-- إذا لا يوجد فائز --}}
-    @if(!$auction->winner)
-        <span class="text-muted">—</span>
+                    {{-- ================== حالة المزاد ================== --}}
+                    <td>
+                        @if(!$auction->winner)
+                            <span class="badge bg-secondary">لا يوجد فائز</span>
 
-    {{-- إذا كانت حالة المزاد مرفوضة --}}
-    @elseif($auction->status === 'rejected')
-        <span class="badge bg-danger">مرفوض</span>
+                        @elseif($auction->status === 'rejected')
+                            <span class="badge bg-danger">مرفوض</span>
 
-    {{-- إذا كانت حالة المزاد مكتملة --}}
-    @elseif($auction->status === 'completed')
-        <span class="badge bg-success">مكتمل</span>
+                        @elseif($auction->status === 'completed')
+                            <span class="badge bg-success">مكتمل</span>
 
-    {{-- إذا كانت حالة المزاد منتهية ويحتاج قرار --}}
-    @elseif($auction->status === 'closed')
+                        @elseif($auction->status === 'closed')
+                            <span class="badge bg-warning text-dark">بانتظار القرار</span>
 
-        {{-- زر قبول (يغيّر الحالة + يفتح المودال) --}}
-        <form action="{{ route('auction.sellers.complete', $auction->id) }}"
-              method="POST" class="d-inline">
-            @csrf
-            @method('PATCH')
+                        @else
+                            <span class="badge bg-light text-dark">
+                                {{ $auction->status }}
+                            </span>
+                        @endif
+                    </td>
 
-            <button type="submit"
-                    class="btn btn-success btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#winnerModal{{ $auction->id }}">
-                قبول
-            </button>
-        </form>
+                    {{-- ================== الإجراءات ================== --}}
+                    <td>
 
-        {{-- زر رفض --}}
-        <form action="{{ route('auction.sellers.reject', $auction->id) }}"
-              method="POST" class="d-inline">
-            @csrf
-            @method('PATCH')
-            <button class="btn btn-danger btn-sm">رفض</button>
-        </form>
+                        @if(!$auction->winner)
+                            <span class="text-muted">—</span>
 
-        {{-- مودال بيانات الفائز --}}
-        <div class="modal fade" id="winnerModal{{ $auction->id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
+                        {{-- إذا كانت مكتملة يظهر زر عرض --}}
+                        @elseif($auction->status === 'completed')
+                            <button type="button"
+                                    class="btn btn-primary btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#winnerModal{{ $auction->id }}">
+                                عرض
+                            </button>
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">بيانات الفائز</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+                        {{-- إذا كانت منتهية وتحتاج قرار --}}
+                        @elseif($auction->status === 'closed')
 
-                    <div class="modal-body">
-                        <p><strong>الاسم:</strong> {{ $auction->winner->name }}</p>
-                        <p><strong>البريد:</strong> {{ $auction->winner->email }}</p>
-                        <p><strong>رقم الجوال:</strong> {{ $auction->winner->phone ?? '—' }}</p>
-                        <p><strong>قيمة المزايدة الفائزة:</strong>
-                            {{ number_format($auction->final_price) }}
-                        </p>
-                    </div>
+                            {{-- زر قبول --}}
+                            <form action="{{ route('auction.sellers.complete', $auction->id) }}"
+                                  method="POST"
+                                  class="d-inline">
+                                @csrf
+                                @method('PATCH')
+                                <button class="btn btn-success btn-sm">
+                                    قبول
+                                </button>
+                            </form>
 
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                    </div>
+                            {{-- زر رفض --}}
+                            <form action="{{ route('auction.sellers.reject', $auction->id) }}"
+                                  method="POST"
+                                  class="d-inline">
+                                @csrf
+                                @method('PATCH')
+                                <button class="btn btn-danger btn-sm">
+                                    رفض
+                                </button>
+                            </form>
 
-                </div>
-            </div>
-        </div>
+                        {{-- إذا مرفوض أو غير ذلك --}}
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
 
-    @endif
-</td>
-
+                    </td>
 
                     <td>{{ $auction->end_at?->format('Y-m-d H:i') }}</td>
                 </tr>
+
+                {{-- ================== مودال بيانات الفائز ================== --}}
+                @if($auction->winner)
+                <div class="modal fade"
+                     id="winnerModal{{ $auction->id }}"
+                     tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+
+                            {{-- <div class="modal-header">
+                                <h5 class="modal-title">بيانات الفائز</h5>
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"></button>
+                            </div> --}}
+<div class="modal-header d-flex justify-content-between">
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="modal">
+    </button>
+
+    <h5 class="modal-title">
+        بيانات الفائز
+    </h5>
+
+</div>
+                            <div class="modal-body">
+                                <p><strong>الاسم:</strong> {{ $auction->winner->name }}</p>
+                                <p><strong>رقم الجوال:</strong> {{ $auction->winner->phone ?? '—' }}</p>
+                                <p>
+                                    <strong>قيمة المزايدة الفائزة:</strong>
+                                    {{ number_format($auction->final_price) }}
+                                </p>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary"
+                                        data-bs-dismiss="modal">
+                                    إغلاق
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 @endforeach
             </tbody>
         </table>
@@ -119,7 +166,9 @@
     {{ $auctions->links() }}
 
     @else
-        <div class="alert alert-info">لا توجد مزادات منتهية بعد</div>
+        <div class="alert alert-info">
+            لا توجد مزادات منتهية بعد
+        </div>
     @endif
 
 </div>

@@ -25,14 +25,7 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">البريد الإلكتروني</label>
-                    <input type="email" name="email" id="email" class="form-control"
-                        value="{{ auth()->user()->email }}">
-                    @error('email')
-                    <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
+            
                 <div class="mb-3">
                     <label class="form-label">رقم الهاتف</label>
                     <input type="phone" name="phone" id="phone" class="form-control"

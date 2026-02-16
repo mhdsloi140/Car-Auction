@@ -16,7 +16,13 @@
     <!-- Bootstrap 5 RTL -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
 
-      <link rel="stylesheet" href="{{ asset('users/css/app.css  ') }}" />
+    <link rel="stylesheet" href="{{ asset('users/css/app.css') }}" />
+    <link rel="manifest" href="/manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js');
+    }
+    </script>
     @livewireStyles
 </head>
 
@@ -36,27 +42,47 @@
     </div>
 
     <!-- الهيدر -->
-<header class="header">
-    <div class="header-container">
-        <div class="logo">
-            <div class="logo-icon">
-                <i class="fas fa-gavel"></i>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>سَيِّر <span>SIR</span></h1>
+                    <p>منصة المزادات الرقمية</p>
+                </div>
             </div>
-            <div class="logo-text">
-                <h1>سَيِّر <span>SIR</span></h1>
-                <p>منصة المزادات الرقمية</p>
-            </div>
-        </div>
 
-        {{-- زر تسجيل الدخول أو تسجيل الخروج --}}
-        @guest
+            {{-- زر تسجيل الدخول أو تسجيل الخروج --}}
+            {{-- @auth
+            <a href="{{ route('user.profile') }}" class="profile-btn">
+                <i class="fas fa-user"></i>
+                الملف الشخصي
+            </a>
+            @endauth --}}
+
+
+
+            @guest
             <button class="login-btn" id="openLoginBtn">
                 <i class="fas fa-user-circle"></i>
                 تسجيل الدخول
             </button>
-        @endguest
+            @endguest
 
-        @auth
+
+            @auth
+            <form method="get" action="{{ route('user.profile') }}" style="margin-right: 600px">
+                @csrf
+                <button type="submit" class="login-btn">
+
+                    <i class="fas fa-user-alt"></i>
+                    الملف الشخصي
+                </button>
+            </form>
+            @endauth
+                 @auth
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="login-btn">
@@ -64,9 +90,9 @@
                     تسجيل الخروج
                 </button>
             </form>
-        @endauth
-    </div>
-</header>
+            @endauth
+        </div>
+    </header>
 
     <!-- Hero Section -->
 
@@ -77,8 +103,8 @@
     @livewire('user.login')
 
     @livewireScripts
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
     const openBtn = document.getElementById('openLoginBtn');
     if (openBtn) {
         openBtn.addEventListener('click', function () {
@@ -98,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-</script>
+    </script>
 </body>
 
 </html>
