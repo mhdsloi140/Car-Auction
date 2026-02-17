@@ -22,15 +22,15 @@ class Login extends Component
     public $new_password;
 
     protected $rules = [
-        'phone' => 'required|exists:users,phone',
+        'phone'    => 'required|exists:users,phone',
         'password' => 'required|min:6',
     ];
 
     protected $messages = [
-        'phone.required' => 'الرجاء إدخال رقم الجوال',
-        'phone.exists' => 'رقم الجوال غير مسجل لدينا',
+        'phone.required'    => 'الرجاء إدخال رقم الجوال',
+        'phone.exists'      => 'رقم الجوال غير مسجل لدينا',
         'password.required' => 'الرجاء إدخال كلمة المرور',
-        'password.min' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+        'password.min'      => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
     ];
 
     // التحقق من رقم الهاتف فقط
@@ -45,12 +45,10 @@ class Login extends Component
     {
         $this->validate();
 
-        if (
-            !Auth::attempt([
-                'phone' => $this->phone,
-                'password' => $this->password,
-            ])
-        ) {
+        if (! Auth::attempt([
+            'phone'    => $this->phone,
+            'password' => $this->password,
+        ])) {
             $this->addError('password', 'كلمة المرور غير صحيحة');
             return;
         }
@@ -66,7 +64,7 @@ class Login extends Component
         }
 
         if ($user->hasRole('user')) {
-            return redirect()->back();
+            return redirect()->route('home');
         }
 
         Auth::logout();
@@ -98,7 +96,7 @@ class Login extends Component
 
         // إرسال الكود عبر واتساب
         $phone = preg_replace('/^0/', '', $this->reset_phone);
-        $fullPhone = '00963' . $phone;
+        $fullPhone = '00964' . $phone;
 
         $msg = "كود استعادة كلمة المرور هو: {$this->generated_code}";
         $ultra = new UltraMsgService();

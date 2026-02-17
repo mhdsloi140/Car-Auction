@@ -177,41 +177,41 @@ class CreateAuctionWizard extends Component
                 $manager = new ImageManager(new Driver());
                 $optimizer = OptimizerChainFactory::create();
 
-            foreach ($this->photos as $photo) {
+                foreach ($this->photos as $photo) {
 
-    // حجم الصورة الأصلية قبل المعالجة
-    $originalSize = $photo->getSize();
+                    // حجم الصورة الأصلية قبل المعالجة
+                    $originalSize = $photo->getSize();
 
-    $image = $manager->read($photo->getRealPath());
+                    $image = $manager->read($photo->getRealPath());
 
-    $image->scaleDown(width: 1200);
+                    $image->scaleDown(width: 1200);
 
-    $webp = $image->toWebp(75);
+                    $webp = $image->toWebp(75);
 
-    $filename = Str::uuid() . '.webp';
+                    $filename = Str::uuid() . '.webp';
 
-    $media = $car->addMediaFromString($webp->toString())
-        ->usingFileName($filename)
-        ->toMediaCollection('cars');
+                    $media = $car->addMediaFromString($webp->toString())
+                        ->usingFileName($filename)
+                        ->toMediaCollection('cars');
 
-    // ضغط إضافي
-    $optimizer->optimize($media->getPath());
+                    // ضغط إضافي
+                    $optimizer->optimize($media->getPath());
 
-    // 🔥 هنا تضيف الفحص
-    $compressedSize = filesize($media->getPath());
+                    //  هنا تضيف الفحص
+                    $compressedSize = filesize($media->getPath());
 
-    logger()->info('Image Compression Check', [
-        'original_kb'   => round($originalSize / 1024, 2),
-        'compressed_kb' => round($compressedSize / 1024, 2),
-        'ratio_%'       => round(
-            100 - (($compressedSize / $originalSize) * 100),
-            2
-        ),
-    ]);
+                    logger()->info('Image Compression Check', [
+                        'original_kb' => round($originalSize / 1024, 2),
+                        'compressed_kb' => round($compressedSize / 1024, 2),
+                        'ratio_%' => round(
+                            100 - (($compressedSize / $originalSize) * 100),
+                            2
+                        ),
+                    ]);
 
-    unset($image);
-    unset($webp);
-}
+                    unset($image);
+                    unset($webp);
+                }
 
             }
 
@@ -232,7 +232,7 @@ class CreateAuctionWizard extends Component
 
             foreach ($admins as $admin) {
                 $phone = preg_replace('/^0/', '', $admin->phone);
-                $fullPhone = '+963' . $phone;
+                $fullPhone = '00964' . $phone;
 
                 $ultra->sendMessage(
                     $fullPhone,

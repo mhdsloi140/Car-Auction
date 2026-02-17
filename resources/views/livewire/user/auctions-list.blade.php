@@ -68,7 +68,7 @@
                             </div>
                             <div class="current-bid-modern mb-3">
                                 <span class="label">السعر الحالي</span>
-                                <span class="price">{{ number_format($auction->current_price, 0) }} ر.س</span>
+                                <span class="price">{{ number_format($auction->starting_price, 0) }} $</span>
                             </div>
                             <div class="bid-meta-modern d-flex justify-content-between align-items-center">
                                 @if($auction->end_time)

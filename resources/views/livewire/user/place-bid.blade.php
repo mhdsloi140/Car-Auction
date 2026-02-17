@@ -146,6 +146,8 @@
                             <div class="bidder-details">
                                 <span class="bidder-name">{{ $bid->user->id ?? 'مزايد' }} مزايدة</span>
                                 <span class="bid-time">{{ $bid->created_at->diffForHumans() }}</span>
+                              
+
                             </div>
                         </div>
                         @endforeach
@@ -163,13 +165,13 @@
         </div>
     </div>
     <script>
-    document.addEventListener('livewire:init', () => {
+        document.addEventListener('livewire:init', () => {
         Livewire.on('update-end-time', (data) => {
             const newEndTime = data.endTime;
             document.getElementById('auctionEndTime').value = newEndTime;
             startCountdown(newEndTime);
         });
     });
-</script>
+    </script>
 
 </div>

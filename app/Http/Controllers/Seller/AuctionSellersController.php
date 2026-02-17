@@ -37,11 +37,11 @@ class AuctionSellersController extends Controller
      */
     public function sellerArchive()
     {
-     $auctions = Auction::with(['car', 'winner'])
-    ->where('seller_id', Auth::id())
-    ->whereIn('status', ['closed', 'rejected','completed'])
-    ->orderByDesc('end_at')
-    ->paginate(10);
+        $auctions = Auction::with(['car', 'winner'])
+            ->where('seller_id', Auth::id())
+            ->whereIn('status', ['closed', 'rejected', 'completed'])
+            ->orderByDesc('end_at')
+            ->paginate(10);
 
 
         return view('seller.auction.archive', compact('auctions'));
@@ -53,8 +53,14 @@ class AuctionSellersController extends Controller
     }
     public function complete(Auction $auction)
     {
-        $auction->update([ 'status' => 'completed' ]);
-         return back()->with('success', 'تم قبول الفائز وتغيير حالة المزاد إلى مكتمل');
+        $auction->update(['status' => 'completed']);
+           $user_id = auth()->id;
+
+        log_activity(
+           'مزاد مكتمل',
+            "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
+        );
+        return back()->with('success', 'تم قبول الفائز وتغيير حالة المزاد إلى مكتمل');
     }
 
     public function reject(Auction $auction)
@@ -63,8 +69,16 @@ class AuctionSellersController extends Controller
             'status' => 'rejected'
         ]);
 
+        $user_id = auth()->id;
+
+        log_activity(
+            'مرفوض مزاد',
+            "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
+        );
+
         return back()->with('success', 'تم رفض المزاد بنجاح');
     }
+
 
     public function store(Request $request)
     {
@@ -83,25 +97,18 @@ class AuctionSellersController extends Controller
 
     //     return view('seller.auction.show', compact('car'));
     // }
-//     public function show($id)
-// {
-//     $car = Car::with(['brand','model','auction','media'])->find($id);
 
-//     if (!$car) {
-//         dd('Car Not Found');
-//     }
 
-//     dd([
-//         'car_exists' => true,
-//         'has_auction' => $car->auction ? true : false,
-//         'auction_data' => $car->auction
-//     ]);
-// }
 
 
     public function details($id)
     {
-        $car = Car::findOrFail($id);
+        $car = Car::with('auction.bids.user', 'brand', 'model', 'media')
+            ->findOrFail($id);
+
+        // تحقق إن كان للسيارة مزاد
+
+
 
         return view('seller.auction.details', compact('car'));
     }

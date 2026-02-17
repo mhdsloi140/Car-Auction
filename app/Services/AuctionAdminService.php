@@ -28,7 +28,7 @@ class AuctionAdminService
             'seller',
             'car.media',
         ])->findOrFail($id);
-
+    // dd($auction);
         return $auction;
     }
 public function approve($id)
@@ -57,7 +57,7 @@ public function approve($id)
     if ($auction->user && $auction->user->phone) {
 
         $phone = preg_replace('/^0/', '', $auction->user->phone);
-        $fullPhone = '00963' . $phone; 
+        $fullPhone = '00963' . $phone;
 
         $msgOwner = "مرحباً {$auction->user->name}،\nتمت الموافقة على مزادك.\nرابط المزاد:\n{$url}";
 

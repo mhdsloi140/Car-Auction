@@ -149,7 +149,7 @@
 
                             <li class="mb-1">
                                 <i class="bi bi-cash-coin text-success"></i>
-                                <strong>السعر الابتدائي:</strong> {{ number_format($auction->starting_price) }} $
+                                {{-- <strong>السعر الابتدائي:</strong> {{ number_format($auction->starting_price) }} $ --}}
                             </li>
                         </ul>
 
@@ -160,7 +160,7 @@
 
                         {{-- زر المزايدات --}}
                         @if($auction->status === 'active')
-                            <a href="{{ route('auction.selles.details', $auction->id) }}"
+                            <a href="{{ route('auction.sellers.details', $auction->id) }}"
                                class="btn btn-outline-success w-100 mt-2">
                                 عرض المزايدات
                             </a>

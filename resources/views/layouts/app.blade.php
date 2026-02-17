@@ -106,11 +106,6 @@
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* تم إزالة الأزرار العلوية، يبقى الهيكل فارغًا (يمكنك إضافة محتوى آخر هنا إن أردت) */
-        .logo-header {
-            /* يمكن استخدام هذه المساحة لاحقًا */
-        }
-
         .sidebar-wrapper {
             padding: 20px 0 30px;
         }
@@ -224,10 +219,26 @@
             box-shadow: 0 20px 40px -15px rgba(15,59,94,0.2);
         }
 
+        /* زر القائمة (هامبورجر) - يظهر فقط في الشاشات الصغيرة */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--primary);
+            cursor: pointer;
+            margin-left: 15px;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:hover {
+            transform: scale(1.1);
+        }
+
         .site-brand {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         .brand-icon {
@@ -371,17 +382,24 @@
             background-clip: text;
         }
 
-        /* ========== تجاوب ========== */
+        /* ========== تحسينات التجاوب ========== */
         @media (max-width: 1200px) {
             :root {
                 --sidebar-width: 280px;
             }
+            .brand-text h2 {
+                font-size: 1.6rem;
+            }
         }
 
         @media (max-width: 992px) {
+            .menu-toggle {
+                display: block; /* إظهار زر القائمة */
+            }
             .sidebar {
                 right: -100%;
                 border-radius: 0;
+                transition: right 0.4s ease;
             }
             .sidebar.show {
                 right: 0;
@@ -397,14 +415,71 @@
             .brand-text h2 {
                 font-size: 1.4rem;
             }
+            .brand-text span {
+                font-size: 0.7rem;
+            }
+            .header-actions {
+                gap: 15px;
+            }
+            .user-dropdown {
+                padding: 6px 15px 6px 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-panel {
+                padding: 15px;
+            }
+            .main-header {
+                padding: 10px 15px;
+            }
+            .brand-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+            .brand-text h2 {
+                font-size: 1.2rem;
+            }
+            .brand-text span {
+                display: none; /* إخفاء النص الفرعي لتوفير المساحة */
+            }
+            .header-actions {
+                gap: 10px;
+            }
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+            .user-info {
+                display: none; /* إخفاء الاسم والترحيب */
+            }
+            .footer {
+                padding: 15px;
+                font-size: 0.9rem;
+                text-align: center;
+            }
+            .footer .d-flex {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
 
         @media (max-width: 576px) {
-            .user-info {
-                display: none;
+            .main-header {
+                border-radius: 20px;
+            }
+            .menu-toggle {
+                font-size: 1.8rem;
+            }
+            .brand-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.3rem;
             }
             .user-dropdown {
-                padding: 8px 12px;
+                padding: 4px 10px;
             }
         }
 
@@ -426,6 +501,22 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary);
+        }
+
+        /* تراك خلفية السايدبار عند الفتح على الموبايل */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(3px);
+            z-index: 999;
+        }
+        .sidebar-overlay.show {
+            display: block;
         }
     </style>
 
@@ -453,8 +544,11 @@
 
     <div class="wrapper">
 
+        <!-- طبقة خلفية تغطي الشاشة عند فتح السايدبار على الموبايل -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- سايدبار (بدون الأيقونات العلوية) -->
-        <div class="sidebar" data-background-color="light">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <div class="logo-header">
                     <!-- تمت إزالة الأزرار بالكامل، يمكنك إضافة أي محتوى آخر هنا -->
@@ -581,18 +675,23 @@
             <!-- هيدر -->
             <div class="main-header">
                 <div class="d-flex justify-content-between align-items-center w-100">
-                    <!-- الشعار -->
-                    <div class="site-brand">
-                        @if(setting('site_logo'))
-                        <img src="{{ setting('site_logo') }}" alt="Logo" style="height: 48px;">
-                        @else
-                        <div class="brand-icon">
-                            <i class="fa-solid fa-gavel"></i>
-                        </div>
-                        @endif
-                        <div class="brand-text">
-                            <h2>{{ setting('site_name', 'سَيِّر SIR') }}</h2>
-                            <span>منصة المزادات الرقمية</span>
+                    <!-- زر القائمة (للجوال) والشعار -->
+                    <div class="d-flex align-items-center">
+                        <button class="menu-toggle" id="menuToggle">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <div class="site-brand">
+                            @if(setting('site_logo'))
+                            <img src="{{ setting('site_logo') }}" alt="Logo" style="height: 48px; max-width: 100%;">
+                            @else
+                            <div class="brand-icon">
+                                <i class="fa-solid fa-gavel"></i>
+                            </div>
+                            @endif
+                            <div class="brand-text">
+                                <h2>{{ setting('site_name', 'سَيِّر SIR') }}</h2>
+                                <span>منصة المزادات الرقمية</span>
+                            </div>
                         </div>
                     </div>
 
@@ -602,9 +701,9 @@
                             @livewire('seller.notifications-counter')
                         @endrole
 
-                        <!-- Dropdown المستخدم -->
+                        <!-- Dropdown المستخدم (تم تبسيطه) -->
                         <div class="dropdown">
-                            <div class="user-dropdown" >
+                            <div class="user-dropdown" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="user-avatar">
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 </div>
@@ -612,11 +711,8 @@
                                     <div class="user-greeting">مرحباً</div>
                                     <div class="user-name">{{ auth()->user()->name }}</div>
                                 </div>
-
                             </div>
 
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -634,10 +730,10 @@
             <!-- فوتر -->
             <footer class="footer">
                 <div class="d-flex justify-content-between align-items-center">
-
                     <div>
                         © 2025 <span class="gradient-text" style="font-weight:800;">سَيِّر</span> | منصة المزادات الرقمية
                     </div>
+                    <!-- يمكن إضافة روابط إضافية هنا إن لزم الأمر -->
                 </div>
             </footer>
         </div>
@@ -649,8 +745,41 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
     <script>
-
         document.addEventListener('DOMContentLoaded', function() {
+            // عناصر التحكم بالقائمة الجانبية
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+
+            // إغلاق السايدبار عند تغيير حجم الشاشة إذا كان مفتوحاً (للشاشات الكبيرة)
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 992) {
+                    closeSidebar();
+                }
+            });
+
+            // إضافة تأثير ظهور للمحتوى
             const content = document.querySelector('.main-content');
             if(content) {
                 content.classList.add('animate-on-scroll');

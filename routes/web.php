@@ -42,7 +42,9 @@ Route::post('/logout', function () {
 Route::prefix('seller')->middleware(['auth', 'role:seller'])->group(function () {
     Route::get('/dashboard', [DashboardSellersController::class, 'index'])->name('seller.dashboard');
     Route::resource('auction', AuctionSellersController::class);
-    Route::get('details/{id}', [AuctionSellersController::class, 'details'])->name('auction.selles.details');
+    // Route::get('details/{id}', [AuctionSellersController::class, 'details'])->name('auction.selles.details');
+    Route::get('details/{id}', [AuctionSellersController::class, 'details'])
+    ->name('auction.sellers.details');
     Route::get('/auctions/archive', [AuctionSellersController::class, 'sellerArchive'])->name('seller.auctions.archive');
     Route::get('winner/{id}', [AuctionSellersController::class, 'winner'])->name('auction.sellers.winner');
     Route::get('profile', [ProfileSellerController::class, 'index'])->name('seller.profile');
@@ -87,7 +89,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 Route::prefix('users')->group(function () {
     Route::get('/auctions/{id}', [AuctionUsersController::class, 'show'])->name('auction.users.show');
 
-    Route::middleware(['auth', 'role:seller'])->group(function () {
+    Route::middleware(['auth', 'role:user'])->group(function () {
         Route::get('/auction/{id}/bid', [BidUserController::class, 'show'])->name('auction.bid');
         Route::get('profile', [ProfileUserController::class, 'index'])
             ->name('user.profile');

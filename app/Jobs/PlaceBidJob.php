@@ -56,10 +56,10 @@ class PlaceBidJob implements ShouldQueue
                 $lastBid = $auction->bids()->latest()->first();
                 $currentPrice = $lastBid->amount ?? $auction->starting_price;
 
-                // منع المزايدة على نفسك فقط إذا كانت آخر مزايدة لك أنت
-                // if ($lastBid && $lastBid->user_id == $this->userId) {
-                //     throw new \Exception('لا يمكنك المزايدة مرتين متتاليتين بدون مزايد آخر');
-                // }
+                //  منع المزايدة المتتالية من نفس المستخدم
+                if ($lastBid && $lastBid->user_id == $this->userId) {
+                    throw new \Exception('لا يمكنك المزايدة مرتين متتاليتين');
+                }
 
                 // السعر الجديد
                 $newAmount = $currentPrice + $this->increment;

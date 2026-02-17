@@ -45,6 +45,13 @@ class PlaceBid extends Component
     public function placeBid()
     {
         $this->resetErrorBag();
+        if (!$this->selectedIncrement) {
+            $this->addError('amount', 'يرجى اختيار قيمة الزيادة أولاً');
+            return;
+        }
+        $this->auction->refresh(); // ⭐ جلب آخر مزايدة (يجب أن يكون هنا قبل استخدامه)
+        $lastBid = $this->auction->bids()->latest()->first();
+if ($lastBid && $lastBid->user_id == auth()->id()) { $this->addError('amount', 'لا يمكنك المزايدة مرتين متتاليتين'); return; }
 
         if (!$this->selectedIncrement) {
             $this->addError('amount', 'يرجى اختيار قيمة الزيادة أولاً');

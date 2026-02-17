@@ -43,26 +43,32 @@
                         </div>
                         @endforeach
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carImagesSlider" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon control-icon-modern"></span>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carImagesSlider"
+                        data-bs-slide="prev">
+
+                        <span class="carousel-control-prev-icon"></span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carImagesSlider" data-bs-slide="next">
-                        <span class="carousel-control-next-icon control-icon-modern"></span>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#carImagesSlider"
+                        data-bs-slide="next">
+
+                        <span class="carousel-control-next-icon"></span>
                     </button>
+
                 </div>
 
                 <!-- المصغرات -->
                 <div class="d-flex gap-3 flex-wrap justify-content-center">
                     @foreach($images as $index => $image)
                     <img src="{{ $image->getUrl() }}"
-                         onclick="bootstrap.Carousel.getInstance(document.getElementById('carImagesSlider')).to({{ $index }})"
-                         class="thumbnail-modern"
-                         style="width: 110px; height: 85px; object-fit: cover;">
+                        onclick="bootstrap.Carousel.getInstance(document.getElementById('carImagesSlider')).to({{ $index }})"
+                        class="thumbnail-modern" style="width: 110px; height: 85px; object-fit: cover;">
                     @endforeach
                 </div>
                 @else
                 <div class="placeholder-image rounded-5 shadow-modern">
-                    <img src="{{ asset('users/img/no-image.png') }}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="لا توجد صور">
+                    <img src="{{ asset('users/img/no-image.png') }}" class="img-fluid w-100 h-100"
+                        style="object-fit: cover;" alt="لا توجد صور">
                 </div>
                 @endif
             </div>
@@ -84,7 +90,8 @@
 
                     <div class="d-flex align-items-center gap-3 text-secondary mb-4 id-wrapper-modern">
                         <i class="fas fa-qrcode fs-4 text-primary-blue"></i>
-                        <span class="fs-5">رقم المزاد: <strong class="text-primary-blue">#{{ $auction->id }}</strong></span>
+                        <span class="fs-5">رقم المزاد: <strong class="text-primary-blue">#{{ $auction->id
+                                }}</strong></span>
                     </div>
 
                     <!-- المواصفات -->
@@ -94,23 +101,35 @@
                             <h4 class="fw-bold mb-0 text-dark-blue">المواصفات</h4>
                         </div>
                         @if($auction->car->specs)
-                            <p class="mb-3 text-gray-700">{{ $auction->car->specs_label }}</p>
+                        <p class="mb-3 text-gray-700">{{ $auction->car->specs_label }}</p>
                         @endif
                         @if($auction->car->description)
-                            <p class="text-gray-600 mb-0">{{ $auction->car->description }}</p>
+                        <p class="text-gray-600 mb-0">{{ $auction->car->description }}</p>
                         @endif
                         @if(!$auction->car->specs && !$auction->car->description)
-                            <p class="text-gray-500 mb-0">لا توجد مواصفات مضافة</p>
+                        <p class="text-gray-500 mb-0">لا توجد مواصفات مضافة</p>
                         @endif
+
                     </div>
+                    @if($auction->car->report_pdf)
+                    <div class="mt-4">
+                        <a href="{{ asset('storage/' . $auction->car->report_pdf) }}" class="btn-bid-modern w-100"
+                            download>
+                            <i class="fas fa-file-pdf me-2"></i>
+                            <span>تحميل كشف السيارة</span>
+                            <i class="fas fa-download ms-2"></i>
+                        </a>
+                    </div>
+                    @endif
 
                     <!-- كروت إحصائية -->
-                    <div class="row g-4 mb-4">
+                    <div class="row g-4 mb-4" style="margin-top: 20px">
                         <div class="col-6">
                             <div class="stat-modern p-4 rounded-4 text-center">
                                 <i class="fas fa-money-bill-wave fs-1 mb-2 text-success"></i>
                                 <span class="d-block text-secondary small">السعر الحالي</span>
-                                <span class="fw-bold display-6 text-primary-blue">{{ number_format($auction->starting_price, 0) }}</span>
+                                <span class="fw-bold display-6 text-primary-blue">{{
+                                    number_format($auction->starting_price, 0) }}</span>
                                 <span class="small text-secondary">$</span>
                             </div>
                         </div>
@@ -118,31 +137,36 @@
                             <div class="stat-modern p-4 rounded-4 text-center">
                                 <i class="fas fa-users fs-1 mb-2 text-primary-blue"></i>
                                 <span class="d-block text-secondary small">عدد المزايدات</span>
-                                <span class="fw-bold display-6 text-primary-blue">{{  $auction->bidders_count  ?? 0 }}</span>
+                                <span class="fw-bold display-6 text-primary-blue">{{ $auction->bidders_count ?? 0
+                                    }}</span>
                                 <span class="small text-secondary">مزايدة</span>
                             </div>
                         </div>
                     </div>
 
+
+
                     <!-- زر المشاركة / التنبيهات -->
                     @auth
-                        @if($auction->status === 'active')
-                            <a href="{{ route('auction.bid', $auction->id) }}" class="btn-bid-modern w-100">
-                                <i class="fas fa-hand-pointer me-2"></i>
-                                <span>دخول المزاد والمزايدة</span>
-                                <i class="fas fa-arrow-left ms-2"></i>
-                            </a>
-                        @else
-                            <div class="alert-modern warning d-flex align-items-center gap-3">
-                                <i class="fas fa-exclamation-triangle fs-4"></i>
-                                <span>هذا المزاد غير متاح حالياً</span>
-                            </div>
-                        @endif
+                    @if($auction->status === 'active')
+                    <a href="{{ route('auction.bid', $auction->id) }}" class="btn-bid-modern w-100">
+                        <i class="fas fa-hand-pointer me-2"></i>
+                        <span>دخول المزاد والمزايدة</span>
+                        <i class="fas fa-arrow-left ms-2"></i>
+                    </a>
                     @else
-                        <div class="alert-modern info d-flex align-items-center gap-3">
-                            <i class="fas fa-info-circle fs-4"></i>
-                            <span>يرجى <a href="#" id="openLoginBtn" class="fw-bold text-decoration-underline text-primary-blue">تسجيل الدخول</a> للمزايدة</span>
-                        </div>
+                    <div class="alert-modern warning d-flex align-items-center gap-3">
+                        <i class="fas fa-exclamation-triangle fs-4"></i>
+                        <span>هذا المزاد غير متاح حالياً</span>
+                    </div>
+                    @endif
+                    @else
+                    <div class="alert-modern info d-flex align-items-center gap-3">
+                        <i class="fas fa-info-circle fs-4"></i>
+                        <span>يرجى <a href="#" id="openLoginBtn"
+                                class="fw-bold text-decoration-underline text-primary-blue">تسجيل الدخول</a>
+                            للمزايدة</span>
+                    </div>
                     @endauth
 
                     <!-- ميزات إضافية -->
@@ -192,13 +216,15 @@
         border: 1px solid rgba(0, 76, 128, 0.15);
         box-shadow: 0 8px 20px -6px rgba(0, 20, 40, 0.1);
     }
+
     .modern-breadcrumb .breadcrumb-item {
         display: flex;
         align-items: center;
         color: #1e293b;
         font-size: 1rem;
     }
-    .modern-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+
+    .modern-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
         content: "›";
         color: #004c80;
         font-size: 1.4rem;
@@ -206,6 +232,7 @@
         opacity: 0.8;
         margin: 0 0.5rem;
     }
+
     .breadcrumb-link {
         display: flex;
         align-items: center;
@@ -216,10 +243,12 @@
         transition: all 0.2s;
         font-weight: 500;
     }
+
     .breadcrumb-link:hover {
         background: rgba(0, 76, 128, 0.1);
         color: #002b44;
     }
+
     .modern-breadcrumb .breadcrumb-item.active {
         display: flex;
         align-items: center;
@@ -235,18 +264,23 @@
     .text-primary-blue {
         color: #004c80 !important;
     }
+
     .text-dark-blue {
         color: #0a2540 !important;
     }
+
     .text-secondary {
         color: #64748b !important;
     }
+
     .text-gray-700 {
         color: #334155;
     }
+
     .text-gray-600 {
         color: #475569;
     }
+
     .text-gray-500 {
         color: #64748b;
     }
@@ -256,18 +290,19 @@
         box-shadow: 0 15px 30px -10px rgba(0, 40, 80, 0.15);
         transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .shadow-modern:hover {
         box-shadow: 0 25px 50px -12px rgba(0, 76, 128, 0.25);
     }
 
     /* أزرار التحكم في السلايدر */
     .control-icon-modern {
-        background: rgba(255,255,255,0.9);
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 50%;
         padding: 15px;
         width: 45px;
         height: 45px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
     /* المصغرات */
@@ -275,9 +310,10 @@
         border-radius: 20px;
         border: 2px solid transparent;
         transition: all 0.3s;
-        box-shadow: 0 10px 20px -8px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.1);
         background: white;
     }
+
     .thumbnail-modern:hover {
         transform: scale(1.1) rotate(1deg);
         border-color: #004c80;
@@ -292,6 +328,7 @@
         box-shadow: 0 20px 40px -12px rgba(0, 40, 80, 0.2);
         transition: all 0.2s;
     }
+
     .info-card-modern:hover {
         box-shadow: 0 30px 60px -15px rgba(0, 76, 128, 0.3);
     }
@@ -322,16 +359,19 @@
         border: 1px solid #cbd5e1;
         color: #334155;
     }
+
     .status-badge-modern.live {
         background: rgba(0, 76, 128, 0.1);
         border-color: #004c80;
         color: #004c80;
     }
+
     .status-badge-modern.ended {
         background: #f1f5f9;
         border-color: #94a3b8;
         color: #475569;
     }
+
     .status-dot-modern {
         width: 12px;
         height: 12px;
@@ -339,6 +379,7 @@
         display: inline-block;
         background: #004c80;
     }
+
     .status-badge-modern.ended .status-dot-modern {
         background: #94a3b8;
     }
@@ -365,6 +406,7 @@
         border: 1px solid #e2e8f0;
         transition: all 0.2s;
     }
+
     .stat-modern:hover {
         transform: translateY(-5px);
         border-color: #004c80;
@@ -387,6 +429,7 @@
         transition: all 0.3s;
         box-shadow: 0 10px 20px -5px #004c80;
     }
+
     .btn-bid-modern:hover {
         background: #002b44;
         transform: translateY(-3px);
@@ -402,16 +445,19 @@
         border: 1px solid #e2e8f0;
         color: #334155;
     }
+
     .alert-modern.warning {
         background: #fff3cd;
         border-color: #ffeeba;
         color: #856404;
     }
+
     .alert-modern.info {
         background: #d1ecf1;
         border-color: #bee5eb;
         color: #0c5460;
     }
+
     .alert-modern a {
         color: #004c80;
     }
@@ -425,6 +471,7 @@
         border-top: 1px solid #e2e8f0;
         padding-top: 2rem;
     }
+
     .feature-item-modern {
         display: flex;
         align-items: center;
@@ -437,12 +484,14 @@
         border: 1px solid #e2e8f0;
         transition: all 0.2s;
     }
+
     .feature-item-modern:hover {
         background: white;
         border-color: #004c80;
         transform: translateY(-2px);
         box-shadow: 0 8px 15px -5px rgba(0, 76, 128, 0.2);
     }
+
     .feature-item-modern i {
         font-size: 1.2rem;
     }
@@ -452,22 +501,28 @@
         .info-card-modern {
             padding: 1.5rem !important;
         }
+
         .thumbnail-modern {
             width: 80px;
             height: 65px;
         }
+
         .btn-bid-modern {
             font-size: 1rem;
             padding: 0.8rem 1.5rem;
         }
+
         .features-strip-modern {
             gap: 1rem;
         }
+
         .modern-breadcrumb {
             padding: 0.5rem 1.2rem;
             gap: 0.3rem;
         }
-        .breadcrumb-link, .modern-breadcrumb .breadcrumb-item.active {
+
+        .breadcrumb-link,
+        .modern-breadcrumb .breadcrumb-item.active {
             padding: 0.2rem 0.8rem;
         }
     }
@@ -486,10 +541,24 @@
         }
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var myCarousel = document.querySelector('#carImagesSlider');
+    if (myCarousel) {
+        new bootstrap.Carousel(myCarousel, {
+            interval: false,
+            ride: false
+        });
+    }
+});
+</script>
+
 
 <!-- AOS (اختياري) -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>AOS.init();</script>
+<script>
+    AOS.init();
+</script>
 
 @endsection
