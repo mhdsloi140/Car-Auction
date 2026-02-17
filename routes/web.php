@@ -50,6 +50,7 @@ Route::prefix('seller')->middleware(['auth', 'role:seller'])->group(function () 
     Route::patch('/auction/{auction}/reject', [AuctionSellersController::class, 'reject'])->name('auction.sellers.reject');
     Route::patch('/auction/{auction}/complete', [AuctionSellersController::class, 'complete'])->name('auction.sellers.complete');
     Route::get('add-user', [AddUserController::class, 'index'])->name('sellers.add.user');
+    // Route::get('auction/{id}', [AuctionSellersController::class, 'show'])->name('auction.show');
 });
 
 // ==================== Admin Routes ====================
@@ -60,7 +61,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/auction', [AuctionAdminController::class, 'index'])->name('admin.auction.index');
     Route::get('/auctions/{auction}', [AuctionAdminController::class, 'show'])->name('auction.admin.show');
     Route::patch('/auctions/{id}/approve', [AuctionAdminController::class, 'approve'])->name('auctions.approve');
-    Route::patch('/auctions/{id}/reject', [AuctionAdminController::class, 'reject'])->middleware('permission:reject auction')->name('auctions.reject');
+    Route::patch('/auctions/{id}/reject', [AuctionAdminController::class, 'reject'])->name('auctions.reject');
     Route::delete('/auction/{id}', [AuctionAdminController::class, 'destroy'])->name('auction.admin.destroy');
 
     Route::get('settings', [SettingsAdminController::class, 'index'])->name('settings.admin.index');
@@ -72,7 +73,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/settings/files', [SettingsAdminController::class, 'file'])->name('admin.settings.file');
     Route::get('/settings/security', [SettingsSecurityController::class, 'index'])->name('admin.settings.security');
     Route::post('/settings/security', [SettingsSecurityController::class, 'save'])->name('admin.settings.security.save');
-
+    Route::post('/admin/settings/files', [SettingsController::class, 'save'])->name('admin.settings.save');
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('admin.activity.logs');
     Route::delete('/activity-logs/delete', [ActivityLogController::class, 'delete'])->name('admin.activity.logs.delete');
 
@@ -83,18 +84,17 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 });
 
 // ==================== Users Auctions Routes ====================
-Route::prefix('users')->middleware(['auth', 'role:user'])->group(function () {
+Route::prefix('users')->group(function () {
     Route::get('/auctions/{id}', [AuctionUsersController::class, 'show'])->name('auction.users.show');
-    Route::get('/auction/{id}/bid', [BidUserController::class, 'show'])->name('auction.bid');
-    // Route::get('profile',[ProfileUserController::class,'index'])->name('user.profile');
-    // Route::post('profile/update',[ProfileUserController::class,'update'])->name('user.profile.update');
-    // Route::post('/profile/password', [ProfileUserController::class, 'updatePassword'])->name('user.profile.password');
-    Route::get('profile', [ProfileUserController::class, 'index'])
-    ->name('user.profile');
 
-Route::post('profile/update', [ProfileUserController::class, 'update'])
-    ->name('user.profile.update');
+    Route::middleware(['auth', 'role:seller'])->group(function () {
+        Route::get('/auction/{id}/bid', [BidUserController::class, 'show'])->name('auction.bid');
+        Route::get('profile', [ProfileUserController::class, 'index'])
+            ->name('user.profile');
+        Route::post('profile/update', [ProfileUserController::class, 'update'])
+            ->name('user.profile.update');
+        Route::post('profile/password', [ProfileUserController::class, 'updatePassword'])
+            ->name('user.profile.password');
+    });
 
-Route::post('profile/password', [ProfileUserController::class, 'updatePassword'])
-    ->name('user.profile.password');
 });

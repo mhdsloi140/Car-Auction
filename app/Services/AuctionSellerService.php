@@ -1,31 +1,33 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Auction;
-use App\Models\Car;
-use App\Models\User;
-use Auth;
 
 class AuctionSellerService
 {
-    ///
+    /**
+     * جلب قائمة المزادات للبائع الحالي
+     */
     public function index()
     {
-        $seller_id = auth()->user();
-        $auctions = Auction::where('seller_id', $seller_id)->paginate(5);
+        $sellerId = auth()->id();
+
+        $auctions = Auction::with(['car.brand', 'car.model', 'car.media'])
+            ->where('seller_id', $sellerId)
+            ->paginate(5);
+
         return $auctions;
     }
 
-
-    public function show($id)
+    /**
+     * عرض مزاد معين مع السيارة والبائع
+     */
+    public function show($auctionId)
     {
-        $car = Car::with(['brand', 'model', 'auction.seller', 'media'])->findOrFail($id);
+        $auction = Auction::with(['car.brand', 'car.model', 'car.media', 'seller'])
+            ->findOrFail($auctionId);
 
-        return $car;
-    }
-
-    public function details($id)
-    {
-        return $id;
+        return $auction;
     }
 }

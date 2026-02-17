@@ -17,7 +17,8 @@ class Auction extends Model
         'status',
         'approved_by',
         'winner_id',
-        'final_price'
+        'final_price',
+       
     ];
      protected $casts = [
         'start_at' => 'datetime',

@@ -162,11 +162,15 @@ return [
         /*
          * Application Service Providers...
          */
+        // Intervention\Image\Laravel\ServiceProvider::class,
+// Intervention\Image\ImageServiceProvider::class,
+
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+    //    Livewire\LivewireServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -182,6 +186,9 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+        // 'Image' => Intervention\Image\Facades\Image::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ])->toArray(),
 
+    'driver' => 'gd',
 ];

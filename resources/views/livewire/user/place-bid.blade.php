@@ -11,16 +11,16 @@
 
         {{-- الإحصائيات --}}
         <div class="row g-4 mb-4">
-      <div class="col-md-4" wire:ignore>
-    <div class="stat-card timer-card">
-        <span class="stat-label">الوقت المتبقي</span>
+            <div class="col-md-4" wire:ignore>
+                <div class="stat-card timer-card">
+                    <span class="stat-label">الوقت المتبقي</span>
 
-        <div class="timer-display" id="countdown">--:--:--</div>
+                    <div class="timer-display" id="countdown">--:--:--</div>
 
-        <input type="hidden" id="auctionEndTime"
-               value="{{ optional($auction->end_at)->setTimezone('UTC')->toIso8601String() }}">
-    </div>
-</div>
+                    <input type="hidden" id="auctionEndTime"
+                        value="{{ optional($auction->end_at)->setTimezone('UTC')->toIso8601String() }}">
+                </div>
+            </div>
 
 
             {{-- بيانات المزاد --}}
@@ -162,4 +162,14 @@
 
         </div>
     </div>
+    <script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('update-end-time', (data) => {
+            const newEndTime = data.endTime;
+            document.getElementById('auctionEndTime').value = newEndTime;
+            startCountdown(newEndTime);
+        });
+    });
+</script>
+
 </div>

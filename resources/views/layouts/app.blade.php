@@ -541,7 +541,7 @@
                         <li class="nav-item {{ request()->routeIs('sellers.add.user') ? 'active' : '' }}">
                             <a href="{{ route('sellers.add.user') }}" class="nav-link">
                                 <i class="fa-solid fa-user-plus"></i>
-                                <span>إضافة مستخدم</span>
+                                <span>إضافة معرض</span>
                             </a>
                         </li>
                         @endrole

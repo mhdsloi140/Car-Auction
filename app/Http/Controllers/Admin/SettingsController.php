@@ -11,7 +11,6 @@ class SettingsController extends Controller
     {
 
         $settings = Setting::pluck('value', 'key')->toArray();
-
         return view('admin.settings.files', compact('settings'));
     }
 

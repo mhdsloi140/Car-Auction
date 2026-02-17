@@ -85,7 +85,7 @@
 
     {{-- العنوان --}}
     <div class="text-center mb-4">
-        <h4 class="fw-bold">قائمة المزادات</h4>
+        <h4 class="fw-bold"></h4>
         <hr class="mx-auto" style="width: 120px;">
     </div>
 

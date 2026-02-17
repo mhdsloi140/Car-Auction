@@ -20,12 +20,18 @@ class AuctionSellersController extends Controller
     {
 
     }
+
     public function index()
     {
         $auctions = $this->auctionSellerService->index();
         return view('seller.auction.index', compact('auctions'));
     }
 
+    public function show($id)
+    {
+        $auction = $this->auctionSellerService->show($id);
+        return view('seller.auction.show', compact('auction'));
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -68,14 +74,29 @@ class AuctionSellersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
-    {
+    // public function show($id)
+    // {
 
-        $car = $this->auctionSellerService->show($id);
+    //     $car = $this->auctionSellerService->show($id);
+    // //  dd($car);
+    // // dd(get_class($car));
 
+    //     return view('seller.auction.show', compact('car'));
+    // }
+//     public function show($id)
+// {
+//     $car = Car::with(['brand','model','auction','media'])->find($id);
 
-        return view('seller.auction.show', compact('car'));
-    }
+//     if (!$car) {
+//         dd('Car Not Found');
+//     }
+
+//     dd([
+//         'car_exists' => true,
+//         'has_auction' => $car->auction ? true : false,
+//         'auction_data' => $car->auction
+//     ]);
+// }
 
 
     public function details($id)

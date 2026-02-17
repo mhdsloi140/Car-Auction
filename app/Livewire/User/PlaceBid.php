@@ -50,11 +50,11 @@ class PlaceBid extends Component
             $this->addError('amount', 'يرجى اختيار قيمة الزيادة أولاً');
             return;
         }
-\Log::info('Dispatching PlaceBidJob', [
-    'auction_id' => $this->auction->id,
-    'user_id' => auth()->id(),
-    'increment' => $this->selectedIncrement,
-]);
+        \Log::info('Dispatching PlaceBidJob', [
+            'auction_id' => $this->auction->id,
+            'user_id' => auth()->id(),
+            'increment' => $this->selectedIncrement,
+        ]);
 
         // تحديث السعر قبل الإرسال
         $this->auction->refresh();
@@ -87,7 +87,7 @@ class PlaceBid extends Component
             // تنبيه مزايدة جديدة
             $this->newBidAlert = [
                 'user_id' => $latestBid->user_id,
-                'amount'  => $latestBid->amount,
+                'amount' => $latestBid->amount,
             ];
 
             // تحديث السعر
@@ -102,7 +102,7 @@ class PlaceBid extends Component
 
         // تحديث الوقت في الواجهة
         if ($this->auction->end_at) {
-$this->dispatch('update-end-time', endTime: $this->auction->end_at->setTimezone('UTC')->toIso8601String());
+            $this->dispatch('update-end-time', endTime: $this->auction->end_at->setTimezone('UTC')->toIso8601String());
         }
     }
 
@@ -110,8 +110,8 @@ $this->dispatch('update-end-time', endTime: $this->auction->end_at->setTimezone(
     {
         return view('livewire.user.place-bid', [
             'currentPrice' => $this->currentPrice,
-            'latestBids'   => $this->latestBids,
-            'bidsCount'    => $this->bidsCount,
+            'latestBids' => $this->latestBids,
+            'bidsCount' => $this->bidsCount,
         ]);
     }
 }

@@ -9,6 +9,6 @@
             <button type="button" class="btn-close" wire:click="dismiss({{ $note['id'] }})"></button>
         </div>
     @empty
-        <div class="text-muted text-center">لا توجد إشعارات</div>
+      
     @endforelse
 </div>

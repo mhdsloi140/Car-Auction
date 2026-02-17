@@ -38,7 +38,7 @@
                         <th>السيارة</th>
                         <th>البائع</th>
                         <th>السعر الابتدائي</th>
-                        <th>سعر الشراء الفوري</th>
+
                         <th>الحالة</th>
                         <th>تاريخ الإنشاء</th>
                         <th>الإجراءات</th>
@@ -60,7 +60,6 @@
 
                         <td>{{ number_format($auction->starting_price) }}</td>
 
-                        <td>{{ $auction->buy_now_price ? number_format($auction->buy_now_price) : '-' }}</td>
 
                         <td>
                             @php

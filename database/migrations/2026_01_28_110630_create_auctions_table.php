@@ -21,7 +21,7 @@ return new class extends Migration {
                 ->constrained('users')
                 ->cascadeOnDelete();
 
-            $table->decimal('starting_price', 10, 2);
+            $table->decimal('starting_price', 10, 2)->nullable();
             $table->decimal('buy_now_price', 10, 2)->nullable();
 
             $table->dateTime('start_at')->nullable();

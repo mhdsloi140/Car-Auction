@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Setting;
 
 class SettingsAdminController extends Controller
 {
@@ -17,7 +18,9 @@ class SettingsAdminController extends Controller
     }
     public function file()
     {
-        return view('admin.settings.files');
+                $settings = Setting::pluck('value', 'key')->toArray();
+
+        return view('admin.settings.files', compact('settings'));
     }
 
     /**

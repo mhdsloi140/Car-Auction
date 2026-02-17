@@ -20,6 +20,7 @@ class Car extends Model implements HasMedia
         'plate_number',
         'description',
         'specs',
+         'report_pdf'
     ];
     public function getSpecsLabelAttribute()
 {

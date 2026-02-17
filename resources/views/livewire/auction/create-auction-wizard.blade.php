@@ -1,6 +1,5 @@
 <div style="direction: rtl; text-align: right;" class="p-3">
 
-
     <button class="btn btn-lg btn-success shadow-sm d-flex align-items-center gap-2 px-4 rounded-pill transition-all"
         wire:click="openModal"
         style="font-weight: 600; border: none; background: linear-gradient(45deg, #198754, #20c997);">
@@ -16,7 +15,7 @@
             <div class="modal-content border-0 shadow-lg" style="border-radius: 1.25rem; overflow: hidden;">
 
                 {{-- HEADER --}}
-                <div class="modal-header border-0 bg-light px-4 py-3">
+                <div class="modal-header border-0 bg-light px-4 py-3 d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
                         <span class="badge bg-primary rounded-pill px-3 py-2">{{ $step }}/3</span>
                         <span>
@@ -26,8 +25,8 @@
                             @endif
                         </span>
                     </h5>
-                    <button type="button" class="btn-close position-absolute start-0 ms-3 mt-2"
-                        wire:click="closeModal"></button>
+                    <!-- زر الإغلاق على اليمين -->
+                    <button type="button" class="btn-close" aria-label="Close" wire:click="closeModal"></button>
                 </div>
 
                 {{-- PROGRESS BAR --}}
@@ -41,6 +40,7 @@
                     {{-- STEP 1 --}}
                     @if($step === 1)
                     <div class="row g-3">
+                        <!-- بيانات السيارة الأساسية هنا -->
                         <div class="col-md-6">
                             <label class="form-label fw-bold small">الماركة</label>
                             <select wire:model.live="brand_id" class="form-select">
@@ -90,29 +90,10 @@
                             <label class="form-label fw-bold small">المدينة</label>
                             <select class="form-select" wire:model.defer="city">
                                 <option value="">اختر المدينة</option>
-                                @foreach([
-                                'بغداد',
-                                'البصرة',
-                                'نينوى',
-                                'أربيل',
-                                'السليمانية',
-                                'دهوك',
-                                'النجف',
-                                'كربلاء',
-                                'الأنبار',
-                                'ديالى',
-                                'صلاح الدين',
-                                'واسط',
-                                'ميسان',
-                                'ذي قار',
-                                'المثنى',
-                                'بابل',
-                                'القادسية',
-                                'كركوك'
-                                ] as $city)
+                                @foreach(['بغداد','البصرة','نينوى','أربيل','السليمانية','دهوك','النجف','كربلاء','الأنبار','ديالى','صلاح
+                                الدين','واسط','ميسان','ذي قار','المثنى','بابل','القادسية','كركوك'] as $city)
                                 <option value="{{ $city }}">{{ $city }}</option>
                                 @endforeach
-
                             </select>
                             @error('city') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
@@ -139,61 +120,64 @@
 
                     {{-- STEP 2 --}}
                     @if($step === 2)
-
                     <div class="upload-zone text-center p-4 border border-dashed rounded-3 mb-3"
                         style="border-color: #d0d7de; background: #f8f9fa;">
-
                         <i class="bi bi-cloud-arrow-up text-primary display-5"></i>
                         <h6 class="mt-2 fw-bold">ارفع صور السيارة</h6>
 
-                        <input type="file" class="form-control mt-3" wire:model="photos" multiple>
+                        <input type="file" class="form-control mt-3" wire:model.live="photos" multiple>
 
-                        {{-- خطأ عدد الصور --}}
                         @error('photos')
                         <small class="text-danger d-block mt-2">{{ $message }}</small>
                         @enderror
 
-                        {{-- خطأ نوع/حجم كل صورة --}}
                         @error('photos.*')
                         <small class="text-danger d-block mt-2">{{ $message }}</small>
                         @enderror
-
                     </div>
 
-                    {{-- عرض الصور المرفوعة --}}
-                    <div class="d-flex flex-wrap gap-2 justify-content-center">
-                        @foreach($photos as $photo)
-                        <img src="{{ $photo->temporaryUrl() }}" class="img-thumbnail rounded-3 shadow-sm"
-                            style="width:120px; height:90px; object-fit:cover;">
-                        @endforeach
-                    </div>
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+    @foreach($photos as $index => $photo)
+    {{-- {{ $photo->getMimeType() }} --}}
+
+      @php
+    $mime = $photo->getMimeType();
+@endphp
+
+@if(str_starts_with($mime, 'image/'))
+    <img src="{{ $photo->temporaryUrl() }}"
+         class="img-thumbnail rounded-3 shadow-sm"
+         style="width:120px; height:90px; object-fit:cover;">
+@else
+    <div class="img-thumbnail rounded-3 shadow-sm d-flex align-items-center justify-content-center"
+         style="width:120px; height:90px; background:#eee;">
+        <span class="text-muted small">غير قابل للمعاينة</span>
+    </div>
+@endif
+
+
+    @endforeach
+</div>
+
 
                     @endif
-
 
                     {{-- STEP 3 --}}
                     @if($step === 3)
                     <div class="row g-4 justify-content-center">
                         <div class="col-md-8 text-center">
                             <div class="card bg-light border-0 p-4 shadow-sm mb-3">
-                                <label class="fw-bold mb-2">السعر الابتدائي</label>
+                                <label class="fw-bold mb-2">ملف الكشف</label>
                                 <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white">$</span>
-                                    <input type="number" class="form-control text-center fw-bold"
-                                        wire:model.defer="starting_price">
+
+                                    <input type="file" class="form-control" wire:model="report_pdf">
+
                                 </div>
-                                @error('starting_price') <small class="text-danger">{{ $message }}</small> @enderror
+                                @error('report_pdf') <span class="text-danger">{{ $message }}</span> @enderror
+                                {{-- @error('report_pdf') <small class="text-danger">{{ $message }}</small> @enderror
+                                --}}
                             </div>
 
-                            <div class="card bg-light border-0 p-4 shadow-sm">
-                                <label class="fw-bold mb-2">سعر الشراء الفوري (اختياري)</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white">$</span>
-                                    <input type="number" class="form-control text-center fw-bold"
-                                        wire:model.defer="buy_now_price">
-                                </div>
-                                @error('buy_now_price') <small class="text-danger">{{ $message }}</small> @enderror
-                            </div>
                         </div>
                     </div>
                     @endif
@@ -207,7 +191,6 @@
                         <button class="btn btn-outline-secondary px-4 py-2 flex-grow-1"
                             wire:click="previousStep">السابق</button>
                         @endif
-
                         @if($step < 3) <button class="btn btn-primary px-4 py-2 flex-grow-1 shadow"
                             wire:click="nextStep">استمرار</button>
                             @else
@@ -220,5 +203,39 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('livewire:init', () => {
+    Livewire.hook('element.updated', () => {
+
+        const input = document.querySelector('input[type="file"][wire\\:model\\.live="photos"]');
+        if (!input) return;
+
+        const files = input.files;
+        if (!files.length) return;
+
+        document.querySelectorAll('[data-webp-preview]').forEach(box => {
+            const index = box.getAttribute('data-webp-preview');
+            const file = files[index];
+
+            if (!file) return;
+            if (file.type !== 'image/webp') return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                box.innerHTML = `
+                    <img src="${e.target.result}"
+                         class="img-thumbnail rounded-3 shadow-sm"
+                         style="width:120px; height:90px; object-fit:cover;">
+                `;
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+});
+    </script>
+
+
     @endif
+
+
 </div>
