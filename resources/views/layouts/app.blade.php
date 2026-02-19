@@ -12,7 +12,8 @@
         type="image/x-icon" />
 
     <!-- Google Fonts (Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <!-- Font Awesome 6 (Free CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -27,22 +28,26 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
     <style>
         /* متغيرات الألوان - درجات الكحلي (الأزرق الداكن) */
         :root {
-            --primary: #0f3b5e;          /* كحلي غامق */
-            --primary-light: #2b5e8c;    /* أفتح */
-            --primary-dark: #092235;      /* أغمق */
-            --secondary: #1f5a8e;         /* درجة متوسطة من الكحلي */
+            --primary: #0f3b5e;
+            /* كحلي غامق */
+            --primary-light: #2b5e8c;
+            /* أفتح */
+            --primary-dark: #092235;
+            /* أغمق */
+            --secondary: #1f5a8e;
+            /* درجة متوسطة من الكحلي */
             --secondary-light: #4a7daa;
             --secondary-dark: #0b3b5a;
             --bg-gradient: linear-gradient(145deg, #e0edff 0%, #c0d8ff 100%);
-            --glass-bg: rgba(255,255,255,0.25);
-            --glass-border: rgba(255,255,255,0.18);
-            --card-shadow: 0 20px 35px -8px rgba(15,59,94,0.15), 0 5px 12px -4px rgba(0,0,0,0.05);
-            --hover-shadow: 0 30px 45px -12px rgba(15,59,94,0.25);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --card-shadow: 0 20px 35px -8px rgba(15, 59, 94, 0.15), 0 5px 12px -4px rgba(0, 0, 0, 0.05);
+            --hover-shadow: 0 30px 45px -12px rgba(15, 59, 94, 0.25);
             --sidebar-width: 300px;
         }
 
@@ -70,6 +75,7 @@
             opacity: 0.4;
             pointer-events: none;
         }
+
         .bg-pattern svg {
             width: 100%;
             height: 100%;
@@ -89,8 +95,8 @@
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(255,255,255,0.5);
-            box-shadow: 0 0 40px rgba(15,59,94,0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 40px rgba(15, 59, 94, 0.1);
             position: fixed;
             top: 0;
             right: 0;
@@ -103,7 +109,7 @@
 
         .sidebar-logo {
             padding: 30px 20px 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-wrapper {
@@ -151,7 +157,7 @@
             right: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
             transform: translateX(-100%);
             transition: 0.5s;
         }
@@ -162,7 +168,7 @@
 
         .nav-link:hover {
             background: white;
-            box-shadow: 0 10px 25px -8px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.1);
         }
 
         .nav-link:hover i {
@@ -172,7 +178,7 @@
         /* العنصر النشط - تدرج كحلي */
         .nav-item.active {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            box-shadow: 0 15px 25px -8px rgba(15,59,94,0.3);
+            box-shadow: 0 15px 25px -8px rgba(15, 59, 94, 0.3);
         }
 
         .nav-item.active .nav-link {
@@ -187,7 +193,7 @@
         .logout-btn {
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 2px dashed rgba(0,0,0,0.1);
+            border-top: 2px dashed rgba(0, 0, 0, 0.1);
         }
 
         .logout-btn .nav-link {
@@ -209,14 +215,14 @@
 
         /* ========== هيدر زجاجي ========== */
         .main-header {
-            background: rgba(255,255,255,0.6);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 28px;
             padding: 16px 30px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 40px -15px rgba(15,59,94,0.2);
+            box-shadow: 0 20px 40px -15px rgba(15, 59, 94, 0.2);
         }
 
         /* زر القائمة (هامبورجر) - يظهر فقط في الشاشات الصغيرة */
@@ -230,6 +236,7 @@
             margin-left: 15px;
             transition: transform 0.2s;
         }
+
         .menu-toggle:hover {
             transform: scale(1.1);
         }
@@ -251,7 +258,7 @@
             justify-content: center;
             color: white;
             font-size: 1.8rem;
-            box-shadow: 0 10px 20px -5px rgba(15,59,94,0.3);
+            box-shadow: 0 10px 20px -5px rgba(15, 59, 94, 0.3);
         }
 
         .brand-text {
@@ -327,7 +334,7 @@
             color: white;
             font-weight: 700;
             font-size: 1.2rem;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -337,7 +344,7 @@
 
         .user-greeting {
             font-size: 0.8rem;
-            color: rgba(0,0,0,0.7);
+            color: rgba(0, 0, 0, 0.7);
         }
 
         .user-name {
@@ -353,12 +360,12 @@
 
         /* ========== فوتر أنيق ========== */
         .footer {
-            background: rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(8px);
             border-radius: 28px;
             padding: 18px 30px;
             margin-top: 40px;
-            border: 1px solid rgba(255,255,255,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             color: #475569;
             font-weight: 500;
         }
@@ -387,6 +394,7 @@
             :root {
                 --sidebar-width: 280px;
             }
+
             .brand-text h2 {
                 font-size: 1.6rem;
             }
@@ -394,33 +402,42 @@
 
         @media (max-width: 992px) {
             .menu-toggle {
-                display: block; /* إظهار زر القائمة */
+                display: block;
+                /* إظهار زر القائمة */
             }
+
             .sidebar {
                 right: -100%;
                 border-radius: 0;
                 transition: right 0.4s ease;
             }
+
             .sidebar.show {
                 right: 0;
             }
+
             .main-panel {
                 margin-right: 0;
                 width: 100%;
                 padding: 20px;
             }
+
             .main-header {
                 padding: 12px 20px;
             }
+
             .brand-text h2 {
                 font-size: 1.4rem;
             }
+
             .brand-text span {
                 font-size: 0.7rem;
             }
+
             .header-actions {
                 gap: 15px;
             }
+
             .user-dropdown {
                 padding: 6px 15px 6px 10px;
             }
@@ -430,36 +447,47 @@
             .main-panel {
                 padding: 15px;
             }
+
             .main-header {
                 padding: 10px 15px;
             }
+
             .brand-icon {
                 width: 40px;
                 height: 40px;
                 font-size: 1.5rem;
             }
+
             .brand-text h2 {
                 font-size: 1.2rem;
             }
+
             .brand-text span {
-                display: none; /* إخفاء النص الفرعي لتوفير المساحة */
+                display: none;
+                /* إخفاء النص الفرعي لتوفير المساحة */
             }
+
             .header-actions {
                 gap: 10px;
             }
+
             .user-avatar {
                 width: 36px;
                 height: 36px;
                 font-size: 1rem;
             }
+
             .user-info {
-                display: none; /* إخفاء الاسم والترحيب */
+                display: none;
+                /* إخفاء الاسم والترحيب */
             }
+
             .footer {
                 padding: 15px;
                 font-size: 0.9rem;
                 text-align: center;
             }
+
             .footer .d-flex {
                 flex-direction: column;
                 gap: 10px;
@@ -470,14 +498,17 @@
             .main-header {
                 border-radius: 20px;
             }
+
             .menu-toggle {
                 font-size: 1.8rem;
             }
+
             .brand-icon {
                 width: 36px;
                 height: 36px;
                 font-size: 1.3rem;
             }
+
             .user-dropdown {
                 padding: 4px 10px;
             }
@@ -492,13 +523,16 @@
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.02);
+            background: rgba(0, 0, 0, 0.02);
         }
+
         ::-webkit-scrollbar-thumb {
             background: var(--primary-light);
             border-radius: 20px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary);
         }
@@ -511,10 +545,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(3px);
             z-index: 999;
         }
+
         .sidebar-overlay.show {
             display: block;
         }
@@ -534,7 +569,7 @@
                     <stop offset="100%" stop-color="#c0d8ff" stop-opacity="0.3" />
                 </linearGradient>
                 <pattern id="pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <circle cx="20" cy="20" r="1.5" fill="#0f3b5e" opacity="0.1"/>
+                    <circle cx="20" cy="20" r="1.5" fill="#0f3b5e" opacity="0.1" />
                 </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#glassGrad)" />
@@ -569,48 +604,45 @@
                         </li>
                         @endrole
 
-                        @role('seller')
-                        <li class="nav-item {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
-                            <a href="{{ route('seller.dashboard') }}" class="nav-link">
-                                <i class="fa-solid fa-table-cells"></i>
-                                <span>الصفحة الرئيسية</span>
-                            </a>
-                        </li>
-                        @endrole
-
+                   
                         <!-- Seller: Auctions -->
                         @role('seller')
                         <li class="nav-item {{ request()->routeIs('auction.index') ? 'active' : '' }}">
                             <a href="{{ route('auction.index') }}" class="nav-link">
                                 <i class="fa-solid fa-gavel"></i>
-                                <span>المزادات</span>
+                                <span>بيع سيارة</span>
                             </a>
                         </li>
 
-                        <li class="nav-item {{ request()->routeIs('seller.auctions.archive') ? 'active' : '' }}">
-                            <a href="{{ route('seller.auctions.archive') }}" class="nav-link">
-                                <i class="fa-solid fa-box-archive"></i>
-                                <span>أرشيف المزادات</span>
-                            </a>
-                        </li>
+
                         @endrole
 
                         <!-- Admin: Auctions & Settings -->
                         @role('admin')
-                        <li class="nav-item {{ request()->is('admin/auction*') ? 'active' : '' }}">
+
+                        <li class="nav-item {{ request()->routeIs('admin.auction.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.auction.index') }}" class="nav-link">
                                 <i class="fa-solid fa-gavel"></i>
                                 <span>إدارة المزادات</span>
                             </a>
                         </li>
 
-                        <li class="nav-item {{ request()->is('admin/settings*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('settings.admin.*') ? 'active' : '' }}">
                             <a href="{{ route('settings.admin.index') }}" class="nav-link">
                                 <i class="fa-solid fa-sliders"></i>
                                 <span>الإعدادات</span>
                             </a>
                         </li>
+
+                        <li class="nav-item {{ request()->routeIs('admin.auctions.archive') ? 'active' : '' }}">
+                            <a href="{{ route('admin.auctions.archive') }}" class="nav-link">
+                                <i class="fa-solid fa-box-archive"></i>
+                                <span>أرشيف المزادات</span>
+                            </a>
+                        </li>
+
                         @endrole
+
 
                         <!-- Profile -->
                         @role('seller')
@@ -645,7 +677,8 @@
                         <li class="nav-item logout-btn">
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="nav-link w-100 text-start" style="background:none; border:none;">
+                                <button type="submit" class="nav-link w-100 text-start"
+                                    style="background:none; border:none;">
                                     <i class="fa-solid fa-right-from-bracket"></i>
                                     <span>تسجيل الخروج</span>
                                 </button>
@@ -657,7 +690,8 @@
                         <li class="nav-item logout-btn">
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="nav-link w-100 text-start" style="background:none; border:none;">
+                                <button type="submit" class="nav-link w-100 text-start"
+                                    style="background:none; border:none;">
                                     <i class="fa-solid fa-right-from-bracket"></i>
                                     <span>تسجيل الخروج</span>
                                 </button>
@@ -698,12 +732,13 @@
                     <!-- الإجراءات -->
                     <div class="header-actions">
                         @role('seller')
-                            @livewire('seller.notifications-counter')
+                        @livewire('seller.notifications-counter')
                         @endrole
 
                         <!-- Dropdown المستخدم (تم تبسيطه) -->
                         <div class="dropdown">
-                            <div class="user-dropdown" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-dropdown" id="userDropdown" data-bs-toggle="dropdown"
+                                aria-expanded="false">
                                 <div class="user-avatar">
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 </div>
@@ -721,9 +756,9 @@
             <!-- المحتوى الديناميكي -->
             <div class="main-content">
                 @if (isset($slot))
-                    {{ $slot }}
+                {{ $slot }}
                 @else
-                    @yield('content')
+                @yield('content')
                 @endif
             </div>
 
@@ -731,7 +766,8 @@
             <footer class="footer">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        © 2025 <span class="gradient-text" style="font-weight:800;">سَيِّر</span> | منصة المزادات الرقمية
+                        © 2025 <span class="gradient-text" style="font-weight:800;">سَيِّر</span> | منصة المزادات
+                        الرقمية
                     </div>
                     <!-- يمكن إضافة روابط إضافية هنا إن لزم الأمر -->
                 </div>

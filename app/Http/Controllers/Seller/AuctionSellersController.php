@@ -35,17 +35,7 @@ class AuctionSellersController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function sellerArchive()
-    {
-        $auctions = Auction::with(['car', 'winner'])
-            ->where('seller_id', Auth::id())
-            ->whereIn('status', ['closed', 'rejected', 'completed'])
-            ->orderByDesc('end_at')
-            ->paginate(10);
 
-
-        return view('seller.auction.archive', compact('auctions'));
-    }
     public function winner($id)
     {
         $user = User::find($id);
@@ -54,36 +44,36 @@ class AuctionSellersController extends Controller
     public function complete(Auction $auction)
     {
         $auction->update(['status' => 'completed']);
-           $user_id = auth()->id;
+        //    $user_id = auth()->id;
 
-        log_activity(
-           'مزاد مكتمل',
-            "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
-        );
+        // log_activity(
+        //    'مزاد مكتمل',
+        //     "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
+        // );
         return back()->with('success', 'تم قبول الفائز وتغيير حالة المزاد إلى مكتمل');
     }
 
-    public function reject(Auction $auction)
-    {
-        $auction->update([
-            'status' => 'rejected'
-        ]);
+    // public function reject(Auction $auction)
+    // {
+    //     $auction->update([
+    //         'status' => 'rejected'
+    //     ]);
 
-        $user_id = auth()->id;
+    //     $user_id = auth()->id;
 
-        log_activity(
-            'مرفوض مزاد',
-            "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
-        );
+    //     log_activity(
+    //         'مرفوض مزاد',
+    //         "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
+    //     );
 
-        return back()->with('success', 'تم رفض المزاد بنجاح');
-    }
+    //     return back()->with('success', 'تم رفض المزاد بنجاح');
+    // }
 
 
-    public function store(Request $request)
-    {
-        //
-    }
+    // public function store(Request $request)
+    // {
+    //     //
+    // }
 
     /**
      * Display the specified resource.
@@ -106,7 +96,7 @@ class AuctionSellersController extends Controller
         $car = Car::with('auction.bids.user', 'brand', 'model', 'media')
             ->findOrFail($id);
 
-        // تحقق إن كان للسيارة مزاد
+     
 
 
 

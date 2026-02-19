@@ -1,6 +1,6 @@
 
 <div wire:poll.30s>
-    <a href="{{ route('seller.dashboard') }}" class="nav-link position-relative">
+    <a href="{{ route('auction.index') }}" class="nav-link position-relative">
         <i class="bi bi-bell fs-5"></i>
 
         {{-- @if($count > 0)

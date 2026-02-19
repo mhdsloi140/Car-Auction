@@ -24,6 +24,36 @@
 
     </div>
     @endif
+           @if($auction->car->report_pdf)
+<div class="card shadow-sm border-0 rounded-3 mb-4">
+    <div class="card-header bg-light">
+        <h5 class="fw-bold mb-0">كشف السيارة</h5>
+    </div>
+    <div class="card-body text-center">
+
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+
+            {{-- زر عرض --}}
+            <a href="{{ asset('storage/' . $auction->car->report_pdf) }}"
+               target="_blank"
+               class="btn btn-outline-primary px-4">
+                <i class="fas fa-eye me-2"></i>
+                عرض الكشف
+            </a>
+
+            {{-- زر تحميل --}}
+            <a href="{{ asset('storage/' . $auction->car->report_pdf) }}"
+               download
+               class="btn btn-primary px-4">
+                <i class="fas fa-download me-2"></i>
+                تحميل الكشف
+            </a>
+
+        </div>
+
+    </div>
+</div>
+@endif
 
     {{-- بطاقة تفاصيل المزاد --}}
     <div class="card shadow-sm mb-4">

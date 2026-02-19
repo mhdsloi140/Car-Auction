@@ -60,7 +60,7 @@ class Login extends Component
         }
 
         if ($user->hasRole('seller')) {
-            return redirect()->route('seller.dashboard');
+            return redirect()->route('auction.index');
         }
 
         if ($user->hasRole('user')) {

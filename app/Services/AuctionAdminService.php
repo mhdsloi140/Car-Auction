@@ -57,7 +57,7 @@ public function approve($id)
     if ($auction->user && $auction->user->phone) {
 
         $phone = preg_replace('/^0/', '', $auction->user->phone);
-        $fullPhone = '00963' . $phone;
+        $fullPhone = '00964' . $phone;
 
         $msgOwner = "مرحباً {$auction->user->name}،\nتمت الموافقة على مزادك.\nرابط المزاد:\n{$url}";
 
@@ -72,7 +72,7 @@ public function approve($id)
         if (!$user->phone) continue;
 
         $phone = preg_replace('/^0/', '', $user->phone);
-        $fullPhone = '+966' . $phone;
+        $fullPhone = '00964' . $phone;
 
         $msgUsers = "يوجد مزاد جديد الآن!\nرابط المزاد:\n{$url}";
 

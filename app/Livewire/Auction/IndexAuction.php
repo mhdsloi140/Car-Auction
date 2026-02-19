@@ -12,7 +12,6 @@ class IndexAuction extends Component
 {
     use WithPagination;
 
- 
     public ?string $filterStatus = null;
     public ?string $filterCity = null;
     public ?int $filterBrand = null;
@@ -23,14 +22,13 @@ class IndexAuction extends Component
 
     protected $listeners = ['auctionCreated' => '$refresh'];
 
-
     public function updatingFilterStatus() { $this->resetPage(); }
     public function updatingFilterCity()   { $this->resetPage(); }
+
     public function updatingFilterBrand()
     {
         $this->resetPage();
         $this->filterModel = null;
-
 
         if ($this->filterBrand) {
             $this->models = CarModel::where('brand_id', $this->filterBrand)
@@ -40,8 +38,29 @@ class IndexAuction extends Component
             $this->models = [];
         }
     }
+
     public function updatingFilterModel()  { $this->resetPage(); }
     public function updatingFilterSpecs()  { $this->resetPage(); }
+
+    /**
+     * إعادة تعيين جميع الفلاتر
+     */
+    public function resetFilters()
+    {
+        $this->reset([
+            'filterStatus',
+            'filterCity',
+            'filterBrand',
+            'filterModel',
+            'filterSpecs',
+        ]);
+
+        $this->models = [];
+        $this->resetPage();
+
+        // رسالة اختيارية
+        // session()->flash('success', 'تم إعادة تعيين الفلاتر بنجاح');
+    }
 
     public function render()
     {

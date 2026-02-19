@@ -4,7 +4,7 @@
         wire:click="openModal"
         style="font-weight: 600; border: none; background: linear-gradient(45deg, #198754, #20c997);">
         <i class="bi bi-plus-circle-fill"></i>
-        <span>إضافة سيارة ومزاد جديد</span>
+        <span>إضافة سيارة </span>
     </button>
 
     @if($showModal)
@@ -136,51 +136,62 @@
                         @enderror
                     </div>
 
-                <div class="d-flex flex-wrap gap-2 justify-content-center">
-    @foreach($photos as $index => $photo)
-    {{-- {{ $photo->getMimeType() }} --}}
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        @foreach($photos as $index => $photo)
+                        {{-- {{ $photo->getMimeType() }} --}}
 
-      @php
-    $mime = $photo->getMimeType();
-@endphp
+                        @php
+                        $mime = $photo->getMimeType();
+                        @endphp
 
-@if(str_starts_with($mime, 'image/'))
-    <img src="{{ $photo->temporaryUrl() }}"
-         class="img-thumbnail rounded-3 shadow-sm"
-         style="width:120px; height:90px; object-fit:cover;">
-@else
-    <div class="img-thumbnail rounded-3 shadow-sm d-flex align-items-center justify-content-center"
-         style="width:120px; height:90px; background:#eee;">
-        <span class="text-muted small">غير قابل للمعاينة</span>
-    </div>
-@endif
+                        @if(str_starts_with($mime, 'image/'))
+                        <img src="{{ $photo->temporaryUrl() }}" class="img-thumbnail rounded-3 shadow-sm"
+                            style="width:120px; height:90px; object-fit:cover;">
+                        @else
+                        <div class="img-thumbnail rounded-3 shadow-sm d-flex align-items-center justify-content-center"
+                            style="width:120px; height:90px; background:#eee;">
+                            <span class="text-muted small">غير قابل للمعاينة</span>
+                        </div>
+                        @endif
 
 
-    @endforeach
-</div>
+                        @endforeach
+                    </div>
 
 
                     @endif
 
                     {{-- STEP 3 --}}
-                    @if($step === 3)
-                    <div class="row g-4 justify-content-center">
-                        <div class="col-md-8 text-center">
-                            <div class="card bg-light border-0 p-4 shadow-sm mb-3">
-                                <label class="fw-bold mb-2">ملف الكشف</label>
-                                <div class="input-group input-group-lg">
+      <!-- STEP 3: رفع كشف السيارة -->
+@if($step === 3)
+<div class="row g-4 justify-content-center">
+    <div class="col-md-8 text-center">
+        <label class="fw-bold mb-2">ملف الكشف <span class="text-danger">*</span></label>
+        <input type="file" class="form-control @error('report_pdf') is-invalid @enderror"
+               wire:model="report_pdf"
+               accept=".pdf,.jpg,.jpeg,.png,.webp">
 
-                                    <input type="file" class="form-control" wire:model="report_pdf">
+        @if($report_pdf)
+            <div class="mt-2 text-success">
+                تم رفع الملف: {{ $report_pdf->getClientOriginalName() }}
+            </div>
+        @endif
 
-                                </div>
-                                @error('report_pdf') <span class="text-danger">{{ $message }}</span> @enderror
-                                {{-- @error('report_pdf') <small class="text-danger">{{ $message }}</small> @enderror
-                                --}}
-                            </div>
+        @error('report_pdf')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+</div>
+@endif
 
-                        </div>
-                    </div>
-                    @endif
+<!-- زر الحفظ -->
+@if($step === 3)
+{{-- <button class="btn btn-success mt-3" wire:click="save" wire:loading.attr="disabled" wire:target="save">
+    <span wire:loading.remove wire:target="save">نشر الآن</span>
+    <span wire:loading wire:target="save">جارٍ النشر...</span>
+</button> --}}
+@endif
+
 
                 </div>
 
@@ -194,8 +205,15 @@
                         @if($step < 3) <button class="btn btn-primary px-4 py-2 flex-grow-1 shadow"
                             wire:click="nextStep">استمرار</button>
                             @else
-                            <button class="btn btn-success px-4 py-2 flex-grow-1 shadow" wire:click="save">نشر المزاد
-                                الآن</button>
+                            <button class="btn btn-success px-4 py-2 flex-grow-1 shadow" wire:click="save"
+                                wire:loading.attr="disabled" wire:target="save">
+                                <span wire:loading.remove wire:target="save">نشر الآن</span>
+                                <span wire:loading wire:target="save">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    جاري النشر...
+                                </span>
+                            </button>
+
                             @endif
                     </div>
                 </div>

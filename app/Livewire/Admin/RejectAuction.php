@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
@@ -8,24 +7,31 @@ use App\Models\Auction;
 class RejectAuction extends Component
 {
     public Auction $auction;
+    public $message = '';
 
     public bool $showRejectConfirm = false;
     public bool $showEditPriceModal = false;
 
-    public $price;
+    public $starting_price;
 
     protected $rules = [
-        'price' => 'required|numeric|min:0'
+        'starting_price' => 'required|numeric'
+    ];
+
+    protected $messages = [
+        'starting_price.required' => 'السعر الابتدائي مطلوب',
+        'starting_price.numeric' => 'السعر يجب أن يكون رقماً',
+        // 'starting_price.min' => 'السعر يجب أن يكون على الأقل 1000'
     ];
 
     public function mount(Auction $auction)
     {
         $this->auction = $auction;
-        $this->price   = $auction->price;
+        $this->starting_price = $auction->starting_price;
     }
 
     /* =========================
-        الصلاحيات
+        صلاحيات الإدارة
     ==========================*/
     protected function authorizeAction()
     {
@@ -35,11 +41,12 @@ class RejectAuction extends Component
     }
 
     /* =========================
-        تعديل السعر
+        تعديل سعر المزاد
     ==========================*/
     public function openEditPrice()
     {
         $this->authorizeAction();
+        $this->resetValidation();
         $this->showEditPriceModal = true;
     }
 
@@ -49,12 +56,13 @@ class RejectAuction extends Component
         $this->validate();
 
         $this->auction->update([
-            'starting_price' => $this->price
+            'starting_price' => $this->starting_price,
+            'current_price' => $this->starting_price,
         ]);
 
         $this->showEditPriceModal = false;
 
-        session()->flash('success', 'تم تعديل السعر بنجاح');
+ $this->message = 'تم تعديل سعر المزاد بنجاح';
     }
 
     /* =========================
@@ -72,13 +80,12 @@ class RejectAuction extends Component
 
         $this->auction->update([
             'status' => 'rejected',
-            'start_at' => now(),
-            'end_at' => now()->addDay()
+            'rejected_at' => now(),
         ]);
 
         $this->showRejectConfirm = false;
 
-        session()->flash('success', 'تم رفض المزاد بنجاح');
+       $this->message = 'تم رفض المزاد بنجاح';
     }
 
     public function render()

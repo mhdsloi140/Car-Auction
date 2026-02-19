@@ -1,28 +1,26 @@
 <?php
 
-namespace App\Livewire\Seller;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use App\Models\Car;
 
 class CarDetails extends Component
 {
-    public $car;
+    public $car; // ❌ لا تضع type هنا
 
     public function mount($car)
     {
-        $this->car = $car->load([
+        $this->car = Car::with([
             'brand',
             'model',
             'media',
             'auction.bids.user'
-        ]); 
-        
+        ])->findOrFail($car);
     }
-
 
     public function render()
     {
-        return view('livewire.seller.car-details');
+        return view('livewire.admin.car-details');
     }
 }

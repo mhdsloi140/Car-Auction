@@ -40,16 +40,15 @@ Route::post('/logout', function () {
 })->name('logout')->middleware('auth');
 // ==================== Seller Routes ====================
 Route::prefix('seller')->middleware(['auth', 'role:seller'])->group(function () {
-    Route::get('/dashboard', [DashboardSellersController::class, 'index'])->name('seller.dashboard');
+    // Route::get('/dashboard', [DashboardSellersController::class, 'index'])->name('seller.dashboard');
     Route::resource('auction', AuctionSellersController::class);
     // Route::get('details/{id}', [AuctionSellersController::class, 'details'])->name('auction.selles.details');
     Route::get('details/{id}', [AuctionSellersController::class, 'details'])
-    ->name('auction.sellers.details');
-    Route::get('/auctions/archive', [AuctionSellersController::class, 'sellerArchive'])->name('seller.auctions.archive');
-    Route::get('winner/{id}', [AuctionSellersController::class, 'winner'])->name('auction.sellers.winner');
+        ->name('auction.sellers.details');
+
     Route::get('profile', [ProfileSellerController::class, 'index'])->name('seller.profile');
     Route::post('profile', [ProfileSellerController::class, 'update'])->name('seller.profile.update');
-    Route::patch('/auction/{auction}/reject', [AuctionSellersController::class, 'reject'])->name('auction.sellers.reject');
+
     Route::patch('/auction/{auction}/complete', [AuctionSellersController::class, 'complete'])->name('auction.sellers.complete');
     Route::get('add-user', [AddUserController::class, 'index'])->name('sellers.add.user');
     // Route::get('auction/{id}', [AuctionSellersController::class, 'show'])->name('auction.show');
@@ -83,8 +82,22 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::post('profile', [ProfileAdminController::class, 'update'])->name('admin.profile.update');
 
     Route::patch('/auction/{auction}/update-price', [AuctionAdminController::class, 'updatePrice'])->name('auction.update.price');
-});
+    Route::get('/auctions/{auction}', [AuctionAdminController::class, 'show'])
+    ->whereNumber('auction')
+    ->name('auction.admin.show');
 
+    Route::get('/auctions/archive', [AuctionAdminController::class, 'adminArchive'])
+        ->name('admin.auctions.archive');
+    Route::get('winner/{id}', [AuctionAdminController::class, 'winner'])
+        ->name('auction.admin.winner');
+    Route::patch('/auction/{auction}/reject', [AuctionAdminController::class, 'reject'])->name('auction.admin.reject');
+      Route::get('details/{id}', [AuctionAdminController::class, 'details'])
+        ->name('auction.admin.details');
+});
+Route::get('/test-queue', function() {
+    \App\Jobs\TestJob::dispatch();
+    return 'Job dispatched!';
+});
 // ==================== Users Auctions Routes ====================
 Route::prefix('users')->group(function () {
     Route::get('/auctions/{id}', [AuctionUsersController::class, 'show'])->name('auction.users.show');

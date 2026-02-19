@@ -42,7 +42,7 @@ class AddUser extends Component
 
         $user->assignRole('user');
         $phone = preg_replace('/^0/', '', $this->phone);
-        $fullPhone = '00963' . $phone;
+        $fullPhone = '+964' . $phone;
         $msg = "مرحباً {$this->name}، تم إنشاء حسابك بنجاح.\nكلمة المرور الخاصة بك هي: {$password}";
         $ultra = new UltraMsgService();
         $ultra->sendMessage($fullPhone, $msg);

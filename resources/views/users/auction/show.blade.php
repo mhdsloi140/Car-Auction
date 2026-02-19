@@ -111,16 +111,30 @@
                         @endif
 
                     </div>
-                    @if($auction->car->report_pdf)
-                    <div class="mt-4">
-                        <a href="{{ asset('storage/' . $auction->car->report_pdf) }}" class="btn-bid-modern w-100"
-                            download>
-                            <i class="fas fa-file-pdf me-2"></i>
-                            <span>تحميل كشف السيارة</span>
-                            <i class="fas fa-download ms-2"></i>
-                        </a>
-                    </div>
-                    @endif
+         @if($auction->car->report_pdf)
+    <div class="mt-4">
+
+        {{-- زر العرض --}}
+        <a href="{{ asset('storage/' . $auction->car->report_pdf) }}"
+           class="btn-bid-modern w-100 mb-2"
+           target="_blank">
+            <i class="fas fa-eye me-2"></i>
+            <span>عرض كشف السيارة</span>
+            <i class="fas fa-external-link-alt ms-2"></i>
+        </a>
+
+        {{-- زر التحميل (كما هو) --}}
+        <a href="{{ asset('storage/' . $auction->car->report_pdf) }}"
+           class="btn-bid-modern w-100"
+           download>
+            <i class="fas fa-file-pdf me-2"></i>
+            <span>تحميل كشف السيارة</span>
+            <i class="fas fa-download ms-2"></i>
+        </a>
+
+    </div>
+@endif
+
 
                     <!-- كروت إحصائية -->
                     <div class="row g-4 mb-4" style="margin-top: 20px">

@@ -78,7 +78,7 @@
                         @elseif($auction->status === 'closed')
 
                         {{-- زر قبول --}}
-                        <form action="{{ route('auction.sellers.complete', $auction->id) }}" method="POST"
+                        <form action="{{ route('auction.admin.complete', $auction->id) }}" method="POST"
                             class="d-inline">
                             @csrf
                             @method('PATCH')
@@ -88,7 +88,7 @@
                         </form>
 
                         {{-- زر رفض --}}
-                        <form action="{{ route('auction.sellers.reject', $auction->id) }}" method="POST"
+                        <form action="{{ route('auction.admin.reject', $auction->id) }}" method="POST"
                             class="d-inline">
                             @csrf
                             @method('PATCH')
