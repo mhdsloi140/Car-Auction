@@ -2,10 +2,25 @@
 <html lang="ar" dir="rtl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{-- <title>سَيِّر SIR | منصة المزادات الرقمية الأقوى</title> --}}
-      <title>{{ setting('site_name', 'سَيِّر SIR') }}</title>
+   <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{{-- أيقونة الموقع (Favicon) --}}
+@php
+    $logoUrl = setting('site_logo') ? asset('storage/' . setting('site_logo')) : null;
+@endphp
+
+@if($logoUrl)
+    <link rel="icon" type="image/png" href="{{ $logoUrl }}">
+    <link rel="shortcut icon" href="{{ $logoUrl }}">
+    <link rel="apple-touch-icon" href="{{ $logoUrl }}">
+@else
+    {{-- أيقونة سيارة افتراضية (Font Awesome) --}}
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23004c80'%3E%3Cpath d='M19 16.5L17 13.5L15 16.5L13 13.5L11 16.5L9 13.5L7 16.5L5 13.5L3 16.5L2 10L4 6H20L22 10L21 16.5L19 16.5Z'/%3E%3C/svg%3E">
+@endif
+
+{{-- عنوان الموقع مع أيقونة --}}
+<title>{{ setting('site_name', 'سَيِّر SIR') }}</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap"

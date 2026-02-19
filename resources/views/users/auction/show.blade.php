@@ -5,6 +5,14 @@
 @section('content')
 <div class="auction-detail-modern">
     <div class="container py-5">
+        <!-- زر العودة الى الصفحة الرئيسية -->
+        <div class="mb-4">
+            <a href="{{ route('home') }}" class="btn-back-home">
+                <i class="fas fa-arrow-right me-2"></i>
+                <span>العودة إلى الصفحة الرئيسية</span>
+            </a>
+        </div>
+
         <!-- مسار التنقل الحديث -->
         <nav aria-label="breadcrumb" class="mb-5">
             <ol class="breadcrumb modern-breadcrumb">
@@ -144,7 +152,7 @@
                                 <span class="d-block text-secondary small">السعر الحالي</span>
                                 <span class="fw-bold display-6 text-primary-blue">{{
                                     number_format($auction->starting_price, 0) }}</span>
-                                <span class="small text-secondary">$</span>
+                                <span class="small text-secondary">د.ع</span>
                             </div>
                         </div>
                         <div class="col-6">
@@ -216,6 +224,39 @@
         background: linear-gradient(135deg, #f5f9ff 0%, #e8f0fe 100%);
         min-height: 100vh;
         padding: 2rem 0;
+    }
+
+    /* زر العودة إلى الرئيسية */
+    .btn-back-home {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.8rem 2rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 76, 128, 0.2);
+        border-radius: 50px;
+        color: #004c80;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-back-home:hover {
+        background: white;
+        border-color: #004c80;
+        transform: translateX(-5px);
+        box-shadow: 0 8px 25px rgba(0, 76, 128, 0.2);
+        color: #002b44;
+    }
+
+    .btn-back-home i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-back-home:hover i {
+        transform: translateX(-3px);
     }
 
     /* شريط التنقل الحديث */
@@ -538,6 +579,11 @@
         .breadcrumb-link,
         .modern-breadcrumb .breadcrumb-item.active {
             padding: 0.2rem 0.8rem;
+        }
+
+        .btn-back-home {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
         }
     }
 </style>

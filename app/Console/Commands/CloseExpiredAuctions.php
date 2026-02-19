@@ -14,31 +14,40 @@ class CloseExpiredAuctions extends Command
     protected $signature = 'auctions:close-expired';
     protected $description = 'Close expired auctions and notify admin';
 
-    public function handle()
-    {
-        $auctions = Auction::where('status', 'active')
-            ->where('end_at', '<=', Carbon::now())
-            ->with(['car.brand', 'car.model'])
-            ->get();
+  public function handle()
+{
+    $auctions = Auction::where('status', 'active')
+        ->where('end_at', '<=', Carbon::now())
+        ->with(['car.brand', 'car.model', 'bids'])
+        ->get();
 
-        $this->info("تم العثور على {$auctions->count()} مزاد منتهي");
-        Log::info("CloseExpiredAuctions: تم العثور على {$auctions->count()} مزاد منتهي");
+    $this->info("تم العثور على {$auctions->count()} مزاد منتهي");
+    Log::info("CloseExpiredAuctions: تم العثور على {$auctions->count()} مزاد منتهي");
 
-        foreach ($auctions as $auction) {
+    foreach ($auctions as $auction) {
 
-            $auction->update([
-                'status' => 'closed',
-                'closed_at' => now(),
-            ]);
+        //  تحديد أعلى مزايدة
+        $highestBid = $auction->bids()
+            ->orderByDesc('amount')
+            ->first();
 
-            // ✅ إرسال إشعار للمدير فقط (بدون تفاصيل الفائز)
-            $this->notifyAdmin($auction);
+        $winnerId = $highestBid ? $highestBid->user_id : null;
 
-            $this->info("✓ مزاد {$auction->id} انتهى");
-        }
+        // تحديث المزاد
+        $auction->update([
+            'status'     => 'closed',
+            'closed_at'  => now(),
+            'winner_id'  => $winnerId,
+        ]);
 
-        return Command::SUCCESS;
+        // إشعار الأدمن
+        $this->notifyAdmin($auction);
+
+        $this->info("✓ مزاد {$auction->id} انتهى - الفائز: " . ($winnerId ?? 'لا يوجد'));
     }
+
+    return Command::SUCCESS;
+}
 
     /**
      * إرسال إشعار للمدير فقط بانتهاء المزاد
@@ -61,7 +70,7 @@ class CloseExpiredAuctions extends Command
             // رابط المزاد في لوحة المدير
             $adminUrl = route('auction.admin.show', $auction->id);
 
-            
+
             $message = "⏰ *مزاد منتهي*\n\n";
             $message .= "📋 *السيارة:*\n";
             $message .= "{$auction->car->brand->name} {$auction->car->model->name} {$auction->car->year}\n";

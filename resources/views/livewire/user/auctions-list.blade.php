@@ -1,39 +1,6 @@
 <div wire:poll.5s class="modern-auctions">
 
-    <!-- قسم الماركات المطور بتصميم حديث -->
-    <div class="brands-section mb-5">
-        <div class="container-fluid px-0">
-            <h3 class="section-title text-center mb-4">
-                <span class="gradient-text">اختر الماركة</span>
-            </h3>
-            <div class="brands-grid">
-                <!-- زر الكل -->
-                <div class="brand-card {{ is_null($selectedBrand) ? 'active' : '' }}"
-                     wire:click="selectBrand(null)"
-                     role="button"
-                     tabindex="0">
-                    <div class="brand-icon">
-                        <i class="fas fa-car"></i>
-                    </div>
-                    <span class="brand-name">الكل</span>
-                </div>
-
-                @foreach ($brands as $brand)
-                    <div class="brand-card {{ $selectedBrand == $brand->id ? 'active' : '' }}"
-                         wire:click="selectBrand({{ $brand->id }})"
-                         role="button"
-                         tabindex="0">
-                        <div class="brand-logo-wrapper">
-                            <img src="{{ $brand->getFirstMediaUrl('logo') }}"
-                                 class="brand-logo"
-                                 alt="{{ $brand->name }}">
-                        </div>
-                        <span class="brand-name">{{ $brand->name }}</span>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
+   
 
     <!-- شبكة المزادات الحديثة -->
     <div class="container-fluid px-0">
@@ -68,10 +35,10 @@
                             </div>
                             <div class="current-bid-modern mb-3">
                                 <span class="label">السعر الحالي</span>
-                                <span class="price">{{ number_format($auction->starting_price, 0) }} $</span>
+                                <span class="price">{{ number_format($auction->starting_price, 0) }} د.ع</span>
                             </div>
                             <div class="bid-meta-modern d-flex justify-content-between align-items-center">
-                                @if($auction->end_time)
+                                @if($auction->end_at)
                                     <div class="time-remaining">
                                         <i class="fas fa-hourglass-half"></i>
                                         <span>{{ $auction->end_at->diffForHumans() }}</span>
@@ -93,7 +60,7 @@
                     <div class="empty-state-modern">
                         <i class="fas fa-car-side"></i>
                         <h4>لا توجد مزادات متاحة</h4>
-                        <p>حاول تعديل الفلاتر أو العودة لاحقاً</p>
+                        <p>لا توجد مزادات متاحة حالياً</p>
                     </div>
                 </div>
             @endforelse
@@ -145,14 +112,14 @@
         }
 
         /* شبكة الماركات */
-   .brands-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 110px));
-    gap: 20px;
-    justify-content: center; /* هذا سيعمل الآن */
-    max-width: 1200px;
-    margin: 0 auto;
-}
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 20px;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
         .brand-card {
             background: white;
             border-radius: 24px;

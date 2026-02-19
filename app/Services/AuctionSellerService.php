@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ActivityLog;
 use App\Models\Auction;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -200,7 +201,7 @@ private function notifyAdmin($auction, $decision)
 
         // بناء الرسالة
         $message = "{$messageTitle}\n\n";
-        
+
 
         $message .= "🏷️ *السعر النهائي:* " . number_format($auction->final_price) . " د.ع\n\n";
 

@@ -74,7 +74,7 @@
             @if ($step === 4)
             <p>أدخل كود التحقق المرسل إلى جوالك</p>
 
-            <input type="text" wire:model="reset_code" class="phone-input" placeholder="******" dir="ltr">
+            <input type="text" wire:model="reset_code" class="phone-input" placeholder="******" dir="ltr" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; outline: none; transition: all 0.3s;" >
 
             @error('reset_code')
             <div class="error">{{ $message }}</div>
@@ -91,7 +91,7 @@
             @if ($step === 5)
             <p>أدخل كلمة المرور الجديدة</p>
 
-            <input type="password" wire:model="new_password" class="phone-input">
+           <input type="password" wire:model="new_password" class="phone-input" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#3498db'" onblur="this.style.borderColor='#ddd'">
 
             @error('new_password')
             <div class="error">{{ $message }}</div>

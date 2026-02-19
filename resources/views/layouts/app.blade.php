@@ -30,6 +30,15 @@
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- PWA Configuration -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0ea5e9">
+<meta name="msapplication-navbutton-color" content="#0ea5e9">
+<meta name="apple-mobile-web-app-title" content="SIR Auctions">
+<meta name="application-name" content="SIR Auctions">
     <style>
         /* متغيرات الألوان - درجات الكحلي (الأزرق الداكن) */
         :root {
@@ -553,6 +562,7 @@
         .sidebar-overlay.show {
             display: block;
         }
+
     </style>
 
     @livewireStyles
@@ -780,7 +790,7 @@
     <!-- Tom Select -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
-    <script>
+   <script>
         document.addEventListener('DOMContentLoaded', function() {
             // عناصر التحكم بالقائمة الجانبية
             const menuToggle = document.getElementById('menuToggle');
@@ -790,11 +800,13 @@
             function toggleSidebar() {
                 sidebar.classList.toggle('show');
                 overlay.classList.toggle('show');
+                document.body.classList.toggle('sidebar-open');
             }
 
             function closeSidebar() {
                 sidebar.classList.remove('show');
                 overlay.classList.remove('show');
+                document.body.classList.remove('sidebar-open');
             }
 
             if (menuToggle) {
@@ -810,7 +822,7 @@
 
             // إغلاق السايدبار عند تغيير حجم الشاشة إذا كان مفتوحاً (للشاشات الكبيرة)
             window.addEventListener('resize', function() {
-                if (window.innerWidth > 992) {
+                if (window.innerWidth > 992 && sidebar.classList.contains('show')) {
                     closeSidebar();
                 }
             });
@@ -822,6 +834,22 @@
             }
         });
     </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registered successfully with scope:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+
 
     @livewireScripts
     @stack('scripts')

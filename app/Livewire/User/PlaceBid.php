@@ -13,7 +13,7 @@ class PlaceBid extends Component
 
     public $amount = null;
     public $selectedIncrement = null;
-    public $increments = [50, 250, 1000, 5000, 10000, 25000];
+    public $increments = [100000, 200000, 500000, 1000000];
 
     public $currentPrice;
     public $bidsCount = 0;

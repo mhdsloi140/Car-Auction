@@ -18,17 +18,17 @@ class SellerSeeder extends Seeder
             [
                 'name' => 'Ahmad',
                 'email' => 'ahd@gimal.com',
-                'phone' => '0930641047',
+                'phone' => '7701234567',
             ],
             [
                 'name' => 'Abd',
                 'email' => 'abd@gimal.com',
-                'phone' => '0930641074',
+                'phone' => '7812345678',
             ],
             [
                 'name'=>'Ali Ahmad',
                 'email'=>'ali@gimal.com',
-                'phone'=>'0994891384'
+                'phone'=>'7509876543'
             ]
         ];
 
