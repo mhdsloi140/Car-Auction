@@ -25,7 +25,7 @@ class AuctionAdminController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-     public function details($id)
+    public function details($id)
     {
         $car = Car::with('auction.bids.user', 'brand', 'model', 'media')
             ->findOrFail($id);
@@ -66,24 +66,33 @@ class AuctionAdminController extends Controller
     }
 
 
+
     public function approve($id)
     {
         $auction = $this->auctionAdminService->approve($id);
+
+
+
+
         return redirect()
             ->route('auction.admin.show', $auction->id)
             ->with('success', 'تم قبول المزاد');
     }
 
+    /**
+     * إرسال إشعار لجميع المستخدمين بمزاد جديد
+     */
+
     public function adminArchive()
     {
 
-       $auctions = Auction::with([
-        'car:id,brand_id,model_id',
-        'winner:id,name,phone'
-    ])
-    ->whereIn('status', ['closed', 'rejected', 'completed','pending_seller'])
-    ->orderByDesc('end_at')
-    ->paginate(10);
+        $auctions = Auction::with([
+            'car:id,brand_id,model_id',
+            'winner:id,name,phone'
+        ])
+            ->whereIn('status', ['closed', 'rejected', 'completed', 'pending_seller'])
+            ->orderByDesc('end_at')
+            ->paginate(10);
 
 
 
@@ -100,25 +109,11 @@ class AuctionAdminController extends Controller
     }
     public function complete(Auction $auction)
     {
-        $auction->update(['status' => 'pending_seller']);
+        $data = $this->auctionAdminService->complete($auction);
 
-        return back()->with('success', 'تم قبول الفائز وتغيير حالة المزاد إلى مكتمل');
+        return back()->with('success', 'تم قبول الفائز وإرسال إشعار للبائع');
     }
-    //     public function reject(Auction $auction)
-    // {
-    //     $auction->update([
-    //         'status' => 'rejected'
-    //     ]);
 
-    //     $user_id = auth()->id;
-
-    //     log_activity(
-    //         'مرفوض مزاد',
-    //         "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
-    //     );
-
-    //     return back()->with('success', 'تم رفض المزاد بنجاح');
-    // }
     public function destroy(string $id)
     {
 

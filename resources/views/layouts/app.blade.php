@@ -29,7 +29,7 @@
 
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         /* متغيرات الألوان - درجات الكحلي (الأزرق الداكن) */
         :root {
@@ -604,7 +604,7 @@
                         </li>
                         @endrole
 
-                   
+
                         <!-- Seller: Auctions -->
                         @role('seller')
                         <li class="nav-item {{ request()->routeIs('auction.index') ? 'active' : '' }}">

@@ -4,60 +4,84 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Auction;
-use App\Models\Notification;
+use App\Models\User;
+use App\Services\UltraMsgService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CloseExpiredAuctions extends Command
 {
     protected $signature = 'auctions:close-expired';
-    protected $description = 'Close expired auctions and notify users';
+    protected $description = 'Close expired auctions and notify admin';
 
     public function handle()
     {
         $auctions = Auction::where('status', 'active')
             ->where('end_at', '<=', Carbon::now())
-            ->with(['bids.user', 'car', 'seller'])
+            ->with(['car.brand', 'car.model'])
             ->get();
+
+        $this->info("تم العثور على {$auctions->count()} مزاد منتهي");
+        Log::info("CloseExpiredAuctions: تم العثور على {$auctions->count()} مزاد منتهي");
 
         foreach ($auctions as $auction) {
 
-            $highestBid = $auction->bids->sortByDesc('amount')->first();
-
             $auction->update([
                 'status' => 'closed',
-                'winner_id' => $highestBid?->user_id,
-                'final_price' => $highestBid?->amount,
+                'closed_at' => now(),
             ]);
 
-            if ($highestBid) {
+            // ✅ إرسال إشعار للمدير فقط (بدون تفاصيل الفائز)
+            $this->notifyAdmin($auction);
 
-                // إشعار البائع
-                Notification::create([
-                    'user_id' => $auction->seller_id,
-                    'title' => 'انتهاء المزاد',
-                    'message' => "انتهى مزاد {$auction->car->brand->name} {$auction->car->model->name} والفائز هو {$highestBid->user->name}.",
-                    'type' => 'success',
-                ]);
-
-                // إشعار الفائز
-                Notification::create([
-                    'user_id' => $highestBid->user_id,
-                    'title' => 'فزت بالمزاد',
-                    'message' => "مبروك! فزت بمزاد {$auction->car->brand->name} {$auction->car->model->name}.",
-                    'type' => 'success',
-                ]);
-
-            } else {
-
-                Notification::create([
-                    'user_id' => $auction->seller_id,
-                    'title' => 'انتهاء المزاد',
-                    'message' => "انتهى مزاد {$auction->car->brand->name} {$auction->car->model->name} بدون مزايدات.",
-                    'type' => 'info',
-                ]);
-            }
+            $this->info("✓ مزاد {$auction->id} انتهى");
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * إرسال إشعار للمدير فقط بانتهاء المزاد
+     */
+    private function notifyAdmin($auction)
+    {
+        try {
+            // جلب المديرين فقط
+            $admins = User::role('admin')
+                ->whereNotNull('phone')
+                ->get();
+
+            if ($admins->isEmpty()) {
+                Log::warning('لا يوجد مديرين بأرقام هواتف');
+                return;
+            }
+
+            $ultra = app(UltraMsgService::class);
+
+            // رابط المزاد في لوحة المدير
+            $adminUrl = route('auction.admin.show', $auction->id);
+
+            
+            $message = "⏰ *مزاد منتهي*\n\n";
+            $message .= "📋 *السيارة:*\n";
+            $message .= "{$auction->car->brand->name} {$auction->car->model->name} {$auction->car->year}\n";
+            $message .= "المدينة: {$auction->car->city}\n\n";
+            $message .= "🔗 *للمراجعة:*\n";
+            $message .= "{$adminUrl}\n";
+
+            // إرسال لكل مدير
+            foreach ($admins as $admin) {
+                $phone = $ultra->formatPhoneNumber($admin->phone);
+                if ($phone) {
+                    $result = $ultra->sendMessage($phone, $message);
+                    if ($result) {
+                        Log::info("تم إرسال إشعار للمدير {$admin->name} بانتهاء مزاد {$auction->id}");
+                    }
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في إرسال إشعار للمدير: ' . $e->getMessage());
+        }
     }
 }

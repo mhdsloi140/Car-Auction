@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auction;
 
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
@@ -51,7 +52,9 @@ class CreateAuctionWizard extends Component
     {
         $this->model_id = null;
         $this->modelSearch = '';
-        $this->models = CarModel::where('brand_id', $value)->orderBy('name')->get();
+        $this->models = CarModel::where('brand_id', $value)
+            ->orderBy('name')
+            ->get();
     }
 
     public function updatedModelSearch()
@@ -112,7 +115,7 @@ class CreateAuctionWizard extends Component
 
         if ($this->step === 2) {
             $this->validate([
-                'photos' => 'array|max:8',
+                'photos' => 'required|array|min:1|max:8',
                 'photos.*' => 'image|max:3072|mimes:jpg,jpeg,png,webp',
             ]);
         }
@@ -120,83 +123,175 @@ class CreateAuctionWizard extends Component
         if ($this->step === 3) {
             $this->validate([
                 'report_pdf' => 'required|file|mimes:pdf,jpg,jpeg,png,webp|max:10240',
-            ], [
-                'report_pdf.required' => 'يرجى رفع ملف كشف السيارة',
-                'report_pdf.mimes' => 'الملف يجب أن يكون pdf, jpg, jpeg, png, webp',
-                'report_pdf.max' => 'حجم الملف لا يجب أن يتجاوز 10 ميجابايت',
             ]);
         }
     }
 
-    
-  public function save(UltraMsgService $ultra)
-{
-    if ($this->processing) return;
-    $this->processing = true;
-
-    $this->validateStep();
-
-    DB::beginTransaction();
-
-    try {
-        // رفع ملف تقرير السيارة
-        $reportPath = $this->report_pdf
-            ? $this->report_pdf->storePublicly('cars_reports', 'public')
-            : null;
-
-        // إنشاء السيارة أولاً
-        $car = Car::create([
-            'brand_id'     => $this->brand_id,
-            'model_id'     => $this->model_id,
-            'year'         => $this->year,
-            'city'         => $this->city,
-            'mileage'      => $this->mileage,
-            'plate_number' => $this->plate_number,
-            'description'  => $this->description,
-            'specs'        => $this->specs,
-            'report_pdf'   => $reportPath,
-        ]);
-
-        // حفظ الصور مؤقتًا قبل إرسالها للـ Job
-        $photoPaths = [];
-        foreach ($this->photos as $photo) {
-            $photoPaths[] = $photo->store('tmp_photos'); // storage/app/tmp_photos
-        }
-
-        // إنشاء المزاد المرتبط بالسيارة
-        $auction = $car->auction()->create([
-            'seller_id' => auth()->id(),
-            'status'    => 'pending',
-        ]);
-
-        DB::commit();
-
-        // إرسال الصور للمعالجة عبر queue
-        if (!empty($photoPaths)) {
-            \App\Jobs\ProcessCarImagesJob::dispatch($car, $photoPaths);
-        }
-
-        // إشعار المشرفين (اختياري)
-        $this->notifyAdmins($auction, $ultra);
-
-        // عرض رسالة نجاح وإغلاق الـ Modal
-        session()->flash('success', 'تم إرسال السيارة للمراجعة بنجاح');
-        $this->closeModal();
-        $this->dispatch('auctionCreated');
-
-    } catch (\Throwable $e) {
-        DB::rollBack();
-        report($e);
-        session()->flash('error', 'حدث خطأ أثناء إنشاء المزاد: ' . $e->getMessage());
-    } finally {
-        $this->processing = false;
-    }
-}
-
-
-    private function notifyAdmins($auction, $ultra)
+    /**
+     * الحصول على تسمية المواصفات
+     */
+    private function getSpecsLabel($specs)
     {
-        // إضافة إشعارات المشرفين هنا إذا أردت (واتساب أو غيره)
+        return match ($specs) {
+            'gcc' => 'خليجية',
+            'non_gcc' => 'غير خليجية',
+            'unknown' => 'غير معروف',
+            default => $specs ?? 'غير محدد',
+        };
+    }
+
+    /**
+     * تنسيق رقم الهاتف العراقي
+     */
+    private function formatIraqiPhoneNumber($phone)
+    {
+        if (empty($phone)) {
+            \Log::warning('formatIraqiPhoneNumber: رقم هاتف فارغ');
+            return null;
+        }
+
+        // إزالة أي أحرف غير رقمية
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        if (empty($phone)) {
+            return null;
+        }
+
+        // إزالة الصفر الأول إذا وجد
+        $phone = ltrim($phone, '0');
+
+        // إزالة 964 إذا كانت موجودة في البداية
+        if (str_starts_with($phone, '964')) {
+            $phone = substr($phone, 3);
+        }
+
+        // التأكد أن الرقم يبدأ بـ 7 (لأرقام الهواتف العراقية)
+        if (!str_starts_with($phone, '7')) {
+            return null;
+        }
+
+        // إضافة رمز العراق 964
+        return '964' . $phone;
+    }
+
+    /**
+     * إرسال إشعار للمشرفين
+     */
+    private function notifyAdmins($auction, UltraMsgService $ultra)
+    {
+        try {
+            // جلب جميع المستخدمين الذين لديهم role admin
+            $admins = User::role('admin')
+                ->whereNotNull('phone')
+                ->get();
+
+            if ($admins->isEmpty()) {
+                \Log::warning('لا يوجد مشرفين بأرقام هواتف');
+                return;
+            }
+
+            $car = $auction->car;
+            $sellerName = auth()->user()->name;
+            $sellerPhone = auth()->user()->phone;
+
+            // رابط المزاد
+            $auctionUrl = route('auction.admin.show', $auction->id);
+
+            // تنسيق الرسالة
+            $message = " *مزاد جديد بانتظار الموافقة*\n\n";
+            $message .= " *معلومات البائع:*\n";
+            $message .= "الاسم: {$sellerName}\n";
+            $message .= "رقم الجوال: {$sellerPhone}\n\n";
+            $message .= " *للمراجعة:*\n";
+            $message .= "اضغط على الرابط:\n{$auctionUrl}\n\n";
+            // إرسال الرسالة لكل مشرف
+            foreach ($admins as $admin) {
+                try {
+                    $formattedPhone = $this->formatIraqiPhoneNumber($admin->phone);
+
+                    if (!$formattedPhone) {
+                        continue;
+                    }
+
+                    $result = $ultra->sendMessage($formattedPhone, $message);
+
+                    if ($result) {
+                        \Log::info('تم إرسال إشعار للمشرف', [
+                            'admin_id' => $admin->id,
+                            'admin_name' => $admin->name,
+                            'auction_id' => $auction->id
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('خطأ في إرسال إشعار للمشرف', [
+                        'admin_id' => $admin->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('خطأ في notifyAdmins: ' . $e->getMessage());
+        }
+    }
+
+    public function save(UltraMsgService $ultra)
+    {
+        if ($this->processing)
+            return;
+
+        $this->processing = true;
+        $this->validateStep();
+
+        DB::beginTransaction();
+
+        try {
+            $reportPath = $this->report_pdf
+                ? $this->report_pdf->storePublicly('cars_reports', 'public')
+                : null;
+
+            $car = Car::create([
+                'brand_id' => $this->brand_id,
+                'model_id' => $this->model_id,
+                'year' => $this->year,
+                'city' => $this->city,
+                'mileage' => $this->mileage,
+                'plate_number' => $this->plate_number,
+                'description' => $this->description,
+                'specs' => $this->specs,
+                'report_pdf' => $reportPath,
+            ]);
+
+            $photoPaths = [];
+            foreach ($this->photos as $photo) {
+                $photoPaths[] = $photo->store('tmp_photos');
+            }
+
+            $auction = $car->auction()->create([
+                'seller_id' => auth()->id(),
+                'status' => 'pending',
+            ]);
+
+            DB::commit();
+
+            if (!empty($photoPaths)) {
+                ProcessCarImagesJob::dispatch($car, $photoPaths);
+            }
+
+            // ✅ إرسال إشعار للمشرفين
+            $this->notifyAdmins($auction, $ultra);
+
+            session()->flash('success', 'تم إرسال السيارة للمراجعة بنجاح');
+            $this->closeModal();
+            $this->dispatch('auctionCreated');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            session()->flash('error', 'حدث خطأ أثناء إنشاء المزاد: ' . $e->getMessage());
+        } finally {
+            $this->processing = false;
+        }
     }
 
     public function render()

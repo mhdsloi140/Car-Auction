@@ -65,9 +65,6 @@ class RejectAuction extends Component
  $this->message = 'تم تعديل سعر المزاد بنجاح';
     }
 
-    /* =========================
-        رفض المزاد
-    ==========================*/
     public function confirmReject()
     {
         $this->authorizeAction();

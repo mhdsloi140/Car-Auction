@@ -18,19 +18,19 @@ class UserSeeder extends Seeder
             [
                 'name'=>'Ahmad',
                  'email'=>'ahmad@example.com',
-                 'phone'=>'0994891380',
+                 'phone'=>'07812345678',
                  'password'=>Hash::make('password')
             ],
             [
                 'name'=>'Ali',
                 'email'=>'ali@example.com',
-                'phone'=>'0994891385',
+                'phone'=>'07701234567',
                 'password'=>Hash::make('password')
             ],
             [
              'name'=>'ibrahem',
              'email'=>'ibrahem@example.com',
-             'phone'=>'0994891386',
+             'phone'=>'07509876543',
              'password'=>Hash::make('password')
 
             ]

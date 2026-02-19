@@ -17,8 +17,11 @@ class Users extends Component
     public $modalFormVisible = false;
     public $isEdit = false;
     public $filterRole = 'all';
-    
 
+    // ✅ المتغيرات الجديدة للمودالات
+    public $deleteModalVisible = false;
+    public $blockModalVisible = false;
+    public $unblockModalVisible = false;
     public $auctionModalVisible = false;
     public $selectedUser;
     public $acceptedAuctionsCount = 0;
@@ -80,6 +83,7 @@ class Users extends Component
                 'phone' => $this->phone,
             ]);
             $user->syncRoles([$this->role]);
+            session()->flash('success', 'تم تحديث المستخدم بنجاح');
         } else {
             $password = $this->generatePassword(10);
             $user = User::create([
@@ -89,29 +93,159 @@ class Users extends Component
             ]);
             $user->assignRole($this->role);
 
-            // إرسال كلمة المرور عبر UltraMsg
-            $phone = preg_replace('/^0/', '', $this->phone);
-            $fullPhone = '00963' . $phone;
-            $msg = "مرحباً {$this->name}، تم إنشاء حسابك بنجاح.\nكلمة المرور الخاصة بك هي: {$password}";
-            $ultra = new UltraMsgService();
-            $ultra->sendMessage($fullPhone, $msg);
+            // ✅ إرسال كلمة المرور عبر UltraMsg
+            $this->sendWelcomeMessage($user, $password);
+
+            session()->flash('success', 'تم إضافة المستخدم بنجاح وتم إرسال كلمة المرور إلى رقم الجوال');
         }
 
-        session()->flash('success', 'تم إضافة المستخدم بنجاح وتم إرسال كلمة المرور إلى رقم الجوال');
         $this->modalFormVisible = false;
         $this->resetFields();
     }
 
-    public function delete($id)
+    /**
+     * إرسال رسالة ترحيب للمستخدم الجديد مع كلمة المرور
+     */
+    private function sendWelcomeMessage($user, $password)
     {
-        User::findOrFail($id)->delete();
+        try {
+            // تنسيق رقم الهاتف (أرقام عراقية)
+            $phone = $this->formatPhoneNumber($user->phone);
+
+            if (!$phone) {
+                \Log::warning('رقم هاتف غير صالح للمستخدم', ['user_id' => $user->id, 'phone' => $user->phone]);
+                return;
+            }
+
+            // تنسيق اسم الدور بالعربية
+            $roleName = match($user->roles->first()?->name) {
+                'admin' => 'مدير',
+                'seller' => 'بائع',
+                'user' => 'معرض',
+                default => 'مستخدم'
+            };
+
+            // بناء الرسالة
+            $message = " *مرحباً بك في منصة سَيِّر SIR*\n\n";
+            $message .= "تم إنشاء حسابك بنجاح ✅\n\n";
+            $message .= " *بيانات الدخول:*\n";
+            $message .= " الاسم: {$user->name}\n";
+            $message .= " رقم الهاتف: {$user->phone}\n";
+            $message .= " كلمة المرور: `{$password}`\n";
+            $message .= " الصلاحية: {$roleName}\n\n";
+            $message .= "🔐 ننصحك بتغيير كلمة المرور بعد أول تسجيل دخول\n\n";
+            $message .= "شكراً لانضمامك إلينا 🙏";
+
+            // إرسال الرسالة
+            $ultra = new UltraMsgService();
+            $result = $ultra->sendMessage($phone, $message);
+
+            if ($result) {
+                \Log::info('تم إرسال رسالة الترحيب بنجاح', ['user_id' => $user->id, 'phone' => $phone]);
+            } else {
+                \Log::warning('فشل إرسال رسالة الترحيب', ['user_id' => $user->id, 'phone' => $phone]);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('خطأ في إرسال رسالة الترحيب: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 
-    public function toggleStatus($id)
+    /**
+     * تنسيق رقم الهاتف العراقي
+     */
+    private function formatPhoneNumber($phone)
     {
-        $user = User::findOrFail($id);
-        $user->status = $user->status === 'active' ? 'inactive' : 'active';
-        $user->save();
+        if (empty($phone)) {
+            return null;
+        }
+
+        // إزالة أي أحرف غير رقمية
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // إزالة الصفر الأول إذا وجد
+        $phone = ltrim($phone, '0');
+
+        // إزالة 964 إذا كانت موجودة في البداية
+        if (str_starts_with($phone, '964')) {
+            $phone = substr($phone, 3);
+        }
+
+        // التأكد أن الرقم يبدأ بـ 7 (لأرقام العراق)
+        if (!str_starts_with($phone, '7')) {
+            return null;
+        }
+
+        // إضافة رمز العراق 964
+        return '964' . $phone;
+    }
+
+    // ✅ دالة تأكيد الحذف
+    public function confirmDelete($id)
+    {
+        $this->selectedUser = User::findOrFail($id);
+        $this->deleteModalVisible = true;
+    }
+
+    // ✅ دالة تنفيذ الحذف
+    public function confirmDeleteAction()
+    {
+        if ($this->selectedUser) {
+            $this->selectedUser->delete();
+            $this->deleteModalVisible = false;
+            $this->selectedUser = null;
+            session()->flash('success', 'تم حذف المستخدم بنجاح');
+        }
+    }
+
+    // ✅ دالة تأكيد الحظر
+    public function confirmBlock($id)
+    {
+        $this->selectedUser = User::findOrFail($id);
+        $this->blockModalVisible = true;
+    }
+
+    // ✅ دالة تنفيذ الحظر
+    public function confirmBlockAction()
+    {
+        if ($this->selectedUser) {
+            $this->selectedUser->status = 'inactive';
+            $this->selectedUser->save();
+            $this->blockModalVisible = false;
+            $this->selectedUser = null;
+            session()->flash('success', 'تم حظر المستخدم بنجاح');
+        }
+    }
+
+    // ✅ دالة تأكيد إلغاء الحظر
+    public function confirmUnblock($id)
+    {
+        $this->selectedUser = User::findOrFail($id);
+        $this->unblockModalVisible = true;
+    }
+
+    // ✅ دالة تنفيذ إلغاء الحظر
+    public function confirmUnblockAction()
+    {
+        if ($this->selectedUser) {
+            $this->selectedUser->status = 'active';
+            $this->selectedUser->save();
+            $this->unblockModalVisible = false;
+            $this->selectedUser = null;
+            session()->flash('success', 'تم إلغاء حظر المستخدم بنجاح');
+        }
+    }
+
+    // عند النقر على اسم المستخدم لعرض عدد المزادات
+    public function showAuctions($userId)
+    {
+        $this->selectedUser = User::with('auctions')->findOrFail($userId);
+        $this->acceptedAuctionsCount = $this->selectedUser->auctions()->where('status', 'active')->count();
+        $this->rejectedAuctionsCount = $this->selectedUser->auctions()->where('status', 'rejected')->count();
+        $this->auctionModalVisible = true;
     }
 
     public function resetFields()
@@ -122,24 +256,13 @@ class Users extends Component
         $this->user_id = null;
     }
 
-    // عند النقر على اسم البائع لعرض عدد المزادات
-    public function showAuctions($userId)
-    {
-        $this->selectedUser = User::with('auctions')->findOrFail($userId);
-
-        $this->acceptedAuctionsCount = $this->selectedUser->auctions()->where('status','active')->count();
-        $this->rejectedAuctionsCount = $this->selectedUser->auctions()->where('status','rejected')->count();
-
-        $this->auctionModalVisible = true;
-    }
-
     public function render()
     {
         $query = User::query();
-        $query->whereDoesntHave('roles', fn($q) => $q->where('name','admin'));
+        $query->whereDoesntHave('roles', fn($q) => $q->where('name', 'admin'));
 
         if ($this->filterRole !== 'all') {
-            $query->whereHas('roles', fn($q) => $q->where('name',$this->filterRole));
+            $query->whereHas('roles', fn($q) => $q->where('name', $this->filterRole));
         }
 
         return view('livewire.admin.users', [
