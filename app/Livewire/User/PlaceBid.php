@@ -13,7 +13,7 @@ class PlaceBid extends Component
 
     public $amount = null;
     public $selectedIncrement = null;
-    public $increments = [50, 250, 1000, 50000,10000,25000];
+    public $increments = [50, 250, 1000, 5000, 10000, 25000];
 
     public $currentPrice;
     public $bidsCount = 0;
@@ -56,7 +56,7 @@ class PlaceBid extends Component
 
         try {
             DB::transaction(function () {
-                // جلب المزاد مع قفل الصف لمنع أي تداخل
+                // قفل المزاد لمنع التداخل
                 $auction = Auction::lockForUpdate()->find($this->auction->id);
 
                 if (!$auction) {
@@ -67,79 +67,104 @@ class PlaceBid extends Component
                     throw new \Exception('المزاد غير نشط');
                 }
 
-                // جلب آخر مزايدة مع قفل الصف أيضاً
+                // قفل آخر مزايدة
                 $lastBid = $auction->bids()->latest()->lockForUpdate()->first();
                 $currentPrice = $lastBid->amount ?? $auction->starting_price;
 
-                // التحقق من عدم وجود مزايدة جديدة منذ آخر تحديث للصفحة
+                // منع وجود مزايدة أحدث
                 if ($lastBid && $lastBid->id != $this->lastBidId) {
                     throw new \Exception('تمت إضافة مزايدة جديدة، يرجى تحديث الصفحة والمحاولة مرة أخرى');
                 }
 
-                // منع المزايدة المتتالية من نفس المستخدم
+                // منع المزايدة مرتين متتاليتين
                 if ($lastBid && $lastBid->user_id == auth()->id()) {
                     throw new \Exception('لا يمكنك المزايدة مرتين متتاليتين');
                 }
 
-                // السعر الجديد
+                // حساب السعر الجديد
                 $newAmount = $currentPrice + $this->selectedIncrement;
 
-                // التحقق من أن السعر الجديد أكبر من السعر الحالي في المزاد
                 if ($newAmount <= $auction->current_price) {
                     throw new \Exception('السعر المزايد به يجب أن يكون أكبر من السعر الحالي');
                 }
 
-                // إضافة المزايدة
+                // إنشاء المزايدة
                 $bid = Bid::create([
                     'auction_id' => $auction->id,
-                    'user_id' => auth()->id(),
-                    'amount' => $newAmount,
+                    'user_id'    => auth()->id(),
+                    'amount'     => $newAmount,
                 ]);
 
                 if (!$bid) {
                     throw new \Exception('فشل في إضافة المزايدة');
                 }
 
-                // تحديث السعر الحالي في المزاد
+                // تحديث السعر الحالي
                 $auction->current_price = $newAmount;
 
-                // تمديد الوقت في حال انتهت الفترة قريباً (أقل من 30 ثانية)
-if ($auction->end_at && now()->greaterThan($auction->end_at->subMinutes(1))) {
-    $auction->end_at = $auction->end_at->addMinutes(1);
-}
+                /*
+                |--------------------------------------------------------------------------
+                | إضافة دقيقة واحدة عند كل مزايدة (دائماً)
+                |--------------------------------------------------------------------------
+                */
+                if ($auction->end_at) {
+                    // حفظ الوقت القديم للتسجيل
+                    $oldEnd = $auction->end_at->copy();
 
+                    // إضافة دقيقة واحدة مباشرة
+                    $auction->end_at = $auction->end_at->addMinute();
+
+                    // تسجيل عملية التمديد
+                    \Log::info('تم إضافة دقيقة للمزاد', [
+                        'auction_id' => $auction->id,
+                        'old_end' => $oldEnd->format('Y-m-d H:i:s'),
+                        'new_end' => $auction->end_at->format('Y-m-d H:i:s')
+                    ]);
+                }
 
                 $auction->save();
 
-                // تحديث البيانات في الواجهة مباشرة
+                // تحديث نسخة المزاد داخل المكون
+                $this->auction = $auction->fresh();
+
+                /*
+                |--------------------------------------------------------------------------
+                | تحديث بيانات الواجهة
+                |--------------------------------------------------------------------------
+                */
+
                 $this->currentPrice = $newAmount;
                 $this->latestBids = $this->auction->bids()->latest()->take(10)->get();
-                $this->bidsCount++;
-
+                $this->bidsCount = $this->auction->bids()->count();
                 $this->lastBidId = $bid->id;
+
                 $this->newBidAlert = [
-                    'user_id' => $bid->user_id,
-                    'amount' => $bid->amount,
+                    'user_id'   => $bid->user_id,
+                    'amount'    => $bid->amount,
                     'user_name' => auth()->user()->name,
                 ];
 
-                // إعادة تعيين الحقول
                 $this->selectedIncrement = null;
                 $this->amount = null;
 
-                // إرسال حدث للمكونات الأخرى
+                // إرسال الأحداث
                 $this->dispatch('bid-placed', bidId: $bid->id);
 
-            }, 5); // إعادة المحاولة 5 مرات في حالة deadlock
+                if ($auction->end_at) {
+                    $this->dispatch('update-end-time',
+                        endTime: $auction->end_at->setTimezone('UTC')->toIso8601String()
+                    );
+                }
+
+            }, 5);
 
             session()->flash('success', 'تمت المزايدة بنجاح');
 
         } catch (\Illuminate\Database\QueryException $e) {
-            // التعامل مع أخطاء قاعدة البيانات
-            if ($e->errorInfo[1] == 1062) { // خطأ duplicate entry
+            if ($e->errorInfo[1] == 1062) {
                 $this->addError('amount', 'حدث تضارب في المزايدة، يرجى المحاولة مرة أخرى');
             } else {
-                $this->addError('amount', 'خطأ في قاعدة البيانات: ' . $e->getMessage());
+                $this->addError('amount', 'خطأ في قاعدة البيانات');
             }
         } catch (\Exception $e) {
             $this->addError('amount', $e->getMessage());
@@ -181,7 +206,8 @@ if ($auction->end_at && now()->greaterThan($auction->end_at->subMinutes(1))) {
 
             // تحديث وقت الانتهاء في الواجهة
             if ($this->auction->end_at) {
-                $this->dispatch('update-end-time',
+                $this->dispatch(
+                    'update-end-time',
                     endTime: $this->auction->end_at->setTimezone('UTC')->toIso8601String()
                 );
             }
@@ -192,7 +218,6 @@ if ($auction->end_at && now()->greaterThan($auction->end_at->subMinutes(1))) {
             }
 
         } catch (\Exception $e) {
-            // تسجيل الخطأ ولكن لا نوقفه للمستخدم
             logger()->error('Error in checkForNewBids: ' . $e->getMessage());
         }
     }

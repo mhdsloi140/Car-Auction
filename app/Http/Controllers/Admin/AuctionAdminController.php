@@ -81,7 +81,7 @@ class AuctionAdminController extends Controller
         'car:id,brand_id,model_id',
         'winner:id,name,phone'
     ])
-    ->whereIn('status', ['closed', 'rejected', 'completed'])
+    ->whereIn('status', ['closed', 'rejected', 'completed','pending_seller'])
     ->orderByDesc('end_at')
     ->paginate(10);
 
@@ -100,13 +100,8 @@ class AuctionAdminController extends Controller
     }
     public function complete(Auction $auction)
     {
-        $auction->update(['status' => 'completed']);
-        //    $user_id = auth()->id;
+        $auction->update(['status' => 'pending_seller']);
 
-        // log_activity(
-        //    'مزاد مكتمل',
-        //     "تم إنشاء مزاد للسيارة رقم {$auction->id} بواسطة المستخدم رقم {$user_id}"
-        // );
         return back()->with('success', 'تم قبول الفائز وتغيير حالة المزاد إلى مكتمل');
     }
     //     public function reject(Auction $auction)

@@ -2,19 +2,46 @@
      x-data="{
         multiplier: 1,
         incrementValue: null,
+        timeLeft: '--:--:--',
+        endTime: '{{ optional($auction->end_at)->setTimezone('UTC')->toIso8601String() }}',
+
+        init() {
+            this.updateTimer();
+            setInterval(() => this.updateTimer(), 1000);
+        },
+
+        updateTimer() {
+            if (!this.endTime) {
+                this.timeLeft = '--:--:--';
+                return;
+            }
+
+            const now = new Date().getTime();
+            const end = new Date(this.endTime).getTime();
+            const diff = end - now;
+
+            if (diff <= 0) {
+                this.timeLeft = 'انتهى';
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            this.timeLeft = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        },
+
         updateMultiplier(operation) {
             if (operation === 'plus') {
-                this.multiplier = Math.min(this.multiplier + 1, 5); // حد أقصى 5 أضعاف
+                this.multiplier = Math.min(this.multiplier + 1, 5);
             } else if (operation === 'minus') {
-                this.multiplier = Math.max(this.multiplier - 1, 1); // حد أدنى 1
+                this.multiplier = Math.max(this.multiplier - 1, 1);
             }
         }
      }"
-     x-init="$watch('multiplier', value => {
-        if (incrementValue) {
-            $wire.set('selectedIncrement', incrementValue * value);
-        }
-     })">
+     x-init="init()"
+     @update-end-time.window="endTime = $event.detail.endTime; updateTimer();">
 
     <div class="container py-4">
 
@@ -28,19 +55,16 @@
 
         {{-- الإحصائيات --}}
         <div class="row g-4 mb-4">
-            <div class="col-md-4" wire:ignore>
+            <div class="col-md-4">
                 <div class="stat-card timer-card">
                     <span class="stat-label">الوقت المتبقي</span>
-                    <div class="timer-display" id="countdown">--:--:--</div>
-                    <input type="hidden" id="auctionEndTime"
-                        value="{{ optional($auction->end_at)->setTimezone('UTC')->toIso8601String() }}">
+                    <div class="timer-display" x-text="timeLeft"></div>
                 </div>
             </div>
 
             {{-- بيانات المزاد --}}
             <div class="col-md-8">
                 <div class="row g-4">
-                    {{-- السعر الحالي --}}
                     <div class="col-sm-4">
                         <div class="stat-card">
                             <span class="stat-label">السعر الحالي</span>
@@ -50,7 +74,6 @@
                         </div>
                     </div>
 
-                    {{-- عدد المزايدات --}}
                     <div class="col-sm-4">
                         <div class="stat-card">
                             <span class="stat-label">عدد المزايدات</span>
@@ -60,7 +83,6 @@
                         </div>
                     </div>
 
-                    {{-- بداية المزاد --}}
                     <div class="col-sm-4">
                         <div class="stat-card">
                             <span class="stat-label">بداية المزاد</span>
@@ -75,12 +97,10 @@
 
         {{-- قسم تقديم المزايدة --}}
         <div class="row g-4">
-            {{-- العمود الأيسر --}}
             <div class="col-lg-8">
                 <div class="content-card">
                     <h2 class="section-title">تقديم مزايدة</h2>
 
-                    {{-- السعر الحالي --}}
                     <div class="current-price">
                         <span class="price-label">السعر الحالي</span>
                         <span class="price-value">
@@ -103,7 +123,7 @@
                         </div>
                     </div>
 
-                    {{-- مضاعف القيمة - يظهر فقط عند اختيار قيمة --}}
+                    {{-- مضاعف القيمة --}}
                     @if($selectedIncrement)
                     <div class="multiplier-section mt-3 p-3 bg-light rounded">
                         <label class="form-label fw-bold">مضاعف القيمة:</label>
@@ -126,7 +146,6 @@
                         </div>
                     </div>
 
-                    {{-- عرض القيمة النهائية --}}
                     <div class="alert alert-success mt-3 text-center">
                         قيمة المزايدة الجديدة:
                         <strong class="fs-4">
@@ -147,12 +166,10 @@
                         </span>
                     </button>
 
-                    {{-- الأخطاء --}}
                     @error('amount')
                     <div class="text-danger mt-2 text-center">{{ $message }}</div>
                     @enderror
 
-                    {{-- رسالة النجاح --}}
                     @if (session()->has('success'))
                     <div class="alert alert-success mt-3 text-center">
                         {{ session('success') }}
@@ -161,10 +178,10 @@
                 </div>
             </div>
 
-            {{-- العمود الأيمن: أثر المزايدات --}}
+            {{-- آخر المزايدات --}}
             <div class="col-lg-4">
                 <div class="content-card h-100">
-                    <h2 class="section-title">أخر المزايدات</h2>
+                    <h2 class="section-title">آخر المزايدات</h2>
 
                     <div class="bids-timeline">
                         @if(count($latestBids))
@@ -174,7 +191,7 @@
                                 {{ number_format($bid->amount) }} د.ع
                             </div>
                             <div class="bidder-details">
-                                <span class="bidder-name">{{ $bid->user->id ?? 'مزايد' }} مزايدة</span>
+                                <span class="bidder-name">{{ $bid->user->name ?? 'مزايد' }}</span>
                                 <span class="bid-time">{{ $bid->created_at->diffForHumans() }}</span>
                             </div>
                         </div>
@@ -190,13 +207,4 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('livewire:init', () => {
-            Livewire.on('update-end-time', (data) => {
-                const newEndTime = data.endTime;
-                document.getElementById('auctionEndTime').value = newEndTime;
-                startCountdown(newEndTime);
-            });
-        });
-    </script>
 </div>

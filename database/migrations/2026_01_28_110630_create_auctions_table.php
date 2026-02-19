@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -42,13 +41,14 @@ return new class extends Migration
 
             // حالة المزاد
             $table->enum('status', [
-                'pending',    // في انتظار الموافقة
-                'approved',   // تمت الموافقة، في انتظار البدء
-                'rejected',   // مرفوض
-                'active',     // جاري التنفيذ
-                'closed',     // مغلق بدون بيع
-                'completed',  // مكتمل وتم البيع
-                'cancelled'   // ملغي
+                'pending',           // في انتظار موافقة المدير
+                'approved',          // تمت الموافقة - جاهز للبدء
+                'active',            // نشط - جاري المزايدة
+                'closed',            // مغلق - انتهى الوقت بانتظار قرار المدير
+                'pending_seller',    // بانتظار البائع - بعد موافقة المدير
+                'completed',         // مكتمل - البائع وافق
+                'rejected',          // مرفوض - من المدير أو البائع
+                'cancelled'          // ملغي
             ])->default('pending')->index();
 
             // المستخدمون المرتبطون
