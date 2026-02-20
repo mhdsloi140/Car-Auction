@@ -122,6 +122,7 @@ class Users extends Component
                 'admin' => 'مدير',
                 'seller' => 'بائع',
                 'user' => 'معرض',
+                'buyer'=>'مبيعات',
                 default => 'مستخدم'
             };
 

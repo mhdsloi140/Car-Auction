@@ -29,16 +29,17 @@
 
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <!-- PWA Configuration -->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0ea5e9">
-<meta name="msapplication-navbutton-color" content="#0ea5e9">
-<meta name="apple-mobile-web-app-title" content="SIR Auctions">
-<meta name="application-name" content="SIR Auctions">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- PWA Configuration -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="msapplication-navbutton-color" content="#0ea5e9">
+    <meta name="apple-mobile-web-app-title" content="SIR Auctions">
+    <meta name="application-name" content="SIR Auctions">
     <style>
         /* متغيرات الألوان - درجات الكحلي (الأزرق الداكن) */
         :root {
@@ -562,7 +563,6 @@
         .sidebar-overlay.show {
             display: block;
         }
-
     </style>
 
     @livewireStyles
@@ -673,11 +673,27 @@
                         </li>
                         @endrole
 
-                        @role('seller')
-                        <li class="nav-item {{ request()->routeIs('sellers.add.user') ? 'active' : '' }}">
+                        @role('buyer')
+                        <li class="nav-item {{ request()->routeIs('buyer.add.user') ? 'active' : '' }}">
                             <a href="{{ route('sellers.add.user') }}" class="nav-link">
                                 <i class="fa-solid fa-user-plus"></i>
                                 <span>إضافة معرض</span>
+                            </a>
+                        </li>
+                        @endrole
+                        @role('admin')
+                        <li class="nav-item {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
+                            <a href="{{ route('admin.profile') }}" class="nav-link">
+                                <i class="fa-solid fa-user"></i>
+                                <span>الملف الشخصي</span>
+                            </a>
+                        </li>
+                        @endrole
+                        @role('buyer')
+                        <li class="nav-item {{ request()->routeIs('buyer.profile') ? 'active' : '' }}">
+                            <a href="{{ route('buyer.profile') }}" class="nav-link">
+                                <i class="fa-solid fa-user"></i>
+                                <span>الملف الشخصي</span>
                             </a>
                         </li>
                         @endrole
@@ -697,6 +713,18 @@
                         @endrole
 
                         @role('seller')
+                        <li class="nav-item logout-btn">
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="nav-link w-100 text-start"
+                                    style="background:none; border:none;">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                    <span>تسجيل الخروج</span>
+                                </button>
+                            </form>
+                        </li>
+                        @endrole
+                        @role('buyer')
                         <li class="nav-item logout-btn">
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
@@ -790,7 +818,7 @@
     <!-- Tom Select -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
-   <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // عناصر التحكم بالقائمة الجانبية
             const menuToggle = document.getElementById('menuToggle');

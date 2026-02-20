@@ -87,17 +87,20 @@
                             $roleNames = [
                                 'seller' => 'بائع',
                                 'user' => 'زبون',
-                                'admin' => 'مدير'
+                                'admin' => 'مدير',
+                                'buyer'=>'مبيعات'
                             ];
                             $roleColors = [
                                 'seller' => 'success',
                                 'user' => 'info',
-                                'admin' => 'warning'
+                                'admin' => 'warning',
+                                'buyer'=>'primary'
                             ];
                             $roleIcons = [
                                 'seller' => 'briefcase',
                                 'user' => 'person',
-                                'admin' => 'shield'
+                                'admin' => 'shield',
+                                'buyer'=>'person'
                             ];
                             $role = $user->roles->first()?->name;
                             $roleLabel = $roleNames[$role] ?? 'غير معروف';

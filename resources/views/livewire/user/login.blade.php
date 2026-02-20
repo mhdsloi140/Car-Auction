@@ -1,338 +1,323 @@
 <div>
-
-    <div wire:ignore.self class="modal" id="loginModal">
+    <div wire:ignore.self class="modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
-
-            <button class="modal-close" onclick="window.dispatchEvent(new Event('closeModal'))">×</button>
-
-            <h3>مرحباً بك</h3>
+            <button class="modal-close" id="closeModalBtn" aria-label="إغلاق" onclick="window.dispatchEvent(new Event('closeModal'))">&times;</button>
+            <div class="modal-icon">
+                <i class="fas fa-car"></i>
+            </div>
 
             {{-- STEP 1: إدخال رقم الجوال --}}
             @if ($step === 1)
-            <p>أدخل رقم جوالك</p>
+            <h3 id="modalTitle">تسجيل الدخول إلى سيّر</h3>
+            <p>أدخل رقم هاتفك</p>
 
-            <div class="phone-input-group">
-                <span class="country-code">+964</span>
-                <input type="text" wire:model="phone" class="phone-input" placeholder="7xxxxxxxx" dir="ltr">
+            <form wire:submit.prevent="checkPhone">
+                <div class="phone-field">
+                    <label for="phone" class="phone-label">رقم الهاتف</label>
+                    <div class="phone-input-group">
+                        <span class="country-code" id="countryCode">+964</span>
+                        <input type="tel" wire:model="phone" class="phone-input" id="phone" placeholder="xxx xxxx xxx" aria-labelledby="countryCode phone" required>
+                    </div>
+                    @error('phone')
+                    <div class="error-message" id="phoneError" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <button type="submit" class="send-code-btn" id="submitBtn" wire:loading.attr="disabled" wire:target="checkPhone">
+                    <span wire:loading.remove wire:target="checkPhone" class="btn-text">متابعة</span>
+                    <span wire:loading wire:target="checkPhone">
+                        <span class="spinner"></span>
+                        <span class="btn-text">جاري التحقق...</span>
+                    </span>
+                </button>
+            </form>
+
+            <div class="modal-links">
+                <p class="register-link">
+                    ليس لديك حساب؟ <a href="#" wire:click.prevent="showRegisterForm">إنشاء حساب جديد</a>
+                </p>
             </div>
-
-            @error('phone')
-            <div class="error">{{ $message }}</div>
-            @enderror
-
-            <button wire:click="checkPhone" wire:loading.attr="disabled" class="send-code-btn">
-                <span wire:loading.remove wire:target="checkPhone">متابعة</span>
-                <span wire:loading wire:target="checkPhone"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>
-            </button>
-
-            <p class="register-link">
-                ليس لديك حساب؟ <a href="#" wire:click.prevent="showRegisterForm">إنشاء حساب جديد</a>
-            </p>
             @endif
 
             {{-- STEP 2: إدخال كلمة المرور --}}
             @if ($step === 2)
+            <h3 id="modalTitle">مرحباً بعودتك</h3>
             <p>أدخل كلمة المرور</p>
-            <div class="password-wrapper">
-                <input type="password" wire:model="password" class="phone-input password-field" id="passwordInput">
-                <span class="toggle-password" onclick="togglePassword()">
-                    <i class="fas fa-eye" id="toggleIcon"></i>
-                </span>
+
+            <form wire:submit.prevent="login">
+                <div class="phone-field">
+                    <label for="password" class="phone-label">كلمة المرور</label>
+                    <div class="password-wrapper">
+                        <input type="password" wire:model="password" class="phone-input password-field" id="passwordInput" placeholder="********">
+                        <span class="toggle-password" onclick="togglePassword()" aria-label="إظهار/إخفاء كلمة المرور">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </span>
+                    </div>
+                    @error('password')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <button type="submit" class="send-code-btn" wire:loading.attr="disabled" wire:target="login">
+                    <span wire:loading.remove wire:target="login" class="btn-text">تسجيل الدخول</span>
+                    <span wire:loading wire:target="login">
+                        <span class="spinner"></span>
+                        <span class="btn-text">جاري الدخول...</span>
+                    </span>
+                </button>
+            </form>
+
+            <div class="modal-links">
+                <p class="forgot-link">
+                    <a href="#" wire:click.prevent="forgotPassword">هل نسيت كلمة المرور؟</a>
+                </p>
             </div>
-
-            @error('password')
-            <div class="error">{{ $message }}</div>
-            @enderror
-
-            <button wire:click="login" wire:loading.attr="disabled" class="send-code-btn">
-                <span wire:loading.remove wire:target="login">تسجيل الدخول</span>
-                <span wire:loading wire:target="login"><i class="fas fa-spinner fa-spin"></i> جاري الدخول...</span>
-            </button>
-
-            <p class="forgot-link">
-                <a href="#" wire:click.prevent="forgotPassword">هل نسيت كلمة المرور؟</a>
-            </p>
             @endif
 
             {{-- STEP 3: إدخال رقم الجوال لاستعادة كلمة المرور --}}
             @if ($step === 3)
+            <h3 id="modalTitle">استعادة كلمة المرور</h3>
             <p>أدخل رقم جوالك لاستعادة كلمة المرور</p>
 
-            <div class="phone-input-group">
-                <span class="country-code">+964</span>
-                <input type="text" wire:model="reset_phone" class="phone-input" placeholder="7xxxxxxxx" dir="ltr">
+            <form wire:submit.prevent="sendResetCode">
+                <div class="phone-field">
+                    <label for="reset_phone" class="phone-label">رقم الهاتف</label>
+                    <div class="phone-input-group">
+                        <span class="country-code">+964</span>
+                        <input type="tel" wire:model="reset_phone" class="phone-input" id="reset_phone" placeholder="xxx xxxx xxx" required>
+                    </div>
+                    @error('reset_phone')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <button type="submit" class="send-code-btn" wire:loading.attr="disabled" wire:target="sendResetCode">
+                    <span wire:loading.remove wire:target="sendResetCode" class="btn-text">إرسال الكود</span>
+                    <span wire:loading wire:target="sendResetCode">
+                        <span class="spinner"></span>
+                        <span class="btn-text">جاري الإرسال...</span>
+                    </span>
+                </button>
+            </form>
+
+            <div class="modal-links">
+                <p>
+                    <a href="#" wire:click.prevent="backToLogin">العودة لتسجيل الدخول</a>
+                </p>
             </div>
-
-            @error('reset_phone')
-            <div class="error">{{ $message }}</div>
-            @enderror
-
-            <button wire:click="sendResetCode" wire:loading.attr="disabled" class="send-code-btn">
-                <span wire:loading.remove wire:target="sendResetCode">إرسال الكود</span>
-                <span wire:loading wire:target="sendResetCode"><i class="fas fa-spinner fa-spin"></i> جاري الإرسال...</span>
-            </button>
             @endif
 
             {{-- STEP 4: إدخال كود التحقق لاستعادة كلمة المرور --}}
             @if ($step === 4)
+            <h3 id="modalTitle">تحقق من الكود</h3>
             <p>أدخل كود التحقق المرسل إلى جوالك</p>
 
-            <input type="text" wire:model="reset_code" class="phone-input" placeholder="******" dir="ltr" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; outline: none; transition: all 0.3s;" >
+            <form wire:submit.prevent="verifyResetCode">
+                <div class="phone-field">
+                    <label for="reset_code" class="phone-label">كود التحقق</label>
+                    <input type="text" wire:model="reset_code" class="phone-input" id="reset_code" placeholder="******" dir="ltr" required maxlength="6">
+                    @error('reset_code')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            @error('reset_code')
-            <div class="error">{{ $message }}</div>
-            @enderror
+                <button type="submit" class="send-code-btn" wire:loading.attr="disabled" wire:target="verifyResetCode">
+                    <span wire:loading.remove wire:target="verifyResetCode" class="btn-text">تحقق</span>
+                    <span wire:loading wire:target="verifyResetCode">
+                        <span class="spinner"></span>
+                        <span class="btn-text">جاري التحقق...</span>
+                    </span>
+                </button>
+            </form>
 
-            <button wire:click="verifyResetCode" wire:loading.attr="disabled" class="send-code-btn">
-                <span wire:loading.remove wire:target="verifyResetCode">تحقق</span>
-                <span wire:loading wire:target="verifyResetCode"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>
-            </button>
+            <div class="modal-links">
+                <p>
+                    <a href="#" wire:click.prevent="sendResetCode">إعادة إرسال الكود</a>
+                </p>
+            </div>
             @endif
 
             {{-- STEP 5: إدخال كلمة مرور جديدة --}}
             @if ($step === 5)
+            <h3 id="modalTitle">كلمة مرور جديدة</h3>
             <p>أدخل كلمة المرور الجديدة</p>
 
-            <input type="password" wire:model="new_password" class="phone-input" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; outline: none; transition: all 0.3s;">
+            <form wire:submit.prevent="saveNewPassword">
+                <div class="phone-field">
+                    <label for="new_password" class="phone-label">كلمة المرور الجديدة</label>
+                    <input type="password" wire:model="new_password" class="phone-input" id="new_password" placeholder="********" required>
+                    @error('new_password')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            @error('new_password')
-            <div class="error">{{ $message }}</div>
-            @enderror
-
-            <button wire:click="saveNewPassword" wire:loading.attr="disabled" class="send-code-btn">
-                <span wire:loading.remove wire:target="saveNewPassword">حفظ كلمة المرور</span>
-                <span wire:loading wire:target="saveNewPassword">
-                    <i class="fas fa-spinner fa-spin"></i> جاري الحفظ...
-                </span>
-            </button>
+                <button type="submit" class="send-code-btn" wire:loading.attr="disabled" wire:target="saveNewPassword">
+                    <span wire:loading.remove wire:target="saveNewPassword" class="btn-text">حفظ كلمة المرور</span>
+                    <span wire:loading wire:target="saveNewPassword">
+                        <span class="spinner"></span>
+                        <span class="btn-text">جاري الحفظ...</span>
+                    </span>
+                </button>
+            </form>
             @endif
 
             {{-- STEP 6: نموذج إنشاء حساب جديد --}}
             @if ($step === 6)
-            <p>إنشاء حساب جديد كبائع</p>
+            <h3 id="modalTitle">إنشاء حساب جديد</h3>
+            <p>سجل كبائع في منصة سيّر</p>
 
-            <input type="text" wire:model="register_name" class="phone-input" placeholder="الاسم الكامل" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; width: 100%;">
-            @error('register_name') <div class="error">{{ $message }}</div> @enderror
+            <form wire:submit.prevent="sendRegisterCode">
+                <div class="phone-field">
+                    <label for="register_name" class="phone-label">الاسم الكامل</label>
+                    <input type="text" wire:model="register_name" class="phone-input" id="register_name" placeholder="الاسم الثلاثي" required>
+                    @error('register_name')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <div class="phone-input-group" style="margin-bottom: 10px;">
-                <span class="country-code">+964</span>
-                <input type="text" wire:model="register_phone" class="phone-input" placeholder="7xxxxxxxx" dir="ltr">
+                <div class="phone-field">
+                    <label for="register_phone" class="phone-label">رقم الهاتف</label>
+                    <div class="phone-input-group">
+                        <span class="country-code">+964</span>
+                        <input type="tel" wire:model="register_phone" class="phone-input" id="register_phone" placeholder="xxx xxxx xxx" required>
+                    </div>
+                    @error('register_phone')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="phone-field">
+                    <label for="register_password" class="phone-label">كلمة المرور</label>
+                    <input type="password" wire:model="register_password" class="phone-input" id="register_password" placeholder="********" required>
+                    @error('register_password')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="phone-field">
+                    <label for="register_password_confirmation" class="phone-label">تأكيد كلمة المرور</label>
+                    <input type="password" wire:model="register_password_confirmation" class="phone-input" id="register_password_confirmation" placeholder="********" required>
+                </div>
+
+                <button type="submit" class="send-code-btn" wire:loading.attr="disabled" wire:target="sendRegisterCode">
+                    <span wire:loading.remove wire:target="sendRegisterCode" class="btn-text">متابعة</span>
+                    <span wire:loading wire:target="sendRegisterCode">
+                        <span class="spinner"></span>
+                        <span class="btn-text">جاري التحقق...</span>
+                    </span>
+                </button>
+            </form>
+
+            <div class="modal-links">
+                <p>
+                    لديك حساب بالفعل؟ <a href="#" wire:click.prevent="backToLogin">تسجيل الدخول</a>
+                </p>
             </div>
-            @error('register_phone') <div class="error">{{ $message }}</div> @enderror
-
-            <input type="password" wire:model="register_password" class="phone-input" placeholder="كلمة المرور" style="border: 1px solid #131111; border-radius: 8px; padding: 12px; margin-bottom: 10px; width: 100%;">
-            @error('register_password') <div class="error">{{ $message }}</div> @enderror
-
-            <input type="password" wire:model="register_password_confirmation" class="phone-input" placeholder="تأكيد كلمة المرور" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; width: 100%;">
-
-            <button wire:click="sendRegisterCode" wire:loading.attr="disabled" class="send-code-btn">
-                <span wire:loading.remove wire:target="sendRegisterCode">متابعة</span>
-                <span wire:loading wire:target="sendRegisterCode"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>
-            </button>
-
-            <p class="register-link" style="margin-top: 15px;">
-                لديك حساب بالفعل؟ <a href="#" wire:click.prevent="backToLogin">تسجيل الدخول</a>
-            </p>
             @endif
 
             {{-- STEP 7: إدخال كود التحقق للتسجيل --}}
             @if ($step === 7)
+            <h3 id="modalTitle">تفعيل الحساب</h3>
             <p>أدخل كود التحقق المرسل إلى جوالك</p>
 
-            <input type="text" wire:model="register_code" class="phone-input" placeholder="******" dir="ltr" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; outline: none; transition: all 0.3s; margin-bottom: 10px;">
+            <form wire:submit.prevent="verifyRegisterCode">
+                <div class="phone-field">
+                    <label for="register_code" class="phone-label">كود التحقق</label>
+                    <input type="text" wire:model="register_code" class="phone-input" id="register_code" placeholder="******" dir="ltr" required maxlength="6">
+                    @error('register_code')
+                    <div class="error-message" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            @error('register_code')
-            <div class="error">{{ $message }}</div>
-            @enderror
+                <button type="submit" class="send-code-btn" wire:loading.attr="disabled" wire:target="verifyRegisterCode">
+                    <span wire:loading.remove wire:target="verifyRegisterCode" class="btn-text">تفعيل الحساب</span>
+                    <span wire:loading wire:target="verifyRegisterCode">
+                        <span class="spinner"></span>
+                        <span class="btn-text">جاري التفعيل...</span>
+                    </span>
+                </button>
+            </form>
 
-            <button wire:click="verifyRegisterCode" wire:loading.attr="disabled" class="send-code-btn">
-                <span wire:loading.remove wire:target="verifyRegisterCode">تفعيل الحساب</span>
-                <span wire:loading wire:target="verifyRegisterCode"><i class="fas fa-spinner fa-spin"></i> جاري التفعيل...</span>
-            </button>
-
-            <p style="text-align: center; margin-top: 15px;">
-                لم يصلك الكود؟ <a href="#" wire:click.prevent="resendRegisterCode">إعادة إرسال</a>
-            </p>
+            <div class="modal-links">
+                <p>
+                    لم يصلك الكود؟ <a href="#" wire:click.prevent="resendRegisterCode">إعادة إرسال</a>
+                </p>
+            </div>
             @endif
 
+            <div class="modal-terms">
+                بالتسجيل أنت توافق على <a href="#">الشروط والأحكام</a>
+            </div>
         </div>
     </div>
 
-    {{-- Script التحكم في فتح وإغلاق المودال --}}
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
+            // مودال
             const openBtn = document.getElementById('openLoginBtn');
+            const modal = document.getElementById('loginModal');
+            const closeBtn = document.getElementById('closeModalBtn');
 
-            if (openBtn) {
-                openBtn.addEventListener('click', function () {
-                    document.getElementById('loginModal').classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
+            let focusableElementsString = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+            let focusableElements, firstFocusable, lastFocusable;
+
+            function openModal() {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    closeBtn.focus();
+                    focusableElements = modal.querySelectorAll(focusableElementsString);
+                    firstFocusable = focusableElements[0];
+                    lastFocusable = focusableElements[focusableElements.length - 1];
+                }, 100);
             }
 
-            window.addEventListener('closeModal', () => {
-                document.getElementById('loginModal').classList.remove('active');
+            function closeModal() {
+                modal.classList.remove('active');
                 document.body.style.overflow = 'auto';
+                openBtn?.focus();
+                // إعادة تعيين الخطوات عند الإغلاق (اختياري)
+                @this.call('backToLogin');
+            }
+
+            if (openBtn) openBtn.addEventListener('click', openModal);
+
+            // استماع لحدث closeModal من Livewire
+            window.addEventListener('closeModal', closeModal);
+
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusable) {
+                            e.preventDefault();
+                            lastFocusable.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusable) {
+                            e.preventDefault();
+                            firstFocusable.focus();
+                        }
+                    }
+                }
+                if (e.key === 'Escape') closeModal();
             });
 
-            // استماع لأحداث الفلاش messages
-            window.addEventListener('swal:modal', event => {
-                Swal.fire({
-                    title: event.detail.title,
-                    text: event.detail.text,
-                    icon: event.detail.icon,
-                    confirmButtonText: 'حسناً'
-                });
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // تحديث focusable elements عند تغيير الخطوات
+            Livewire.hook('message.processed', () => {
+                setTimeout(() => {
+                    focusableElements = modal.querySelectorAll(focusableElementsString);
+                    firstFocusable = focusableElements[0];
+                    lastFocusable = focusableElements[focusableElements.length - 1];
+                    // Focus على أول عنصر في الخطوة الجديدة
+                    if (firstFocusable) firstFocusable.focus();
+                }, 50);
             });
         });
-    </script>
 
-    <style>
-        .error {
-            color: red;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            text-align: right;
-        }
-
-        .forgot-link, .register-link {
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .forgot-link a, .register-link a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
-        .send-code-btn {
-            width: 100%;
-            padding: 12px;
-            background: #3498db;
-            color: white;
-            border: none !important;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-
-        .send-code-btn:hover:not(:disabled) {
-            background: #2980b9;
-        }
-
-        .send-code-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .send-code-btn:focus {
-            outline: none !important;
-            box-shadow: none !important;
-        }
-
-        .phone-input-group {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .country-code {
-            background: #f5f5f5;
-            padding: 12px 15px;
-            color: #333;
-            font-weight: 500;
-            border-left: 1px solid #ddd;
-        }
-
-        .phone-input {
-            flex: 1;
-            border: none !important;
-            padding: 12px;
-            font-size: 16px;
-            outline: none;
-        }
-
-        .password-wrapper {
-            position: relative;
-            margin-bottom: 10px;
-        }
-
-        .password-field {
-            width: 100%;
-            border: 1px solid #ddd !important;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 16px;
-        }
-
-        .toggle-password {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #666;
-        }
-
-        .toggle-password:hover {
-            color: #333;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-            direction: rtl;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .modal-close:hover {
-            color: #333;
-        }
-    </style>
-
-    <script>
         function togglePassword() {
             const input = document.getElementById('passwordInput');
             const icon = document.getElementById('toggleIcon');
@@ -348,5 +333,373 @@
             }
         }
     </script>
+<style>
+    /* مودال - متوافق مع التصميم الجديد */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10,26,58,0.8);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
 
+    .modal.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .modal-content {
+        background: var(--card-bg);
+        border-radius: 60px;
+        padding: 50px 45px;
+        max-width: 480px;
+        width: 92%;
+        position: relative;
+        transform: scale(0.9) translateY(20px);
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 50px 80px -30px black;
+        text-align: center;
+        border-top: 5px solid var(--accent);
+    }
+
+    .modal.active .modal-content {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: var(--gray);
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close:hover {
+        background: var(--primary);
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    .modal-icon {
+        font-size: 4.375rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+
+    .modal h3 {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--text-dark);
+        margin-bottom: 10px;
+    }
+
+    .modal p {
+        color: var(--text-muted);
+        margin-bottom: 30px;
+        font-size: 1rem;
+    }
+
+    /* حقول الإدخال */
+    .phone-field {
+        margin-bottom: 20px;
+        text-align: right;
+    }
+
+    .phone-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.9375rem;
+    }
+
+    .phone-input-group {
+        display: flex;
+        align-items: center;
+        background: var(--gray-light);
+        border: 2px solid var(--gray);
+        border-radius: 60px;
+        overflow: hidden;
+        transition: all 0.3s;
+        direction: ltr;
+    }
+
+    .phone-input-group:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(10,36,114,0.15);
+        background: var(--card-bg);
+    }
+
+    .country-code {
+        background: var(--card-bg);
+        padding: 16px 20px;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1rem;
+        border-left: 2px solid var(--gray);
+    }
+
+    .phone-input {
+        flex: 1;
+        border: none;
+        padding: 16px 15px;
+        font-size: 1rem;
+        background: transparent;
+        outline: none;
+        text-align: left;
+        color: var(--text-dark);
+    }
+
+    /* حقل كلمة المرور */
+    .password-wrapper {
+        position: relative;
+        background: var(--gray-light);
+        border: 2px solid var(--gray);
+        border-radius: 60px;
+        transition: all 0.3s;
+        direction: ltr;
+    }
+
+    .password-wrapper:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(10,36,114,0.15);
+        background: var(--card-bg);
+    }
+
+    .password-field {
+        border: none !important;
+        padding: 16px 15px;
+        font-size: 1rem;
+        width: 100%;
+        background: transparent;
+        border-radius: 60px;
+        padding-left: 45px;
+        color: var(--text-dark);
+    }
+
+    .toggle-password {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: color 0.3s;
+    }
+
+    .toggle-password:hover {
+        color: var(--primary);
+    }
+
+    /* أزرار المودال - بتصميم btn-login */
+    .send-code-btn {
+        width: 100%;
+        padding: 16px 35px;
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--gray) !important;
+        border-radius: var(--border-radius-btn);
+        font-size: 1.125rem;
+        font-weight: 800;
+        cursor: pointer;
+        margin: 15px 0 20px;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .send-code-btn:hover:not(:disabled) {
+        background: var(--primary);
+        border-color: var(--primary) !important;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .send-code-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        background: var(--gray);
+        border-color: var(--gray) !important;
+        color: var(--text-muted);
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* رسائل الخطأ */
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 8px;
+        text-align: right;
+        min-height: 20px;
+        font-weight: 500;
+    }
+
+    /* روابط المودال */
+    .modal-links {
+        margin: 15px 0;
+        text-align: center;
+    }
+
+    .modal-links a {
+        color: var(--primary);
+        font-weight: 700;
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        transition: border-color 0.3s, color 0.3s;
+        font-size: 0.95rem;
+    }
+
+    .modal-links a:hover {
+        border-bottom-color: var(--primary);
+        color: var(--primary-dark);
+    }
+
+    .forgot-link,
+    .register-link {
+        margin: 10px 0;
+    }
+
+    /* شروط المودال */
+    .modal-terms {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 2px solid var(--gray);
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    .modal-terms a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s;
+    }
+
+    .modal-terms a:hover {
+        border-bottom-color: var(--primary);
+    }
+
+    /* حالات التحميل */
+    .send-code-btn .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    /* حالة التحميل للزر */
+    .send-code-btn:has(.spinner) {
+        background: var(--primary);
+        border-color: var(--primary) !important;
+        color: white;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* تأثير Ripple */
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.6);
+        width: 100px;
+        height: 100px;
+        margin-top: -50px;
+        margin-left: -50px;
+        animation: ripple 0.6s linear;
+        transform: scale(0);
+        pointer-events: none;
+    }
+
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    /* تحسينات للتجاوب */
+    @media (max-width: 480px) {
+        .modal-content {
+            padding: 35px 25px;
+        }
+
+        .modal h3 {
+            font-size: 1.75rem;
+        }
+
+        .send-code-btn {
+            padding: 14px 25px;
+            font-size: 1rem;
+        }
+
+        .phone-input,
+        .country-code {
+            padding: 14px;
+        }
+
+        .modal-icon {
+            font-size: 3.5rem;
+        }
+    }
+</style>
+    {{-- <style>
+             .btn-login {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--gray);
+            padding: 12px 35px;
+            border-radius: var(--border-radius-btn);
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-login:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+    </style> --}}
 </div>

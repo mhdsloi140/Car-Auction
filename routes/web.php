@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Buyer\DashboardController;
+use App\Http\Controllers\Buyer\ProfileBuyerController;
 use App\Http\Controllers\Seller\AddUserController;
 use App\Http\Controllers\User\ProfileUserController;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +54,12 @@ Route::prefix('seller')->middleware(['auth', 'role:seller'])->group(function () 
     Route::patch('/auction/{auction}/complete', [AuctionSellersController::class, 'complete'])->name('auction.sellers.complete');
     Route::get('add-user', [AddUserController::class, 'index'])->name('sellers.add.user');
 
+});
+Route::prefix('buyer')->middleware(['auth', 'role:buyer'])->group(function () {
+     Route::get('dashboard', [DashboardController::class, 'index'])->name('buyer.dashboard');
+     Route::get('add-user',[DashboardController::class,'AddUser'])->name('buyber.add.user');
+      Route::get('profile',[ProfileBuyerController::class,'index'])->name('buyer.profile');
+      Route::post('profile',[ProfileBuyerController::class,'update'])->name('buyer.profile.update');
 });
 
 // ==================== Admin Routes ====================

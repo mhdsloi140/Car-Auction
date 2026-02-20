@@ -20,6 +20,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'bid on auctions']);
         $admin = Role::create(['name' => 'admin']);
         $seller = Role::create(['name' => 'seller']);
+         $buyer = Role::create(['name' => 'buyer']);
         $user = Role::create(['name' => 'user']);
         $admin->givePermissionTo(Permission::all());
         $seller->givePermissionTo(['create cars', 'create auctions']);

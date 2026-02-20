@@ -93,6 +93,9 @@ class Login extends Component
         if ($user->hasRole('user')) {
             return redirect()->route('home');
         }
+          if ($user->hasRole('buyer')) {
+            return redirect()->route('buyber.add.user');
+        }
 
         Auth::logout();
         $this->addError('phone', 'غير مسموح لك بتسجيل الدخول من هنا');
