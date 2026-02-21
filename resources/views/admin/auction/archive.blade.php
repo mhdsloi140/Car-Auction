@@ -60,9 +60,9 @@
                         </td>
 
                         <td>
-                            @if($auction->final_price)
+                            @if($auction->current_price)
                             <span class="fw-bold text-success">
-                                {{ number_format($auction->final_price) }} د.ع
+                                {{ number_format($auction->current_price) }} د.ع
                             </span>
                             @else
                             <span class="badge bg-light text-muted px-3 py-2">

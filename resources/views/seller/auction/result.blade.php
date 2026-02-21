@@ -91,7 +91,7 @@
                     <div class="mb-4">
                         <span class="text-muted d-block mb-2">السعر النهائي</span>
                         <div class="display-3 fw-bold text-success mb-0">
-                            {{ number_format($auction->final_price) }}
+                            {{ number_format($auction->current_price) }}
                             <small class="fs-4">د.ع</small>
                         </div>
                     </div>
@@ -135,12 +135,12 @@
                     @endif
 
                     {{-- رسالة الرفض --}}
-                    @if($auction->status === 'rejected' && $auction->rejection_reason)
+                    {{-- @if($auction->status === 'rejected' && $auction->rejection_reason)
                         <div class="alert alert-danger mt-4">
                             <i class="bi bi-x-circle-fill me-2"></i>
                             <strong>سبب الرفض:</strong> {{ $auction->rejection_reason }}
                         </div>
-                    @endif
+                    @endif --}}
 
                 </div>
             </div>
@@ -180,7 +180,7 @@
                                         <i class="bi bi-person-fill fs-3"></i>
                                     </div>
                                     <div>
-                                        <small class="text-muted d-block">الفائز</small>
+                                        <small class="text-muted d-block"></small>
                                         <h5 class="fw-bold mb-1">{{ $auction->winner->name ?? 'لا يوجد' }}</h5>
                                         @if($auction->winner && $auction->winner->phone)
                                             <small class="text-muted">
@@ -203,7 +203,7 @@
                                     <div>
                                         <small class="text-muted d-block">السعر النهائي</small>
                                         <h3 class="fw-bold text-success mb-0">
-                                            {{ number_format($auction->final_price) }} د.ع
+                                            {{ number_format($auction->current_price) }} د.ع
                                         </h3>
                                     </div>
                                 </div>
@@ -221,7 +221,7 @@
                                     <i class="bi bi-geo-alt-fill fs-3"></i>
                                 </div>
                                 <div>
-                                    <small class="text-muted d-block">موقع الفائز</small>
+                                    <small class="text-muted d-block">موقع </small>
                                     <h5 class="fw-bold mb-1">{{ $auction->winner->address ?? 'لا يوجد عنوان' }}</h5>
                                     <small class="text-muted">
                                         <i class="bi bi-geo ms-1"></i>
@@ -236,7 +236,7 @@
                                  data-lat="{{ $auction->winner->latitude }}"
                                  data-lng="{{ $auction->winner->longitude }}"
                                  data-name="{{ $auction->winner->name }}"
-                                 data-address="{{ $auction->winner->address ?? 'موقع الفائز' }}">
+                                 data-address="{{ $auction->winner->address ?? 'موقع ' }}">
                             </div>
 
                             {{-- رابط خرائط Google --}}

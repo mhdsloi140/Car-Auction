@@ -133,9 +133,9 @@
                     <!-- الوقت المتبقي -->
                     @if($auction->status === 'active' && $auction->end_at)
                     <div class="bg-light p-3 rounded-3 mb-3 d-flex align-items-center gap-2 flex-wrap">
-                        <i class="fas fa-hourglass-half text-warning"></i>
-                        <span>الوقت المتبقي:</span>
-                        <strong class="text-primary">{{ $auction->end_at->diffForHumans() }}</strong>
+                        {{-- <i class="fas fa-hourglass-half text-warning"></i> --}}
+
+                        {{-- <strong class="text-primary">{{ $auction->end_at->diffForHumans() }}</strong> --}}
                     </div>
                     @endif
 

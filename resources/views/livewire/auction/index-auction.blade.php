@@ -178,29 +178,28 @@
                 </div>
 
                 {{-- زر التفاصيل --}}
-           <div class="card-footer bg-white border-0 p-3 pt-0">
-    @if($auction->status === 'pending_seller')
-        {{-- إذا كان المزاد بانتظار البائع - يظهر زر النتيجة --}}
-        <a href="{{ route('auction.sellers.result', $auction->id) }}"
-           class="btn btn-success w-100 rounded-pill py-2">
-            <i class="bi bi-trophy-fill me-1"></i>
-            عرض النتيجة
-        </a>
-    @elseif($auction->status === 'rejected')
-        {{-- إذا كان المزاد مرفوض - يظهر رسالة مرفوض --}}
-        <button class="btn btn-danger w-100 rounded-pill py-2" disabled>
-            <i class="bi bi-x-circle-fill me-1"></i>
-            تم رفض السعر
-        </button>
-    @else
-        {{-- إذا كان المزاد في حالة أخرى - يظهر زر التفاصيل العادي --}}
-        <a href="{{ route('auction.show', $auction->id) }}"
-           class="btn btn-primary w-100 rounded-pill py-2">
-            <i class="bi bi-eye me-1"></i>
-            عرض التفاصيل
-        </a>
-    @endif
-</div>
+                <div class="card-footer bg-white border-0 p-3 pt-0">
+                    @if($auction->status === 'pending_seller' || $auction->status === 'completed')
+                    {{-- إذا كان المزاد بانتظار البائع - يظهر زر النتيجة --}}
+                    <a href="{{ route('auction.sellers.result', $auction->id) }}"
+                        class="btn btn-success w-100 rounded-pill py-2">
+                        <i class="bi bi-trophy-fill me-1"></i>
+                        عرض النتيجة
+                    </a>
+                    @elseif($auction->status === 'rejected')
+                    {{-- إذا كان المزاد مرفوض - يظهر رسالة مرفوض --}}
+                    <button class="btn btn-danger w-100 rounded-pill py-2" disabled>
+                        <i class="bi bi-x-circle-fill me-1"></i>
+                        تم رفض السعر
+                    </button>
+                    @else
+                    {{-- إذا كان المزاد في حالة أخرى - يظهر زر التفاصيل العادي --}}
+                    <a href="{{ route('auction.show', $auction->id) }}" class="btn btn-primary w-100 rounded-pill py-2">
+                        <i class="bi bi-eye me-1"></i>
+                        عرض التفاصيل
+                    </a>
+                    @endif
+                </div>
             </div>
         </div>
         @endforeach

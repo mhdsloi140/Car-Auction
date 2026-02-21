@@ -36,12 +36,12 @@
                                 <span class="price">{{ number_format($auction->starting_price, 0) }} د.ع</span>
                             </div>
                             <div class="bid-meta-modern d-flex justify-content-between align-items-center">
-                                @if($auction->end_at)
+                                {{-- @if($auction->end_at)
                                     <div class="time-remaining">
                                         <i class="fas fa-hourglass-half"></i>
                                         <span>{{ $auction->end_at->diffForHumans() }}</span>
                                     </div>
-                                @endif
+                                @endif --}}
                                 <span class="bids-count">
                                     <i class="fas fa-users"></i> {{ $auction->bids_count ?? 0 }}
                                 </span>
