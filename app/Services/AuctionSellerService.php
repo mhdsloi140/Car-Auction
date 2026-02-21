@@ -203,7 +203,7 @@ private function notifyAdmin($auction, $decision)
         $message = "{$messageTitle}\n\n";
 
 
-        $message .= "🏷️ *السعر النهائي:* " . number_format($auction->final_price) . " د.ع\n\n";
+        $message .= "🏷️ *السعر النهائي:* " . number_format($auction->current_price) . " د.ع\n\n";
 
         $message .= "👤 *البائع:*\n";
         $message .= "الاسم: {$auction->seller->name}\n";
