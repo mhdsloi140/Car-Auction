@@ -57,9 +57,10 @@ Route::prefix('seller')->middleware(['auth', 'role:seller'])->group(function () 
 });
 Route::prefix('buyer')->middleware(['auth', 'role:buyer'])->group(function () {
      Route::get('dashboard', [DashboardController::class, 'index'])->name('buyer.dashboard');
-     Route::get('add-user',[DashboardController::class,'AddUser'])->name('buyber.add.user');
+     Route::get('add-user',[DashboardController::class,'create'])->name('buyber.add.user');
       Route::get('profile',[ProfileBuyerController::class,'index'])->name('buyer.profile');
       Route::post('profile',[ProfileBuyerController::class,'update'])->name('buyer.profile.update');
+        Route::post('/add-user', [DashboardController::class, 'store'])->name('add-user.store');
 });
 
 // ==================== Admin Routes ====================
@@ -124,3 +125,4 @@ Route::prefix('users')->group(function () {
 
 });
 
+Route::get('/download-media/{mediaId}', [App\Http\Controllers\MediaController::class, 'download'])->name('media.download');

@@ -10,7 +10,7 @@
     <!-- Favicon -->
     <link rel="icon" href="{{ setting('site_logo') ?: asset('assets/img/kaiadmin/favicon.ico') }}"
         type="image/x-icon" />
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Google Fonts (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -636,6 +636,12 @@
                                 <span>إدارة المزادات</span>
                             </a>
                         </li>
+                          <li class="nav-item {{ request()->routeIs('admin.auctions.archive') ? 'active' : '' }}">
+                            <a href="{{ route('admin.auctions.archive') }}" class="nav-link">
+                                <i class="fa-solid fa-box-archive"></i>
+                                <span>أرشيف المزادات</span>
+                            </a>
+                        </li>
 
                         <li class="nav-item {{ request()->routeIs('settings.admin.*') ? 'active' : '' }}">
                             <a href="{{ route('settings.admin.index') }}" class="nav-link">
@@ -644,12 +650,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item {{ request()->routeIs('admin.auctions.archive') ? 'active' : '' }}">
-                            <a href="{{ route('admin.auctions.archive') }}" class="nav-link">
-                                <i class="fa-solid fa-box-archive"></i>
-                                <span>أرشيف المزادات</span>
-                            </a>
-                        </li>
+
 
                         @endrole
 
@@ -681,14 +682,7 @@
                             </a>
                         </li>
                         @endrole
-                        @role('admin')
-                        <li class="nav-item {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
-                            <a href="{{ route('admin.profile') }}" class="nav-link">
-                                <i class="fa-solid fa-user"></i>
-                                <span>الملف الشخصي</span>
-                            </a>
-                        </li>
-                        @endrole
+
                         @role('buyer')
                         <li class="nav-item {{ request()->routeIs('buyer.profile') ? 'active' : '' }}">
                             <a href="{{ route('buyer.profile') }}" class="nav-link">

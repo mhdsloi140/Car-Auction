@@ -23,6 +23,7 @@ class Users extends Component
     public $blockModalVisible = false;
     public $unblockModalVisible = false;
     public $auctionModalVisible = false;
+    public $locationModalVisible = false; // ✅ مودال عرض الموقع
     public $selectedUser;
     public $acceptedAuctionsCount = 0;
     public $rejectedAuctionsCount = 0;
@@ -134,6 +135,11 @@ class Users extends Component
             $message .= " رقم الهاتف: {$user->phone}\n";
             $message .= " كلمة المرور: `{$password}`\n";
             $message .= " الصلاحية: {$roleName}\n\n";
+
+            if ($user->latitude && $user->longitude) {
+                $message .= "📍 تم تسجيل موقعك على الخريطة\n";
+            }
+
             $message .= "🔐 ننصحك بتغيير كلمة المرور بعد أول تسجيل دخول\n\n";
             $message .= "شكراً لانضمامك إلينا 🙏";
 
@@ -247,6 +253,16 @@ class Users extends Component
         $this->acceptedAuctionsCount = $this->selectedUser->auctions()->where('status', 'active')->count();
         $this->rejectedAuctionsCount = $this->selectedUser->auctions()->where('status', 'rejected')->count();
         $this->auctionModalVisible = true;
+    }
+
+    // ✅ دالة عرض موقع المستخدم على الخريطة
+    public function showLocation($userId)
+    {
+        $this->selectedUser = User::findOrFail($userId);
+        $this->locationModalVisible = true;
+
+        // إرسال حدث لتهيئة الخريطة بعد فتح المودال
+        $this->dispatch('location-modal-opened');
     }
 
     public function resetFields()

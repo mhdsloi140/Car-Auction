@@ -1,13 +1,11 @@
 <div wire:poll.5s class="modern-auctions">
-
-   
-
-    <!-- شبكة المزادات الحديثة -->
     <div class="container-fluid px-0">
+        {{-- هنا يجب أن يكون row --}}
         <div class="row g-4">
             @forelse ($auctions as $auction)
                 <div class="col-md-6 col-lg-4 col-xl-3">
                     <div class="auction-card-modern">
+                        <!-- محتوى البطاقة -->
                         <div class="auction-card-media">
                             <img src="{{ $auction->car->getFirstMediaUrl('cars') }}"
                                  class="card-img"
@@ -67,126 +65,64 @@
         </div>
     </div>
 
-    <!-- ستايلات عصرية حديثة مستوحاة من bid-modern -->
+    {{-- تأكد من أن style الـ row و col صحيح --}}
     <style>
-        /* استيراد خطوط عصرية */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
-
         .modern-auctions {
             font-family: 'Inter', 'Cairo', sans-serif;
             background: linear-gradient(135deg, #f5f9ff 0%, #e8f0fe 100%);
             padding: 30px 0;
             min-height: 100vh;
-        }
-
-        /* قسم الماركات */
-        .brands-section {
-            padding: 0 20px;
-        }
-        .section-title {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 30px;
-            color: #0a2540;
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #004c80 0%, #0a2540 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-            display: inline-block;
-        }
-        .gradient-text::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(135deg, #004c80 0%, #0a2540 100%);
-            border-radius: 4px;
-        }
-
-        /* شبكة الماركات */
-        .brands-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 20px;
-            justify-content: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .brand-card {
-            background: white;
-            border-radius: 24px;
-            padding: 20px 10px;
-            box-shadow: 0 10px 30px -10px rgba(0, 40, 80, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 1px solid rgba(0, 76, 128, 0.1);
-            text-align: center;
-        }
-        .brand-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -12px rgba(0, 76, 128, 0.3);
-            border-color: #004c80;
-        }
-        .brand-card.active {
-            border: 2px solid #004c80;
-            box-shadow: 0 15px 35px -8px rgba(0, 76, 128, 0.4);
-        }
-        .brand-icon {
-            width: 60px;
-            height: 60px;
-            background: #004c80;
-            border-radius: 30px 30px 30px 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            color: white;
-            font-size: 28px;
-            transition: 0.3s;
-        }
-        .brand-card:hover .brand-icon {
-            border-radius: 30px 5px 30px 30px;
-            background: #002b44;
-        }
-        .brand-logo-wrapper {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-bottom: 15px;
-            border: 2px solid #e0edff;
-            padding: 8px;
-            background: white;
-            transition: 0.3s;
-        }
-        .brand-card:hover .brand-logo-wrapper {
-            border-color: #004c80;
-            transform: rotate(5deg);
-        }
-        .brand-logo {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .brand-name {
-            font-weight: 700;
-            font-size: 14px;
-            color: #0a2540;
-            letter-spacing: 0.3px;
         }
 
-        /* بطاقات المزادات الحديثة */
+        .container-fluid {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+
+        .col-md-6, .col-lg-4, .col-xl-3 {
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .col-lg-4 {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .col-xl-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
+
+        .g-4 {
+            gap: 1.5rem;
+        }
+
+        /* باقي الأنماط كما هي */
         .auction-card-modern {
             background: white;
             border-radius: 28px;
@@ -197,26 +133,32 @@
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(0, 76, 128, 0.1);
+            width: 100%;
         }
+
         .auction-card-modern:hover {
             transform: translateY(-8px);
             box-shadow: 0 25px 50px -12px rgba(0, 76, 128, 0.3);
             border-color: #004c80;
         }
+
         .auction-card-media {
             position: relative;
             height: 220px;
             overflow: hidden;
         }
+
         .auction-card-media img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s;
         }
+
         .auction-card-modern:hover .auction-card-media img {
             transform: scale(1.08);
         }
+
         .card-overlay {
             position: absolute;
             top: 0;
@@ -231,9 +173,11 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
+
         .auction-card-modern:hover .card-overlay {
             opacity: 1;
         }
+
         .btn-view-modern {
             width: 60px;
             height: 60px;
@@ -249,15 +193,16 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             text-decoration: none;
         }
+
         .auction-card-modern:hover .btn-view-modern {
             transform: scale(1);
         }
+
         .btn-view-modern:hover {
             background: #004c80;
             color: white;
         }
 
-        /* شارات الحالة */
         .badge-modern {
             position: absolute;
             top: 20px;
@@ -272,22 +217,24 @@
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.3);
         }
+
         .badge-modern.live {
             background: linear-gradient(135deg, #004c80, #0a2540);
             color: white;
         }
+
         .badge-modern.ended {
             background: rgba(108, 117, 125, 0.9);
             color: white;
         }
 
-        /* محتوى البطاقة */
         .auction-card-content {
             padding: 22px 20px 20px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
         .brand-name-tag {
             font-weight: 700;
             color: #004c80;
@@ -296,11 +243,13 @@
             padding: 4px 12px;
             border-radius: 30px;
         }
+
         .model-name {
             font-weight: 600;
             color: #0a2540;
             font-size: 16px;
         }
+
         .car-year {
             font-size: 14px;
             color: #64748b;
@@ -311,11 +260,11 @@
             padding: 8px 12px;
             border-radius: 40px;
         }
+
         .text-primary-blue {
             color: #004c80;
         }
 
-        /* السعر الحالي */
         .current-bid-modern {
             display: flex;
             justify-content: space-between;
@@ -324,11 +273,13 @@
             border-top: 1px dashed #e2e8f0;
             border-bottom: 1px dashed #e2e8f0;
         }
+
         .current-bid-modern .label {
             font-weight: 500;
             color: #64748b;
             font-size: 15px;
         }
+
         .current-bid-modern .price {
             font-weight: 800;
             color: #004c80;
@@ -336,10 +287,10 @@
             letter-spacing: -0.5px;
         }
 
-        /* ميتا البيانات */
         .bid-meta-modern {
             font-size: 14px;
         }
+
         .time-remaining {
             display: flex;
             align-items: center;
@@ -350,6 +301,7 @@
             border-radius: 40px;
             font-weight: 600;
         }
+
         .bids-count {
             background: #e0edff;
             padding: 6px 14px;
@@ -358,7 +310,6 @@
             font-weight: 600;
         }
 
-        /* زر دخول المزاد */
         .btn-bid-modern {
             background: #004c80;
             color: white;
@@ -375,6 +326,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .btn-bid-modern::before {
             content: '';
             position: absolute;
@@ -385,9 +337,11 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             transition: left 0.5s;
         }
+
         .btn-bid-modern:hover::before {
             left: 100%;
         }
+
         .btn-bid-modern:hover {
             background: #002b44;
             transform: translateY(-3px);
@@ -395,7 +349,6 @@
             color: white;
         }
 
-        /* حالة عدم وجود مزادات */
         .empty-state-modern {
             text-align: center;
             padding: 80px 20px;
@@ -403,36 +356,37 @@
             border-radius: 40px;
             box-shadow: 0 15px 35px -8px rgba(0,40,80,0.1);
         }
+
         .empty-state-modern i {
             font-size: 100px;
             color: #cbd5e1;
             margin-bottom: 20px;
         }
+
         .empty-state-modern h4 {
             font-weight: 700;
             color: #0a2540;
             font-size: 28px;
         }
+
         .empty-state-modern p {
             color: #64748b;
             font-size: 18px;
         }
 
-        /* تحسينات الجوال */
         @media (max-width: 768px) {
-            .brands-grid {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-                gap: 10px;
+            .modern-auctions {
+                padding: 15px 0;
             }
-            .brand-card {
-                padding: 12px 5px;
+            .auction-card-media {
+                height: 180px;
             }
-            .brand-icon, .brand-logo-wrapper {
-                width: 50px;
-                height: 50px;
+            .current-bid-modern .price {
+                font-size: 18px;
             }
-            .section-title {
-                font-size: 26px;
+            .btn-bid-modern {
+                padding: 12px 15px;
+                font-size: 14px;
             }
         }
     </style>

@@ -34,10 +34,11 @@
         </h3>
         <div class="d-flex gap-2">
             <select class="form-select" style="width: 180px" wire:model.live="filterRole">
-                <option value="all">📋 عرض الجميع</option>
-                <option value="user">👤 المستخدمين</option>
-                <option value="seller">💼 البائعين</option>
-                <option value="admin">👑 المديرين</option>
+                <option value="all"> عرض الجميع</option>
+                <option value="user"> المعارض</option>
+                <option value="seller"> البائعين</option>
+                <option value="buyer"> المبيعات</option>
+                <option value="admin"> المديرين</option>
             </select>
             <button class="btn btn-primary" wire:click="showCreateModal">
                 <i class="bi bi-plus-circle me-1"></i>
@@ -58,12 +59,37 @@
                             <th class="py-3">رقم الهاتف</th>
                             <th class="py-3">الدور</th>
                             <th class="py-3">الحالة</th>
+                            <th class="py-3">الموقع</th>
                             <th class="py-3">تاريخ التسجيل</th>
                             <th class="py-3">العمليات</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($users as $user)
+                        @php
+                        $roleNames = [
+                            'seller' => 'بائع',
+                            'user' => 'معرض',
+                            'admin' => 'مدير',
+                            'buyer' => 'مبيعات'
+                        ];
+                        $roleColors = [
+                            'seller' => 'success',
+                            'user' => 'info',
+                            'admin' => 'warning',
+                            'buyer' => 'primary'
+                        ];
+                        $roleIcons = [
+                            'seller' => 'briefcase',
+                            'user' => 'person',
+                            'admin' => 'shield',
+                            'buyer' => 'cart'
+                        ];
+                        $role = $user->roles->first()?->name;
+                        $roleLabel = $roleNames[$role] ?? 'غير معروف';
+                        $roleColor = $roleColors[$role] ?? 'secondary';
+                        $roleIcon = $roleIcons[$role] ?? 'person';
+                        @endphp
                         <tr>
                             <td class="pe-4">{{ $user->id }}</td>
                             <td>
@@ -83,30 +109,6 @@
                                     <span class="text-muted">—</span>
                                 @endif
                             </td>
-                            @php
-                            $roleNames = [
-                                'seller' => 'بائع',
-                                'user' => 'زبون',
-                                'admin' => 'مدير',
-                                'buyer'=>'مبيعات'
-                            ];
-                            $roleColors = [
-                                'seller' => 'success',
-                                'user' => 'info',
-                                'admin' => 'warning',
-                                'buyer'=>'primary'
-                            ];
-                            $roleIcons = [
-                                'seller' => 'briefcase',
-                                'user' => 'person',
-                                'admin' => 'shield',
-                                'buyer'=>'person'
-                            ];
-                            $role = $user->roles->first()?->name;
-                            $roleLabel = $roleNames[$role] ?? 'غير معروف';
-                            $roleColor = $roleColors[$role] ?? 'secondary';
-                            $roleIcon = $roleIcons[$role] ?? 'person';
-                            @endphp
                             <td>
                                 <span class="badge bg-{{ $roleColor }}-subtle text-{{ $roleColor }} px-3 py-2 rounded-pill">
                                     <i class="bi bi-{{ $roleIcon }} me-1"></i>
@@ -127,6 +129,19 @@
                                 @endif
                             </td>
                             <td>
+                                @if($user->latitude && $user->longitude)
+                                    <span class="badge bg-info-subtle text-info px-3 py-2 rounded-pill">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>
+                                        موقع مسجل
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                                        <i class="bi bi-geo-alt me-1"></i>
+                                        لا يوجد
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
                                 <span class="text-muted small">
                                     <i class="bi bi-calendar3 me-1"></i>
                                     {{ $user->created_at->format('Y-m-d') }}
@@ -139,6 +154,15 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2 justify-content-center">
+                                    {{-- زر عرض الموقع --}}
+                                    @if($user->latitude && $user->longitude)
+                                    <button class="btn btn-outline-info btn-sm"
+                                            wire:click="showLocation({{ $user->id }})"
+                                            title="عرض الموقع على الخريطة">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </button>
+                                    @endif
+
                                     {{-- زر الحذف --}}
                                     <button class="btn btn-outline-danger btn-sm"
                                             wire:click="confirmDelete({{ $user->id }})"
@@ -172,7 +196,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <i class="bi bi-people display-1 text-muted d-block mb-3"></i>
                                 <h5 class="text-muted">لا يوجد مستخدمين</h5>
                                 <p class="text-muted">لم يتم إضافة أي مستخدمين بعد</p>
@@ -239,7 +263,7 @@
                         </label>
                         <select class="form-select @error('role') is-invalid @enderror" wire:model="role">
                             <option value="">اختر الصلاحية</option>
-                            @foreach(['user' => 'زبون', 'seller' => 'بائع', 'admin' => 'مدير'] as $key => $label)
+                            @foreach(['user' => 'زبون', 'seller' => 'بائع', 'buyer' => 'مبيعات', 'admin' => 'مدير'] as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
                             @endforeach
                         </select>
@@ -279,7 +303,7 @@
     @endif
 
     {{-- مودال حذف المستخدم --}}
-    @if($deleteModalVisible)
+    @if($deleteModalVisible && $selectedUser)
     <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); z-index: 1050;">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
@@ -320,8 +344,8 @@
                             <div>
                                 <small class="text-muted d-block">الدور</small>
                                 @php
-                                $roleLabels = ['seller' => 'بائع', 'user' => 'زبون', 'admin' => 'مدير'];
-                                $role = $selectedUser->roles->first()?->name ?? 'غير معروف';
+                                $roleLabels = ['seller' => 'بائع', 'user' => 'معرض', 'admin' => 'مدير', 'buyer' => 'مبيعات'];
+                                $role = $selectedUser?->roles->first()?->name ?? 'غير معروف';
                                 @endphp
                                 <span class="fw-bold">{{ $roleLabels[$role] ?? $role }}</span>
                             </div>
@@ -359,7 +383,7 @@
     @endif
 
     {{-- مودال حظر المستخدم --}}
-    @if($blockModalVisible)
+    @if($blockModalVisible && $selectedUser)
     <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); z-index: 1050;">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
@@ -388,7 +412,7 @@
                                 <span class="fw-bold">{{ $selectedUser->name ?? '' }}</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="d-flex align-items-center gap-3">
                             <i class="bi bi-shield fs-4 text-warning"></i>
                             <div>
                                 <small class="text-muted d-block">الحالة الحالية</small>
@@ -431,7 +455,7 @@
     @endif
 
     {{-- مودال إلغاء الحظر --}}
-    @if($unblockModalVisible)
+    @if($unblockModalVisible && $selectedUser)
     <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); z-index: 1050;">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
@@ -503,14 +527,14 @@
     @endif
 
     {{-- مودال المزادات --}}
-    @if($auctionModalVisible)
+    @if($auctionModalVisible && $selectedUser)
     <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); z-index: 1050;">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header bg-primary text-white border-0 rounded-top-4">
                     <h5 class="modal-title">
                         <i class="bi bi-graph-up me-2"></i>
-                        مزادات {{ $selectedUser->name }}
+                        مزادات {{ $selectedUser->name ?? '' }}
                     </h5>
                     <button type="button" class="btn-close btn-close-white" wire:click="$set('auctionModalVisible', false)"></button>
                 </div>
@@ -538,8 +562,8 @@
                         <div class="progress" style="height: 10px;">
                             @php
                             $total = $acceptedAuctionsCount + $rejectedAuctionsCount;
-                            $acceptedPercent = ($acceptedAuctionsCount / $total) * 100;
-                            $rejectedPercent = ($rejectedAuctionsCount / $total) * 100;
+                            $acceptedPercent = $total > 0 ? ($acceptedAuctionsCount / $total) * 100 : 0;
+                            $rejectedPercent = $total > 0 ? ($rejectedAuctionsCount / $total) * 100 : 0;
                             @endphp
                             <div class="progress-bar bg-success" style="width: {{ $acceptedPercent }}%"></div>
                             <div class="progress-bar bg-danger" style="width: {{ $rejectedPercent }}%"></div>
@@ -563,12 +587,94 @@
                         إغلاق
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
     @endif
 
+    {{-- مودال عرض الموقع على الخريطة --}}
+{{-- مودال عرض الموقع على الخريطة --}}
+{{-- مودال عرض الموقع على الخريطة --}}
+@if($locationModalVisible && $selectedUser)
+<div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-info text-white border-0 rounded-top-4">
+                <h5 class="modal-title">
+                    <i class="bi bi-geo-alt-fill me-2"></i>
+                    موقع {{ $selectedUser->name ?? '' }}
+                </h5>
+                <div class="d-flex gap-2">
+                    {{-- زر إغلاق في الهيدر --}}
+                    <button type="button" class="btn-close btn-close-white" wire:click="$set('locationModalVisible', false)" aria-label="إغلاق"></button>
+                </div>
+            </div>
+
+            <div class="modal-body p-4">
+                @if($selectedUser->latitude && $selectedUser->longitude)
+                    <div class="mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="bg-light p-3 rounded-3">
+                                    <small class="text-muted d-block">خط العرض (Latitude)</small>
+                                    <span class="fw-bold">{{ $selectedUser->latitude }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="bg-light p-3 rounded-3">
+                                    <small class="text-muted d-block">خط الطول (Longitude)</small>
+                                    <span class="fw-bold">{{ $selectedUser->longitude }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($selectedUser->address)
+                    <div class="mb-3">
+                        <div class="bg-light p-3 rounded-3">
+                            <small class="text-muted d-block">العنوان</small>
+                            <span class="fw-bold">{{ $selectedUser->address }}</span>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- حاوية الخريطة --}}
+                    <div id="locationMap"
+                         style="width:100%; height:400px; border-radius:12px; border:1px solid #ddd;"
+                         data-lat="{{ $selectedUser->latitude }}"
+                         data-lng="{{ $selectedUser->longitude }}"
+                         data-name="{{ $selectedUser->name }}"
+                         data-address="{{ $selectedUser->address ?? 'موقع المستخدم' }}">
+                    </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="bi bi-geo-alt-fill text-muted" style="font-size: 5rem;"></i>
+                        <h5 class="mt-3 text-muted">لا يوجد موقع مسجل لهذا المستخدم</h5>
+                        <p class="text-muted">لم يتم تحديد موقع على الخريطة أثناء إنشاء الحساب</p>
+                    </div>
+                @endif
+            </div>
+
+            <div class="modal-footer border-0">
+                {{-- زر إغلاق في الفوتر (اختياري) --}}
+                <button class="btn btn-outline-secondary px-4 rounded-pill" wire:click="$set('locationModalVisible', false)">
+                    <i class="bi bi-x-lg me-1"></i>
+                    إغلاق
+                </button>
+
+                @if($selectedUser->latitude && $selectedUser->longitude)
+                <a href="https://www.google.com/maps?q={{ $selectedUser->latitude }},{{ $selectedUser->longitude }}"
+                   target="_blank"
+                   class="btn btn-primary px-4 rounded-pill">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>
+                    فتح في خرائط Google
+                </a>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 </div>
 
 @push('styles')
@@ -582,22 +688,131 @@
     .modal {
         z-index: 1050 !important;
     }
-    .btn-outline-danger, .btn-outline-dark, .btn-outline-success, .btn-outline-primary {
+    .btn-outline-danger, .btn-outline-dark, .btn-outline-success, .btn-outline-primary, .btn-outline-info {
         transition: all 0.2s ease;
     }
-    .btn-outline-danger:hover, .btn-outline-dark:hover, .btn-outline-success:hover, .btn-outline-primary:hover {
+    .btn-outline-danger:hover, .btn-outline-dark:hover, .btn-outline-success:hover, .btn-outline-primary:hover, .btn-outline-info:hover {
         transform: scale(1.05);
     }
+    .leaflet-container {
+        border-radius: 12px;
+        z-index: 1060 !important;
+    }
 </style>
+
 @endpush
 
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     document.addEventListener('livewire:init', () => {
+        let map = null; // حفظ الخريطة في متغير عام
+
         // تنظيف backdrop عند إغلاق المودال
         Livewire.on('modal-closed', () => {
             document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
             document.body.classList.remove('modal-open');
+
+            // تدمير الخريطة عند إغلاق المودال
+            if (map) {
+                map.remove();
+                map = null;
+            }
+        });
+
+        // تهيئة الخريطة عند فتح مودال الموقع
+        Livewire.on('location-modal-opened', () => {
+            // تأخير أطول للتأكد من اكتمال المودال
+            setTimeout(initLocationMap, 500);
+        });
+
+        function initLocationMap() {
+            const mapElement = document.getElementById('locationMap');
+            if (!mapElement) return;
+
+            // إذا كانت الخريطة موجودة مسبقاً، قم بإزالتها
+            if (map) {
+                map.remove();
+                map = null;
+            }
+
+            // جلب البيانات من attributes
+            const lat = parseFloat(mapElement.dataset.lat);
+            const lng = parseFloat(mapElement.dataset.lng);
+            const name = mapElement.dataset.name;
+            const address = mapElement.dataset.address;
+
+            if (isNaN(lat) || isNaN(lng)) {
+                console.error('إحداثيات غير صالحة:', lat, lng);
+                return;
+            }
+
+            // التأكد من أن الخريطة تأخذ الحجم الكامل
+            mapElement.style.height = '400px';
+            mapElement.style.width = '100%';
+
+            // إنشاء الخريطة
+            map = L.map('locationMap', {
+                center: [lat, lng],
+                zoom: 15,
+                fadeAnimation: true,
+                zoomAnimation: true
+            });
+
+            // إضافة طبقة الخريطة
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // إضافة علامة
+            L.marker([lat, lng], {
+                title: name,
+                riseOnHover: true
+            }).addTo(map)
+                .bindPopup(`
+                    <div style="text-align: center; padding: 5px;">
+                        <strong style="font-size: 16px;">${name}</strong><br>
+                        <span style="color: #666;">${address}</span>
+                    </div>
+                `)
+                .openPopup();
+
+            // فرض إعادة حساب حجم الخريطة
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize(true);
+                    // تأكد من أن الخريطة تتمركز على الموقع
+                    map.setView([lat, lng], 15);
+                }
+            }, 200);
+
+            // تأخير آخر للتأكد من اكتمال كل شيء
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize(true);
+                }
+            }, 500);
+        }
+
+        // مراقبة تغيير حجم المودال
+        const observer = new ResizeObserver(() => {
+            if (map) {
+                map.invalidateSize(true);
+            }
+        });
+
+        // بدء المراقبة عند وجود المودال
+        Livewire.on('location-modal-opened', () => {
+            const modalContent = document.querySelector('.modal-content');
+            if (modalContent) {
+                observer.observe(modalContent);
+            }
+        });
+
+        // إيقاف المراقبة عند إغلاق المودال
+        Livewire.on('modal-closed', () => {
+            observer.disconnect();
         });
     });
 </script>

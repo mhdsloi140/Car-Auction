@@ -30,7 +30,7 @@ class CreateAuctionWizard extends Component
     public $specs = null;
 
     public $photos = [];
-    public $report_pdf = null;
+    public $report_images = []; // مصفوفة الصور
 
     public $brands;
     public $models;
@@ -75,7 +75,7 @@ class CreateAuctionWizard extends Component
         $this->resetErrorBag();
         $this->step = 1;
         $this->showModal = true;
-        $this->report_pdf = null;
+        $this->report_images = [];
         $this->photos = [];
     }
 
@@ -84,7 +84,7 @@ class CreateAuctionWizard extends Component
         $this->showModal = false;
         $this->step = 1;
         $this->resetErrorBag();
-        $this->report_pdf = null;
+        $this->report_images = [];
         $this->photos = [];
     }
 
@@ -97,6 +97,33 @@ class CreateAuctionWizard extends Component
     public function previousStep()
     {
         $this->step--;
+    }
+
+    /**
+     * دالة حذف صورة من مصفوفة report_images
+     */
+    public function removeImage($index)
+    {
+        if (isset($this->report_images[$index])) {
+            // حذف الصورة من المصفوفة
+            unset($this->report_images[$index]);
+            // إعادة ترتيب المصفوفة
+            $this->report_images = array_values($this->report_images);
+
+            // رسالة اختيارية
+            // session()->flash('success', 'تم حذف الصورة بنجاح');
+        }
+    }
+
+    /**
+     * دالة حذف صورة من مصفوفة photos (إذا احتجتها)
+     */
+    public function removePhoto($index)
+    {
+        if (isset($this->photos[$index])) {
+            unset($this->photos[$index]);
+            $this->photos = array_values($this->photos);
+        }
     }
 
     protected function validateStep()
@@ -122,14 +149,19 @@ class CreateAuctionWizard extends Component
 
         if ($this->step === 3) {
             $this->validate([
-                'report_pdf' => 'required|file|mimes:pdf,jpg,jpeg,png,webp|max:10240',
+                'report_images' => 'required|array|min:1|max:5',
+                'report_images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            ], [
+                'report_images.required' => 'الرجاء رفع صورة واحدة على الأقل',
+                'report_images.min' => 'الرجاء رفع صورة واحدة على الأقل',
+                'report_images.max' => 'يمكنك رفع 5 صور كحد أقصى',
+                'report_images.*.image' => 'الملف يجب أن يكون صورة',
+                'report_images.*.mimes' => 'الصورة يجب أن تكون من نوع: jpg, jpeg, png, webp',
+                'report_images.*.max' => 'حجم الصورة لا يجب أن يتجاوز 2 ميجابايت',
             ]);
         }
     }
 
-    /**
-     * الحصول على تسمية المواصفات
-     */
     private function getSpecsLabel($specs)
     {
         return match ($specs) {
@@ -140,9 +172,6 @@ class CreateAuctionWizard extends Component
         };
     }
 
-    /**
-     * تنسيق رقم الهاتف العراقي
-     */
     private function formatIraqiPhoneNumber($phone)
     {
         if (empty($phone)) {
@@ -150,37 +179,28 @@ class CreateAuctionWizard extends Component
             return null;
         }
 
-        // إزالة أي أحرف غير رقمية
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
         if (empty($phone)) {
             return null;
         }
 
-        // إزالة الصفر الأول إذا وجد
         $phone = ltrim($phone, '0');
 
-        // إزالة 964 إذا كانت موجودة في البداية
         if (str_starts_with($phone, '964')) {
             $phone = substr($phone, 3);
         }
 
-        // التأكد أن الرقم يبدأ بـ 7 (لأرقام الهواتف العراقية)
         if (!str_starts_with($phone, '7')) {
             return null;
         }
 
-        // إضافة رمز العراق 964
         return '964' . $phone;
     }
 
-    /**
-     * إرسال إشعار للمشرفين
-     */
     private function notifyAdmins($auction, UltraMsgService $ultra)
     {
         try {
-            // جلب جميع المستخدمين الذين لديهم role admin
             $admins = User::role('admin')
                 ->whereNotNull('phone')
                 ->get();
@@ -193,18 +213,15 @@ class CreateAuctionWizard extends Component
             $car = $auction->car;
             $sellerName = auth()->user()->name;
             $sellerPhone = auth()->user()->phone;
-
-            // رابط المزاد
             $auctionUrl = route('auction.admin.show', $auction->id);
 
-            // تنسيق الرسالة
             $message = " *مزاد جديد بانتظار الموافقة*\n\n";
             $message .= " *معلومات البائع:*\n";
             $message .= "الاسم: {$sellerName}\n";
             $message .= "رقم الجوال: {$sellerPhone}\n\n";
             $message .= " *للمراجعة:*\n";
             $message .= "اضغط على الرابط:\n{$auctionUrl}\n\n";
-            // إرسال الرسالة لكل مشرف
+
             foreach ($admins as $admin) {
                 try {
                     $formattedPhone = $this->formatIraqiPhoneNumber($admin->phone);
@@ -246,10 +263,7 @@ class CreateAuctionWizard extends Component
         DB::beginTransaction();
 
         try {
-            $reportPath = $this->report_pdf
-                ? $this->report_pdf->storePublicly('cars_reports', 'public')
-                : null;
-
+            // إنشاء السيارة
             $car = Car::create([
                 'brand_id' => $this->brand_id,
                 'model_id' => $this->model_id,
@@ -259,12 +273,22 @@ class CreateAuctionWizard extends Component
                 'plate_number' => $this->plate_number,
                 'description' => $this->description,
                 'specs' => $this->specs,
-                'report_pdf' => $reportPath,
             ]);
 
+            // حفظ صور التقرير (report_images) باستخدام Spatie MediaLibrary
+            if (!empty($this->report_images)) {
+                foreach ($this->report_images as $image) {
+                    $car->addMedia($image)
+                        ->toMediaCollection('car_reports'); // collection خاصة بتقارير السيارة
+                }
+            }
+
+            // حفظ مسارات الصور المؤقتة للـ Job
             $photoPaths = [];
-            foreach ($this->photos as $photo) {
-                $photoPaths[] = $photo->store('tmp_photos');
+            if (!empty($this->photos)) {
+                foreach ($this->photos as $photo) {
+                    $photoPaths[] = $photo->store('tmp_photos', 'public');
+                }
             }
 
             $auction = $car->auction()->create([
@@ -274,11 +298,12 @@ class CreateAuctionWizard extends Component
 
             DB::commit();
 
+            // معالجة الصور في الخلفية
             if (!empty($photoPaths)) {
                 ProcessCarImagesJob::dispatch($car, $photoPaths);
             }
 
-            // ✅ إرسال إشعار للمشرفين
+            // إرسال إشعار للمشرفين
             $this->notifyAdmins($auction, $ultra);
 
             session()->flash('success', 'تم إرسال السيارة للمراجعة بنجاح');

@@ -149,7 +149,7 @@
     @endif
 
     {{-- تفاصيل المزاد بعد القبول --}}
-    @if($accepted || $auction->status === 'completed')
+  @if($accepted || $auction->status === 'completed')
     <div class="row justify-content-center mt-5">
         <div class="col-md-10">
             <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
@@ -211,6 +211,47 @@
                         </div>
                     </div>
 
+                    {{-- موقع الفائز على الخريطة --}}
+                    @if($auction->winner && $auction->winner->latitude && $auction->winner->longitude)
+                    <div class="mb-4">
+                        <div class="bg-light p-4 rounded-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width: 50px; height: 50px;">
+                                    <i class="bi bi-geo-alt-fill fs-3"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">موقع الفائز</small>
+                                    <h5 class="fw-bold mb-1">{{ $auction->winner->address ?? 'لا يوجد عنوان' }}</h5>
+                                    <small class="text-muted">
+                                        <i class="bi bi-geo ms-1"></i>
+                                        خط العرض: {{ $auction->winner->latitude }} | خط الطول: {{ $auction->winner->longitude }}
+                                    </small>
+                                </div>
+                            </div>
+
+                            {{-- خريطة مصغرة --}}
+                            <div id="winnerMap-{{ $auction->id }}"
+                                 style="width:100%; height:300px; border-radius:12px; border:1px solid #ddd;"
+                                 data-lat="{{ $auction->winner->latitude }}"
+                                 data-lng="{{ $auction->winner->longitude }}"
+                                 data-name="{{ $auction->winner->name }}"
+                                 data-address="{{ $auction->winner->address ?? 'موقع الفائز' }}">
+                            </div>
+
+                            {{-- رابط خرائط Google --}}
+                            <div class="text-center mt-3">
+                                <a href="https://www.google.com/maps?q={{ $auction->winner->latitude }},{{ $auction->winner->longitude }}"
+                                   target="_blank"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>
+                                    فتح في خرائط Google
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- معلومات إضافية --}}
                     <div class="row g-3">
                         <div class="col-md-3 col-6">
@@ -233,7 +274,45 @@
             </div>
         </div>
     </div>
-    @endif
+
+    {{-- سكريبت تهيئة الخريطة --}}
+    @push('scripts')
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapElement = document.getElementById('winnerMap-{{ $auction->id }}');
+            if (mapElement && mapElement.dataset.lat && mapElement.dataset.lng) {
+                const lat = parseFloat(mapElement.dataset.lat);
+                const lng = parseFloat(mapElement.dataset.lng);
+                const name = mapElement.dataset.name;
+                const address = mapElement.dataset.address;
+
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    var map = L.map(mapElement).setView([lat, lng], 15);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup(`<b>${name}</b><br>${address}`)
+                        .openPopup();
+                }
+            }
+        });
+    </script>
+    @endpush
+
+    {{-- إضافة CSS للخريطة --}}
+    @push('styles')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .leaflet-container {
+            border-radius: 12px;
+        }
+    </style>
+    @endpush
+@endif
 
 </div>
 @endsection

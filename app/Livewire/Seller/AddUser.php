@@ -7,15 +7,21 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Services\UltraMsgService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class AddUser extends Component
 {
     public $name;
     public $phone;
+    public $latitude;
+    public $longitude;
+    public $address;
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'phone' => 'required|numeric|unique:users,phone',
+        'latitude' => 'required|numeric|between:-90,90',
+        'longitude' => 'required|numeric|between:-180,180',
     ];
 
     protected $messages = [
@@ -24,6 +30,10 @@ class AddUser extends Component
         'phone.required' => 'الرجاء إدخال رقم الجوال',
         'phone.numeric' => 'رقم الجوال يجب أن يكون أرقام فقط',
         'phone.unique' => 'رقم الجوال مستخدم من قبل',
+        'latitude.required' => 'الرجاء تحديد الموقع على الخريطة',
+        'longitude.required' => 'الرجاء تحديد الموقع على الخريطة',
+        'latitude.numeric' => 'خط العرض غير صحيح',
+        'longitude.numeric' => 'خط الطول غير صحيح',
     ];
 
     /**
@@ -72,6 +82,8 @@ class AddUser extends Component
         $this->validate();
 
         try {
+            DB::beginTransaction();
+
             // توليد كلمة المرور
             $password = $this->generatePassword(12);
 
@@ -80,11 +92,16 @@ class AddUser extends Component
                 'name' => $this->name,
                 'phone' => $this->phone,
                 'password' => Hash::make($password),
-                'status' => 'active', // تفعيل المستخدم مباشرة
+                'status' => 'active',
+                'latitude' => $this->latitude,
+                'longitude' => $this->longitude,
+                'address' => $this->address ?? null,
             ]);
 
             // تعيين الصلاحية
             $user->assignRole('user');
+
+            DB::commit();
 
             // تنسيق رقم الهاتف وإرسال الرسالة
             $formattedPhone = $this->formatPhoneNumber($this->phone);
@@ -97,6 +114,11 @@ class AddUser extends Component
                 $message .= "👤 الاسم: {$this->name}\n";
                 $message .= "📱 رقم الهاتف: {$this->phone}\n";
                 $message .= "🔑 كلمة المرور: `{$password}`\n\n";
+
+                if ($this->address) {
+                    $message .= "📍 الموقع: {$this->address}\n\n";
+                }
+
                 $message .= "🔐 ننصحك بتغيير كلمة المرور بعد أول تسجيل دخول\n\n";
                 $message .= "شكراً لانضمامك إلينا 🙏";
 
@@ -117,11 +139,24 @@ class AddUser extends Component
             session()->flash('success', '✅ تم إضافة المستخدم بنجاح وتم إرسال كلمة المرور إلى جواله');
 
             // إعادة تعيين الحقول
-            $this->reset(['name', 'phone']);
+            $this->reset(['name', 'phone', 'latitude', 'longitude', 'address']);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('خطأ في إضافة المستخدم: ' . $e->getMessage());
             session()->flash('error', '❌ حدث خطأ أثناء إضافة المستخدم');
+        }
+    }
+
+    /**
+     * تحديث العنوان عند اختيار موقع على الخريطة
+     */
+    public function updatedLocation($lat, $lng, $address = null)
+    {
+        $this->latitude = $lat;
+        $this->longitude = $lng;
+        if ($address) {
+            $this->address = $address;
         }
     }
 

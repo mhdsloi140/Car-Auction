@@ -165,23 +165,126 @@
       <!-- STEP 3: رفع كشف السيارة -->
 @if($step === 3)
 <div class="row g-4 justify-content-center">
-    <div class="col-md-8 text-center">
-        <label class="fw-bold mb-2">ملف الكشف <span class="text-danger">*</span></label>
-        <input type="file" class="form-control @error('report_pdf') is-invalid @enderror"
-               wire:model="report_pdf"
-               accept=".pdf,.jpg,.jpeg,.png,.webp">
+    <div class="col-md-8">
+        <label class="fw-bold mb-3">
+            <i class="bi bi-image me-1"></i>
+            صور فحص السونار <span class="text-danger">*</span>
+        </label>
 
-        @if($report_pdf)
-            <div class="mt-2 text-success">
-                تم رفع الملف: {{ $report_pdf->getClientOriginalName() }}
+        {{-- حقل رفع الصور --}}
+        <div class="border-2 border-dashed rounded-4 p-4 text-center bg-light"
+             style="border: 2px dashed #ccc; cursor: pointer; transition: all 0.3s ease;"
+             onclick="document.getElementById('report_images').click()"
+             onmouseover="this.style.borderColor='#0d6efd'; this.style.backgroundColor='#f8f9ff';"
+             onmouseout="this.style.borderColor='#ccc'; this.style.backgroundColor='#f8f9fa';">
+
+            <i class="bi bi-cloud-upload fs-1 text-primary mb-3"></i>
+            <h6 class="fw-bold">اضغط لرفع الصور</h6>
+            <p class="text-muted small mb-2">يمكنك رفع حتى 5 صور</p>
+            <p class="text-muted small">
+                <i class="bi bi-file-earmark-image me-1"></i>
+                jpg, jpeg, png, webp - 2MB كحد أقصى لكل صورة
+            </p>
+
+            <input type="file"
+                   id="report_images"
+                   class="d-none"
+                   wire:model.live="report_images"
+                   multiple
+                   accept=".jpg,.jpeg,.png,.webp">
+        </div>
+
+        @error('report_images')
+            <div class="alert alert-danger py-2 mt-2">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                {{ $message }}
+            </div>
+        @enderror
+
+        {{-- معاينة الصور المرفوعة --}}
+        @if($report_images && count($report_images) > 0)
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-images me-1"></i>
+                        الصور المرفوعة ({{ count($report_images) }}/5)
+                    </h6>
+                    <span class="badge bg-info">
+                        {{ count($report_images) }} من 5
+                    </span>
+                </div>
+
+                <div class="row g-3">
+                    @foreach($report_images as $index => $image)
+                        <div class="col-md-4 col-6">
+                            <div class="position-relative border rounded-3 p-2 hover-shadow">
+                                <img src="{{ $image->temporaryUrl() }}"
+                                     class="img-fluid rounded-3"
+                                     style="height: 120px; width: 100%; object-fit: cover;"
+                                     alt="صورة {{ $index + 1 }}">
+
+                                {{-- اسم الملف --}}
+                                <div class="small text-truncate mt-2" dir="ltr" title="{{ $image->getClientOriginalName() }}">
+                                    <i class="bi bi-file-earmark-image me-1 text-primary"></i>
+                                    {{ $image->getClientOriginalName() }}
+                                </div>
+
+                                {{-- حجم الملف --}}
+                                <div class="small text-muted">
+                                    <i class="bi bi-hdd me-1"></i>
+                                    {{ round($image->getSize() / 1024, 1) }} KB
+                                </div>
+
+                                {{-- زر الحذف --}}
+                                <button type="button"
+                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle"
+                                        style="width: 30px; height: 30px; padding: 0;"
+                                        wire:click="removeImage({{ $index }})"
+                                        onclick="event.stopPropagation()"
+                                        title="حذف الصورة">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @else
+            <div class="text-center text-muted mt-3">
+                <i class="bi bi-inbox fs-2"></i>
+                <p>لم يتم رفع أي صور بعد</p>
             </div>
         @endif
 
-        @error('report_pdf')
-            <small class="text-danger">{{ $message }}</small>
+        {{-- أخطاء كل صورة --}}
+        @error('report_images.*')
+            <div class="alert alert-warning py-2 mt-2">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                {{ $message }}
+            </div>
         @enderror
     </div>
 </div>
+
+{{-- CSS إضافي --}}
+@push('styles')
+<style>
+    .border-dashed {
+        transition: all 0.3s ease;
+    }
+    .border-dashed:hover {
+        border-color: #0d6efd !important;
+        background-color: #f0f7ff !important;
+    }
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+@endpush
 @endif
 
 <!-- زر الحفظ -->

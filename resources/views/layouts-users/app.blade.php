@@ -11,9 +11,16 @@
     <!-- Preload fonts and critical assets -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
         as="style">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+        as="style">
 
+
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> --}}
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* متغيرات الألوان*/
         :root {
@@ -1245,6 +1252,7 @@
             }
         }
     </style>
+    @stack('styles')
 
     <!-- تحميل غير متزامن لـ Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -1256,7 +1264,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="manifest" href="/manifest.json">
+    {{-- <link rel="manifest" href="{{ asset('manifest.json') }}"> --}}
+
     @livewireStyles
 </head>
 
@@ -1311,39 +1320,7 @@
     <!-- المحتوى الرئيسي -->
 @yield('content')
 
-    <!-- مودال تسجيل الدخول -->
-    {{-- <div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="modal-content">
-            <button class="modal-close" id="closeModalBtn" aria-label="إغلاق">&times;</button>
-            <div class="modal-icon">
-                <i class="fas fa-car"></i>
-            </div>
-            <h3 id="modalTitle">تسجيل الدخول إلى سيّر</h3>
-            <p>أدخل رقم هاتفك</p>
 
-            <form id="loginForm" action="#" method="post">
-                <div class="phone-field">
-                    <label for="phone" class="phone-label">رقم الهاتف</label>
-                    <div class="phone-input-group">
-                        <span class="country-code" id="countryCode">+964</span>
-                        <input type="tel" class="phone-input" id="phone" name="phone" placeholder="xxx xxxx xxx"
-                            aria-labelledby="countryCode phone" required>
-                    </div>
-                    <div class="error-message" id="phoneError" role="alert"></div>
-                </div>
-
-                <button type="submit" class="send-code-btn" id="submitBtn">
-                    <span class="spinner"></span>
-                    <span class="btn-text"> تسجيل الدخول </span>
-                </button>
-            </form>
-
-
-            <div class="modal-terms">
-                بالتسجيل أنت توافق على <a href="#">الشروط والأحكام</a>
-            </div>
-        </div>
-    </div> --}}
   @livewire('user.login')
 @livewireScripts
 
@@ -1576,6 +1553,7 @@
         }
     }
 </script>
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script> --}}
 </body>
 
 </html>

@@ -1,328 +1,624 @@
-@extends('layouts.app')
+@extends('layouts-users.app')
+
+@section('title', 'تفاصيل المزاد')
 
 @section('content')
-<div class="container py-4 page-rtl" dir="rtl">
-
-    {{-- أزرار الإدارة --}}
-    @if(auth()->user()->hasRole('admin') && $auction->status === 'pending')
-    <div class="d-flex justify-content-center gap-3 mb-4">
-        {{-- زر القبول --}}
-        <form action="{{ route('auctions.approve', $auction->id) }}" method="POST">
-            @csrf
-            @method('PATCH')
-            <button type="submit" class="btn btn-success px-4 d-flex align-items-center gap-2">
-                <i class="bi bi-check-circle-fill"></i>
-                قبول المزاد
-            </button>
-        </form>
-
-        {{-- زر الرفض (Livewire) --}}
-        <livewire:admin.reject-auction :auction="$auction" wire:key="reject-{{ $auction->id }}" />
-    </div>
-    @endif
-
-    {{-- ملف كشف السيارة --}}
-    @if($auction->car->report_pdf)
-    <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
-        <div class="card-header bg-gradient-success text-white py-3" style="background: linear-gradient(45deg, #198754, #157347);">
-            <h5 class="fw-bold mb-0">
-                <i class="bi bi-file-pdf-fill me-2"></i>
-                كشف السيارة
-            </h5>
+<div class="auction-detail-modern">
+    <div class="container py-5">
+        <!-- زر العودة الى الصفحة الرئيسية -->
+        <div class="mb-4">
+            <a href="{{ route('home') }}" class="btn-back-home">
+                <i class="fas fa-arrow-right me-2"></i>
+                <span>العودة إلى الصفحة الرئيسية</span>
+            </a>
         </div>
-        <div class="card-body p-4 text-center">
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                <a href="{{ Storage::url($auction->car->report_pdf) }}"
-                   target="_blank"
-                   class="btn btn-outline-primary px-4 py-2 rounded-pill">
-                    <i class="bi bi-eye me-2"></i>
-                    عرض الكشف
-                </a>
 
-                <a href="{{ Storage::url($auction->car->report_pdf) }}"
-                   download
-                   class="btn btn-primary px-4 py-2 rounded-pill">
-                    <i class="bi bi-download me-2"></i>
-                    تحميل الكشف
-                </a>
+        <!-- مسار التنقل الحديث -->
+        <nav aria-label="breadcrumb" class="mb-5">
+            <ol class="breadcrumb modern-breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/" class="breadcrumb-link">
+                        <i class="fas fa-home"></i>
+                        <span class="ms-2 d-none d-sm-inline">الرئيسية</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#" class="breadcrumb-link">
+                        <i class="fas fa-gavel"></i>
+                        <span class="ms-2 d-none d-sm-inline">المزادات</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="ms-2">تفاصيل المزاد</span>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="row g-5 align-items-stretch">
+            <!-- عمود الصور -->
+            <div class="col-lg-6">
+                @php $images = $auction->car->getMedia('cars'); @endphp
+
+                @if($images->count() > 0)
+                <!-- السلايدر الرئيسي -->
+                <div id="carImagesSlider" class="carousel slide rounded-5 mb-4 shadow-modern" data-bs-ride="carousel">
+                    <div class="carousel-inner rounded-5 overflow-hidden">
+                        @foreach($images as $index => $image)
+                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                            <img src="{{ $image->getUrl() }}" class="d-block w-100" alt="سيارة"
+                                style="height: 480px; object-fit: cover;">
+                        </div>
+                        @endforeach
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carImagesSlider"
+                        data-bs-slide="prev">
+
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#carImagesSlider"
+                        data-bs-slide="next">
+
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+
+                </div>
+
+                <!-- المصغرات -->
+                <div class="d-flex gap-3 flex-wrap justify-content-center">
+                    @foreach($images as $index => $image)
+                    <img src="{{ $image->getUrl() }}"
+                        onclick="bootstrap.Carousel.getInstance(document.getElementById('carImagesSlider')).to({{ $index }})"
+                        class="thumbnail-modern" style="width: 110px; height: 85px; object-fit: cover;">
+                    @endforeach
+                </div>
+                @else
+                <div class="placeholder-image rounded-5 shadow-modern">
+                    <img src="{{ asset('users/img/no-image.png') }}" class="img-fluid w-100 h-100"
+                        style="object-fit: cover;" alt="لا توجد صور">
+                </div>
+                @endif
             </div>
 
-            <small class="text-muted d-block mt-3">
-                <i class="bi bi-info-circle me-1"></i>
-                {{-- الملف: {{ basename($auction->car->report_pdf) }} --}}
-            </small>
-        </div>
-    </div>
-    @endif
-
-    {{-- بطاقة تفاصيل المزاد --}}
-    <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
-        <div class="card-header bg-gradient-primary text-white py-3" style="background: linear-gradient(45deg, #0d6efd, #0b5ed7);">
-            <h5 class="fw-bold mb-0">
-                <i class="bi bi-info-circle-fill me-2"></i>
-                تفاصيل المزاد
-            </h5>
-        </div>
-        <div class="card-body p-4">
-            {{-- عنوان السيارة --}}
-            <div class="d-flex justify-content-between align-items-start mb-4">
-                <div>
-                    <h3 class="fw-bold mb-2">
-                        {{ $auction->car->brand?->name }} {{ $auction->car->model?->name }}
-                        <span class="text-muted fs-5">({{ $auction->car->year }})</span>
-                    </h3>
-
-                    @php
-                    $statusColors = [
-                        'pending' => 'bg-warning text-dark',
-                        'active' => 'bg-success',
-                        'closed' => 'bg-secondary',
-                        'rejected' => 'bg-danger',
-                        'completed' => 'bg-info',
-                    ];
-
-                    $statusLabels = [
-                        'pending' => 'معلق',
-                        'active' => 'نشط',
-                        'closed' => 'مغلق',
-                        'rejected' => 'مرفوض',
-                        'completed' => 'مكتمل',
-                    ];
-
-                    $colorClass = $statusColors[$auction->status] ?? 'bg-primary';
-                    $statusLabel = $statusLabels[$auction->status] ?? $auction->status;
-                    @endphp
-
-                    <span class="badge {{ $colorClass }} px-3 py-2 rounded-pill">
-                        <i class="bi bi-tag me-1"></i>
-                        {{ $statusLabel }}
-                    </span>
-                </div>
-
-                <div class="text-muted">
-                    <small>رقم المزاد: #{{ $auction->id }}</small>
-                </div>
-            </div>
-
-            <hr class="my-4">
-
-            {{-- بيانات المزاد --}}
-            <h5 class="fw-bold mb-3">
-                <i class="bi bi-graph-up-arrow text-primary me-2"></i>
-                بيانات المزاد
-            </h5>
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="bg-light p-3 rounded-3">
-                        <small class="text-muted d-block">البائع</small>
-                        <span class="fw-bold">{{ $auction->seller?->name ?? '-' }}</span>
+            <!-- عمود المعلومات -->
+            <div class="col-lg-6">
+                <div class="info-card-modern p-4 p-xl-5 rounded-5">
+                    <!-- العنوان والشارة -->
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                        <h2 class="fw-bold display-6 mb-0 text-dark-blue">
+                            {{ $auction->car->brand->name }} {{ $auction->car->model->name }}
+                            <span class="year-badge-modern">{{ $auction->car->year }}</span>
+                        </h2>
+                        <span class="status-badge-modern {{ $auction->status === 'active' ? 'live' : 'ended' }}">
+                            <span class="status-dot-modern"></span>
+                            {{ $auction->status === 'active' ? 'مزاد مباشر' : 'مزاد منتهي' }}
+                        </span>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="bg-light p-3 rounded-3">
-                        <small class="text-muted d-block">السعر الابتدائي</small>
-                        <span class="fw-bold text-primary">{{ number_format($auction->starting_price) }} د.ع</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="bg-light p-3 rounded-3">
-                        <small class="text-muted d-block">تاريخ الإنشاء</small>
-                        <span class="fw-bold">{{ $auction->created_at->format('Y-m-d') }}</span>
-                    </div>
-                </div>
-            </div>
 
-            <hr class="my-4">
+                    <div class="d-flex align-items-center gap-3 text-secondary mb-4 id-wrapper-modern">
+                        <i class="fas fa-qrcode fs-4 text-primary-blue"></i>
+                        <span class="fs-5">رقم المزاد: <strong class="text-primary-blue">#{{ $auction->id
+                                }}</strong></span>
+                    </div>
 
-            {{-- معلومات السيارة --}}
-            <h5 class="fw-bold mb-3">
-                <i class="bi bi-car-front-fill text-success me-2"></i>
-                معلومات السيارة
-            </h5>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="d-flex align-items-center p-3 bg-light rounded-3">
-                        <i class="bi bi-geo-alt-fill text-danger fs-4 me-3"></i>
-                        <div>
-                            <small class="text-muted d-block">المدينة</small>
-                            <span class="fw-bold">{{ $auction->car->city ?? '-' }}</span>
+                    <!-- المواصفات -->
+                    <div class="specs-modern p-4 rounded-4 mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="fas fa-file-alt fs-2 text-primary-blue"></i>
+                            <h4 class="fw-bold mb-0 text-dark-blue">المواصفات</h4>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="d-flex align-items-center p-3 bg-light rounded-3">
-                        <i class="bi bi-speedometer2 text-primary fs-4 me-3"></i>
-                        <div>
-                            <small class="text-muted d-block">عدد الكيلومترات</small>
-                            <span class="fw-bold">{{ number_format($auction->car->mileage ?? 0) }} كم</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="d-flex align-items-center p-3 bg-light rounded-3">
-                        <i class="bi bi-gear text-warning fs-4 me-3"></i>
-                        <div>
-                            <small class="text-muted d-block">المواصفات</small>
-                            <span class="fw-bold">
-                                @if($auction->car->specs)
-                                    @if($auction->car->specs == 'gcc')
-                                        <span class="badge bg-success">خليجية</span>
-                                    @elseif($auction->car->specs == 'non_gcc')
-                                        <span class="badge bg-warning text-dark">غير خليجية</span>
-                                    @else
-                                        <span class="badge bg-secondary">لا أعلم</span>
-                                    @endif
-                                @else
-                                    -
-                                @endif
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="p-3 bg-light rounded-3">
-                        <div class="d-flex">
-                            <i class="bi bi-file-text text-secondary fs-4 me-3"></i>
-                            <div>
-                                <small class="text-muted d-block">الوصف</small>
-                                <p class="mb-0">{{ $auction->car->description ?? 'لا يوجد وصف' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- صور السيارة --}}
-    @if($auction->car->getMedia('cars')->count() > 0)
-    <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
-        <div class="card-header bg-gradient-info text-white py-3" style="background: linear-gradient(45deg, #0dcaf0, #0aa2c0);">
-            <h5 class="fw-bold mb-0">
-                <i class="bi bi-images me-2"></i>
-                صور السيارة ({{ $auction->car->getMedia('cars')->count() }})
-            </h5>
-        </div>
-        <div class="card-body p-4">
-            <div class="row g-4">
-                @foreach($auction->car->getMedia('cars') as $index => $photo)
-                <div class="col-6 col-md-4 col-lg-3">
-                    <div class="image-box rounded-3 shadow-sm overflow-hidden"
-                         style="height:180px; cursor:pointer;"
-                         data-bs-toggle="modal"
-                         data-bs-target="#imagesModal"
-                         onclick="openSlide({{ $index }})">
-                        <img src="{{ $photo->getUrl() }}"
-                             class="w-100 h-100"
-                             style="object-fit:cover; transition: transform 0.3s;"
-                             onmouseover="this.style.transform='scale(1.05)'"
-                             onmouseout="this.style.transform='scale(1)'"
-                             alt="Car image">
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-    @endif
-
-    {{-- زر حذف المزاد --}}
-    @if(auth()->user()->hasRole('admin'))
-    <div class="text-center mb-5">
-        <form action="{{ route('auction.admin.destroy', $auction->id) }}" method="POST"
-              onsubmit="return confirm('هل أنت متأكد من حذف هذا المزاد؟');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger px-5 py-2 rounded-pill d-inline-flex align-items-center gap-2">
-                <i class="bi bi-trash-fill"></i>
-                حذف المزاد
-            </button>
-        </form>
-    </div>
-    @endif
-
-    {{-- مودال عرض الصور --}}
-    <div class="modal fade" id="imagesModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content bg-dark">
-                <div class="modal-body p-0 position-relative">
-                    <button type="button"
-                            class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-
-                    <div id="modalCarousel" class="carousel slide" data-bs-ride="false">
-                        <div class="carousel-inner">
-                            @foreach($auction->car->getMedia('cars') as $index => $photo)
-                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ $photo->getUrl() }}"
-                                     class="d-block w-100"
-                                     style="max-height:80vh; object-fit:contain;">
-                            </div>
-                            @endforeach
-                        </div>
-
-                        @if($auction->car->getMedia('cars')->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#modalCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">السابق</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#modalCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">التالي</span>
-                        </button>
+                        @if($auction->car->specs)
+                        <p class="mb-3 text-gray-700">{{ $auction->car->specs_label }}</p>
                         @endif
+                        @if($auction->car->description)
+                        <p class="text-gray-600 mb-0">{{ $auction->car->description }}</p>
+                        @endif
+                        @if(!$auction->car->specs && !$auction->car->description)
+                        <p class="text-gray-500 mb-0">لا توجد مواصفات مضافة</p>
+                        @endif
+
+                    </div>
+         @if($auction->car->report_pdf)
+    <div class="mt-4">
+
+        {{-- زر العرض --}}
+        <a href="{{ asset('storage/' . $auction->car->report_pdf) }}"
+           class="btn-bid-modern w-100 mb-2"
+           target="_blank">
+            <i class="fas fa-eye me-2"></i>
+            <span>عرض كشف السيارة</span>
+            <i class="fas fa-external-link-alt ms-2"></i>
+        </a>
+
+        {{-- زر التحميل (كما هو) --}}
+        <a href="{{ asset('storage/' . $auction->car->report_pdf) }}"
+           class="btn-bid-modern w-100"
+           download>
+            <i class="fas fa-file-pdf me-2"></i>
+            <span>تحميل كشف السيارة</span>
+            <i class="fas fa-download ms-2"></i>
+        </a>
+
+    </div>
+@endif
+
+
+                    <!-- كروت إحصائية -->
+                    <div class="row g-4 mb-4" style="margin-top: 20px">
+                        <div class="col-6">
+                            <div class="stat-modern p-4 rounded-4 text-center">
+                                <i class="fas fa-money-bill-wave fs-1 mb-2 text-success"></i>
+                                <span class="d-block text-secondary small">السعر الحالي</span>
+                                <span class="fw-bold display-6 text-primary-blue">{{
+                                    number_format($auction->starting_price, 0) }}</span>
+                                <span class="small text-secondary">د.ع</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-modern p-4 rounded-4 text-center">
+                                <i class="fas fa-users fs-1 mb-2 text-primary-blue"></i>
+                                <span class="d-block text-secondary small">عدد المزايدات</span>
+                                <span class="fw-bold display-6 text-primary-blue">{{ $auction->bidders_count ?? 0
+                                    }}</span>
+                                <span class="small text-secondary">مزايدة</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- زر المشاركة / التنبيهات -->
+                    @auth
+                    @if($auction->status === 'active')
+                    <a href="{{ route('auction.bid', $auction->id) }}" class="btn-bid-modern w-100">
+                        <i class="fas fa-hand-pointer me-2"></i>
+                        <span>دخول المزاد والمزايدة</span>
+                        <i class="fas fa-arrow-left ms-2"></i>
+                    </a>
+                    @else
+                    <div class="alert-modern warning d-flex align-items-center gap-3">
+                        <i class="fas fa-exclamation-triangle fs-4"></i>
+                        <span>هذا المزاد غير متاح حالياً</span>
+                    </div>
+                    @endif
+                    @else
+                    <div class="alert-modern info d-flex align-items-center gap-3">
+                        <i class="fas fa-info-circle fs-4"></i>
+                        <span>يرجى <a href="#" id="openLoginBtn"
+                                class="fw-bold text-decoration-underline text-primary-blue">تسجيل الدخول</a>
+                            للمزايدة</span>
+                    </div>
+                    @endauth
+
+                    <!-- ميزات إضافية -->
+                    <div class="features-strip-modern mt-5">
+                        <div class="feature-item-modern">
+                            <i class="fas fa-shield-alt text-primary-blue"></i>
+                            <span>مزايدة آمنة</span>
+                        </div>
+                        <div class="feature-item-modern">
+                            <i class="fas fa-clock text-primary-blue"></i>
+                            <span>تحديث فوري</span>
+                        </div>
+                        <div class="feature-item-modern">
+                            <i class="fab fa-whatsapp text-primary-blue"></i>
+                            <span>إشعار واتساب</span>
+                        </div>
+                        <div class="feature-item-modern">
+                            <i class="fas fa-star text-primary-blue"></i>
+                            <span>ضمان الجودة</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
-{{-- CSS إضافي --}}
-@push('styles')
 <style>
-    .bg-gradient-primary { background: linear-gradient(45deg, #0d6efd, #0b5ed7); }
-    .bg-gradient-success { background: linear-gradient(45deg, #198754, #157347); }
-    .bg-gradient-info { background: linear-gradient(45deg, #0dcaf0, #0aa2c0); }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cairo:wght@300;400;500;600;700&display=swap');
 
-    .modal-backdrop.show {
-        z-index: 1040 !important;
+    .auction-detail-modern {
+        font-family: 'Inter', 'Cairo', sans-serif;
+        background: linear-gradient(135deg, #f5f9ff 0%, #e8f0fe 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
     }
-    .modal.show {
-        z-index: 1050 !important;
-    }
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 10%;
-    }
-</style>
-@endpush
 
-{{-- JavaScript --}}
-@push('scripts')
-<script>
-    // فتح الصورة المحددة في Carousel
-    window.openSlide = function(index) {
-        const carouselEl = document.getElementById('modalCarousel');
-        if (carouselEl) {
-            const carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl);
-            carousel.to(index);
+    /* زر العودة إلى الرئيسية */
+    .btn-back-home {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.8rem 2rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 76, 128, 0.2);
+        border-radius: 50px;
+        color: #004c80;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-back-home:hover {
+        background: white;
+        border-color: #004c80;
+        transform: translateX(-5px);
+        box-shadow: 0 8px 25px rgba(0, 76, 128, 0.2);
+        color: #002b44;
+    }
+
+    .btn-back-home i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-back-home:hover i {
+        transform: translateX(-3px);
+    }
+
+    /* شريط التنقل الحديث */
+    .modern-breadcrumb {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(8px);
+        border-radius: 60px;
+        padding: 0.7rem 2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        border: 1px solid rgba(0, 76, 128, 0.15);
+        box-shadow: 0 8px 20px -6px rgba(0, 20, 40, 0.1);
+    }
+
+    .modern-breadcrumb .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        color: #1e293b;
+        font-size: 1rem;
+    }
+
+    .modern-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
+        content: "›";
+        color: #004c80;
+        font-size: 1.4rem;
+        line-height: 1;
+        opacity: 0.8;
+        margin: 0 0.5rem;
+    }
+
+    .breadcrumb-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #004c80;
+        padding: 0.3rem 1.2rem;
+        border-radius: 40px;
+        transition: all 0.2s;
+        font-weight: 500;
+    }
+
+    .breadcrumb-link:hover {
+        background: rgba(0, 76, 128, 0.1);
+        color: #002b44;
+    }
+
+    .modern-breadcrumb .breadcrumb-item.active {
+        display: flex;
+        align-items: center;
+        color: #002b44;
+        background: rgba(0, 76, 128, 0.1);
+        padding: 0.3rem 1.5rem;
+        border-radius: 40px;
+        font-weight: 700;
+        border: 1px solid rgba(0, 76, 128, 0.3);
+    }
+
+    /* الألوان الأساسية */
+    .text-primary-blue {
+        color: #004c80 !important;
+    }
+
+    .text-dark-blue {
+        color: #0a2540 !important;
+    }
+
+    .text-secondary {
+        color: #64748b !important;
+    }
+
+    .text-gray-700 {
+        color: #334155;
+    }
+
+    .text-gray-600 {
+        color: #475569;
+    }
+
+    .text-gray-500 {
+        color: #64748b;
+    }
+
+    /* الظل الحديث */
+    .shadow-modern {
+        box-shadow: 0 15px 30px -10px rgba(0, 40, 80, 0.15);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .shadow-modern:hover {
+        box-shadow: 0 25px 50px -12px rgba(0, 76, 128, 0.25);
+    }
+
+    /* أزرار التحكم في السلايدر */
+    .control-icon-modern {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        padding: 15px;
+        width: 45px;
+        height: 45px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* المصغرات */
+    .thumbnail-modern {
+        border-radius: 20px;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+        box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.1);
+        background: white;
+    }
+
+    .thumbnail-modern:hover {
+        transform: scale(1.1) rotate(1deg);
+        border-color: #004c80;
+        box-shadow: 0 15px 30px -10px #004c80;
+        cursor: pointer;
+    }
+
+    /* بطاقة المعلومات */
+    .info-card-modern {
+        background: white;
+        border: 1px solid rgba(0, 76, 128, 0.1);
+        box-shadow: 0 20px 40px -12px rgba(0, 40, 80, 0.2);
+        transition: all 0.2s;
+    }
+
+    .info-card-modern:hover {
+        box-shadow: 0 30px 60px -15px rgba(0, 76, 128, 0.3);
+    }
+
+    /* شارة السنة */
+    .year-badge-modern {
+        display: inline-block;
+        background: rgba(0, 76, 128, 0.1);
+        padding: 5px 18px;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #004c80;
+        border: 1px solid rgba(0, 76, 128, 0.2);
+        margin-right: 10px;
+    }
+
+    /* شارة الحالة */
+    .status-badge-modern {
+        padding: 8px 22px;
+        border-radius: 60px;
+        font-weight: 600;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+    }
+
+    .status-badge-modern.live {
+        background: rgba(0, 76, 128, 0.1);
+        border-color: #004c80;
+        color: #004c80;
+    }
+
+    .status-badge-modern.ended {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        color: #475569;
+    }
+
+    .status-dot-modern {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        background: #004c80;
+    }
+
+    .status-badge-modern.ended .status-dot-modern {
+        background: #94a3b8;
+    }
+
+    /* معرف المزاد */
+    .id-wrapper-modern {
+        background: #f8fafd;
+        padding: 10px 20px;
+        border-radius: 60px;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* المواصفات */
+    .specs-modern {
+        background: #f8fafd;
+        border: 1px solid #e2e8f0;
+        border-right: 5px solid #004c80;
+        border-radius: 24px;
+    }
+
+    /* كروت الإحصائيات */
+    .stat-modern {
+        background: white;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+    .stat-modern:hover {
+        transform: translateY(-5px);
+        border-color: #004c80;
+        box-shadow: 0 20px 30px -15px rgba(0, 76, 128, 0.2);
+    }
+
+    /* زر المزايدة */
+    .btn-bid-modern {
+        background: #004c80;
+        border: none;
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+        padding: 1rem 2rem;
+        border-radius: 60px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s;
+        box-shadow: 0 10px 20px -5px #004c80;
+    }
+
+    .btn-bid-modern:hover {
+        background: #002b44;
+        transform: translateY(-3px);
+        box-shadow: 0 20px 30px -8px #004c80;
+        color: white;
+    }
+
+    /* التنبيهات */
+    .alert-modern {
+        padding: 1rem 1.5rem;
+        border-radius: 60px;
+        background: #f8fafd;
+        border: 1px solid #e2e8f0;
+        color: #334155;
+    }
+
+    .alert-modern.warning {
+        background: #fff3cd;
+        border-color: #ffeeba;
+        color: #856404;
+    }
+
+    .alert-modern.info {
+        background: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    .alert-modern a {
+        color: #004c80;
+    }
+
+    /* شريط الميزات */
+    .features-strip-modern {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 2rem;
+    }
+
+    .feature-item-modern {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #475569;
+        font-size: 0.95rem;
+        padding: 0.5rem 1.2rem;
+        border-radius: 40px;
+        background: #f8fafd;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+    .feature-item-modern:hover {
+        background: white;
+        border-color: #004c80;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px -5px rgba(0, 76, 128, 0.2);
+    }
+
+    .feature-item-modern i {
+        font-size: 1.2rem;
+    }
+
+    /* تحسينات الجوال */
+    @media (max-width: 768px) {
+        .info-card-modern {
+            padding: 1.5rem !important;
+        }
+
+        .thumbnail-modern {
+            width: 80px;
+            height: 65px;
+        }
+
+        .btn-bid-modern {
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+        }
+
+        .features-strip-modern {
+            gap: 1rem;
+        }
+
+        .modern-breadcrumb {
+            padding: 0.5rem 1.2rem;
+            gap: 0.3rem;
+        }
+
+        .breadcrumb-link,
+        .modern-breadcrumb .breadcrumb-item.active {
+            padding: 0.2rem 0.8rem;
+        }
+
+        .btn-back-home {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
         }
     }
+</style>
 
-    // تنظيف backdrop عند إغلاق المودال
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('imagesModal');
-        if (modal) {
-            modal.addEventListener('hidden.bs.modal', () => {
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-                document.body.classList.remove('modal-open');
+<!-- سكريبت فتح المودال -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const openLoginBtn = document.getElementById('openLoginBtn');
+        if (openLoginBtn) {
+            openLoginBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const modal = document.getElementById('loginModal');
+                if (modal) modal.classList.add('active');
             });
         }
     });
 </script>
-@endpush
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var myCarousel = document.querySelector('#carImagesSlider');
+    if (myCarousel) {
+        new bootstrap.Carousel(myCarousel, {
+            interval: false,
+            ride: false
+        });
+    }
+});
+</script>
+
+
+<!-- AOS (اختياري) -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
 
 @endsection

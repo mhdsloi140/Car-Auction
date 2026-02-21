@@ -20,16 +20,16 @@ class Car extends Model implements HasMedia
         'plate_number',
         'description',
         'specs',
-         'report_pdf'
+        //  'report_pdf'
     ];
     public function getSpecsLabelAttribute()
-{
-    return [
-        'gcc' => 'خليجية',
-        'non_gcc' => 'غير خليجية',
-        'unknown' => 'لا أعلم',
-    ][$this->specs] ?? null;
-}
+    {
+        return [
+            'gcc' => 'خليجية',
+            'non_gcc' => 'غير خليجية',
+            'unknown' => 'لا أعلم',
+        ][$this->specs] ?? null;
+    }
 
     public function brand()
     {
@@ -45,11 +45,11 @@ class Car extends Model implements HasMedia
     {
         return $this->hasOne(Auction::class);
     }
-public function registerMediaCollections(): void
-{
-    $this
-        ->addMediaCollection('cars'); // بدون singleFile()
-}
+    public function registerMediaCollections(): void
+    {
+        $this ->addMediaCollection('cars'); // بدون singleFile()
+        $this->addMediaCollection('car_reports');
+    }
 
 
 }

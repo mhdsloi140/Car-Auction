@@ -25,18 +25,18 @@ return new class extends Migration {
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
 
-
             $table->year('year');
             $table->string('city');
             $table->integer('mileage');
             $table->string('plate_number')->nullable();
             $table->text('description');
-            $table->string('report_pdf');
+
+            // ❌ تم حذف report_pdf
+
             $table->text('specs');
 
             $table->timestamps();
         });
-
     }
 
     /**

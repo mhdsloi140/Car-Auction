@@ -24,6 +24,9 @@ class User extends Authenticatable
         'password',
         'phone',
         'status',
+          'latitude',    // يجب أن يكون موجوداً
+        'longitude',   // يجب أن يكون موجوداً
+        'address',  
     ];
 
     /**
