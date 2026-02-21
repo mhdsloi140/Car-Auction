@@ -5,7 +5,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>{{ setting('site_name', 'سَيِّر SIR') }}</title>
 
-    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+    {{-- <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+     --}}
+     @php
+    $logo = setting('site_logo');
+@endphp
+
+@if($logo)
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $logo) }}">
+@else
+    <!-- أيقونة سيارة افتراضية -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'>
+        <path fill='%23000000' d='M544 192h-16L475.2 56.6C469.3 42.2 455.5 32 440 32H200c-15.5 0-29.3 10.2-35.2 24.6L112 192H96c-53 0-96 43-96 96v64c0 35.3 28.7 64 64 64h16c0 35.3 28.7 64 64 64s64-28.7 64-64h192c0 35.3 28.7 64 64 64s64-28.7 64-64h16c35.3 0 64-28.7 64-64v-64c0-53-43-96-96-96zM200 96h240l32 96H168l32-96z"/>
+    </svg>">
+@endif
+
 
     <!-- Favicon -->
     <link rel="icon" href="{{ setting('site_logo') ?: asset('assets/img/kaiadmin/favicon.ico') }}"
